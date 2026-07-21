@@ -35,6 +35,13 @@ def launch_setup(context, *args, **kwargs):
     # 全ノードに共有する。+2.0sはノード起動の猶予(起動が間に合わずt<0の
     # メッセージが出ることを避けるための単純なバッファ)。
     sim_start_time_sec = time.time() + 2.0
+    # 診断解析用: 各ノードの壁時計スタンプを軌道相対時刻へ換算する基準を残す
+    # (launch起動時の定数書き出し。ノードのホットパスではないので汚染しない)。
+    try:
+        with open('/tmp/sim_start_time.txt', 'w') as _f:
+            _f.write(f'{sim_start_time_sec:.9f}\n')
+    except OSError:
+        pass
 
     imu_sim = Node(
         package='lio_localization_sim', executable='imu_sim_node',
@@ -67,7 +74,8 @@ def launch_setup(context, *args, **kwargs):
         name='imu_preintegration_node',
         # シミュレーションではTFの購読者がいないため、1kHzのTF配信負荷を止める
         # (②は/odom_fastを直接購読しTFを使わない。実機launchでは有効のままにする)。
-        parameters=[{'publish_tf': False}],
+        # field_configも渡すことで、yamlのdiag_odom_path等(診断)を①に届ける。
+        parameters=[field_config, {'publish_tf': False}],
         output='screen')
     backend_node = Node(
         package='lio_localization', executable='backend_optimizer_node',
