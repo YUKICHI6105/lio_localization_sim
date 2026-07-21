@@ -100,9 +100,34 @@ class EvaluatorNode(Node):
         after = self.gt_samples[idx]
         return before if (t - before.t) <= (after.t - t) else after
 
+    def _interp_gt(self, t: float):
+        """両隣の真値サンプルを線形補間して時刻tの真値を返す。
+
+        最近傍マッチだと、真値配信側のホストジッタで数msの間欠が生じた
+        瞬間に「時刻差×速度」がそのまま見かけの位置誤差として混入する
+        (実測: 位置誤差上位サンプルは全てマッチ時刻差3.6〜6.4msと完全相関、
+        推定器自体の誤差ではない)。補間で計測アーティファクトを排除する。
+        """
+        if not self.gt_times:
+            return None
+        idx = bisect.bisect_left(self.gt_times, t)
+        if idx <= 0:
+            return self.gt_samples[0]
+        if idx >= len(self.gt_times):
+            return self.gt_samples[-1]
+        a = self.gt_samples[idx - 1]
+        b = self.gt_samples[idx]
+        span = b.t - a.t
+        r = (t - a.t) / span if span > 1e-9 else 0.0
+        return Sample(
+            t,
+            a.x + r * (b.x - a.x),
+            a.y + r * (b.y - a.y),
+            a.yaw + r * wrap_angle(b.yaw - a.yaw))
+
     def odom_callback(self, msg: Odometry):
         t = self._stamp_to_t(msg.header.stamp)
-        gt = self._nearest_gt(t)
+        gt = self._interp_gt(t)
         if gt is None:
             return
         ex = msg.pose.pose.position.x - gt.x
@@ -138,7 +163,13 @@ class EvaluatorNode(Node):
         pos_mm = [e[1] * 1000.0 for e in steady]
         yaw_deg = [e[2] for e in steady]
 
-        spin_pos_mm = [e[1] * 1000.0 for e in steady if self._in_any_window(e[0], self.traj.spin_bursts)]
+        # trajectory.state()は内部でSTARTUP_HOLD_SEC(3秒)だけ時間をシフトする
+        # ため、スピンバーストが実際に起きるのは(スケジュール時刻+3秒)。
+        # シフトせずに集計すると、スピン区間統計が「バースト3秒前〜」という
+        # 無関係な区間を測ってしまう(原因調査中に発覚した集計側のバグ)。
+        spin_windows = [
+            (t0 + Trajectory.STARTUP_HOLD_SEC, dur) for (t0, dur) in self.traj.spin_bursts]
+        spin_pos_mm = [e[1] * 1000.0 for e in steady if self._in_any_window(e[0], spin_windows)]
         ball_window = [self.traj.ball_active_window]
         ball_pos_mm = [e[1] * 1000.0 for e in steady if self._in_any_window(e[0], ball_window)]
         non_ball_pos_mm = [e[1] * 1000.0 for e in steady if not self._in_any_window(e[0], ball_window)]
@@ -226,7 +257,9 @@ class EvaluatorNode(Node):
         axes[1].axhline(10.0, color='green', linestyle='--', label='10mm target')
         axes[1].axhline(20.0, color='orange', linestyle='--', label='20mm target')
         for (t0, dur) in self.traj.spin_bursts:
-            axes[1].axvspan(t0, t0 + dur, color='purple', alpha=0.15)
+            axes[1].axvspan(
+                t0 + Trajectory.STARTUP_HOLD_SEC,
+                t0 + Trajectory.STARTUP_HOLD_SEC + dur, color='purple', alpha=0.15)
         t0, t1 = self.traj.ball_active_window
         axes[1].axvspan(t0, t1, color='blue', alpha=0.15)
         axes[1].set_xlabel('time [s]')
