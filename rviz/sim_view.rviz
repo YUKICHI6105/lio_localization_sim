@@ -1,0 +1,96 @@
+Panels:
+  - Class: rviz_common/Displays
+    Name: Displays
+    Property Tree Widget:
+      Expanded:
+        - /Global Options1
+        - /LaserScan1
+      Splitter Ratio: 0.5
+  - Class: rviz_common/Views
+    Name: Views
+Visualization Manager:
+  Class: ""
+  Displays:
+    - Class: rviz_default_plugins/Grid
+      Name: Grid
+      Color: 160; 160; 164
+      Cell Size: 1
+      Plane Cell Count: 12
+      Enabled: true
+      Reference Frame: map
+    - Class: rviz_default_plugins/TF
+      Name: TF
+      Enabled: true
+      Marker Scale: 0.6
+      Show Names: true
+      Show Axes: true
+      Show Arrows: true
+    - Class: rviz_default_plugins/LaserScan
+      Name: LaserScan
+      Topic:
+        Value: /scan
+        Depth: 5
+        Durability Policy: Volatile
+        Reliability Policy: Best Effort
+      Enabled: true
+      Style: Points
+      Size (Pixels): 3
+      Color: 255; 85; 0
+      Color Transformer: FlatColor
+      Decay Time: 0
+    - Class: rviz_default_plugins/Odometry
+      Name: EstimatedOdom(/odom_fast)
+      Topic:
+        Value: /odom_fast
+        Durability Policy: Volatile
+        Reliability Policy: Reliable
+      Enabled: true
+      Keep: 300
+      Position Tolerance: 0.02
+      Angle Tolerance: 0.02
+      Shape:
+        Value: Arrow
+        Color: 0; 170; 255
+        Shaft Length: 0.25
+        Shaft Radius: 0.04
+        Head Length: 0.12
+        Head Radius: 0.08
+    - Class: rviz_default_plugins/Odometry
+      Name: GroundTruth(/ground_truth_pose)
+      Topic:
+        Value: /ground_truth_pose
+        Durability Policy: Volatile
+        Reliability Policy: Reliable
+      Enabled: true
+      Keep: 300
+      Position Tolerance: 0.02
+      Angle Tolerance: 0.02
+      Shape:
+        Value: Arrow
+        Color: 0; 255; 0
+        Shaft Length: 0.25
+        Shaft Radius: 0.04
+        Head Length: 0.12
+        Head Radius: 0.08
+  Global Options:
+    Fixed Frame: map
+    Background Color: 48; 48; 48
+    Frame Rate: 30
+  Name: root
+  Tools:
+    - Class: rviz_default_plugins/MoveCamera
+    - Class: rviz_default_plugins/FocusCamera
+    - Class: rviz_default_plugins/Measure
+  Views:
+    Current:
+      Class: rviz_default_plugins/TopDownOrtho
+      Name: TopDown
+      Scale: 70
+      Target Frame: map
+      X: 0
+      Y: 0
+    Saved: ~
+Window Geometry:
+  Height: 900
+  Width: 1300
+  Hidden: false

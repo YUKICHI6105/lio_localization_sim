@@ -5,6 +5,7 @@
 """
 
 import math
+import random
 from dataclasses import dataclass
 
 
@@ -31,6 +32,16 @@ class Trajectory:
 
     GRAVITY = 9.81
     MAX_OMEGA = 2.0 * math.pi  # main.md C項: 最大角速度 2π rad/s
+    MAX_VEL = 5.0              # main.md C項: 最大移動速度 5.0 m/s
+    MAX_ACC = 4.905           # main.md C項: 最大加速度 0.5G
+    # 最大角加速度: main.md未規定のため仮定値(0.5秒で最大角速度2πに到達する
+    # 4π rad/s²)。ランダム経路の角運動をこの範囲内に構成的に収める。
+    MAX_ALPHA = 4.0 * math.pi
+    # 機体の外接半径。500mm等辺三角柱(角を半径50mmでフィレット)の重心から
+    # 最遠点までの距離 = 辺長/√3 = 0.5/√3 ≈ 0.289m(フィレットは外接円を縮める
+    # 方向なので安全側の上界)。オムニで自由回転するため、中心がこの半径以上
+    # 壁・円柱から離れていれば機体は非衝突。
+    ROBOT_RADIUS = 0.5 / math.sqrt(3.0)
 
     def __init__(self, field_width: float, field_height: float, margin: float = 1.0,
                  pattern: int = 0):
@@ -41,7 +52,19 @@ class Trajectory:
         2: スピン多発。60秒間にスピンバースト4回(高G旋回の連続ストレス)
         3: 壁際周回。マージンを狭めて壁近傍を大きく周回(視野が壁に偏り
            やすく、ポールが死角/遠距離になる時間が長い)
+        pattern>=1000: ランダム経路(seed=pattern)。第二段階の耐久試験用。
+           帯域制限ランダム(ランダム位相サインの重ね合わせ)+平滑立ち上がり
+           エンベロープで、運動力学的に妥当な「めちゃくちゃな」経路を生成する。
+           生成後に全区間を密サンプリングして実ピークを計測し、振幅を単一
+           スケールで縮めることで 速度≤5.0 / 加速度≤0.5G / 角速度≤2π /
+           角加速度≤4π / 壁非衝突(中心が壁からmargin以上) を構成的に保証する
+           (壁への食い込み・運動力学違反は起こさない。円柱衝突回避は経路が
+           通らない場所にのみ円柱を置くランナー側で担保)。
         """
+        if pattern >= 1000:
+            self._init_random(field_width, field_height, seed=pattern)
+            return
+        self.random_mode = False
         self.ax_amp = max(field_width / 2.0 - margin, 0.5)
         self.ay_amp = max(field_height / 2.0 - margin, 0.5)
         self.wx = 0.5   # rad/s
@@ -81,6 +104,133 @@ class Trajectory:
         self.ball_velocity = (2.0, 0.3)  # m/s
         self.ball_radius = 0.11
 
+    # ----- ランダム経路モード(第二段階耐久試験) -----
+    RANDOM_MARGIN = 0.5   # 壁マージン: ROBOT_RADIUS(0.289) + クリアランス
+    RANDOM_TAU = 3.0      # 静止からの平滑立ち上がり時間(s)
+    RANDOM_N_HARM = 4     # 軸あたりの調和成分数
+    RANDOM_SAFETY = 0.97  # 各限界に対する安全係数(境界での等号を避ける)
+
+    def _init_random(self, field_width: float, field_height: float, seed: int):
+        self.random_mode = True
+        rng = random.Random(seed)
+        # 従来モードの属性(evaluator/plotが参照)を無効値で用意しておく
+        self.spin_bursts = []
+        self.ball_active_window = (-1.0, -1.0)  # 常に非アクティブ
+        self.ball_start = (0.0, 0.0)
+        self.ball_velocity = (0.0, 0.0)
+        self.ball_radius = 0.11
+
+        def draw_harmonics(n, w_lo, w_hi, a_lo, a_hi):
+            return [(rng.uniform(a_lo, a_hi), rng.uniform(w_lo, w_hi),
+                     rng.uniform(0.0, 2.0 * math.pi)) for _ in range(n)]
+
+        # 並進: 特性角周波数を v/L~1rad/s 帯に置くと速度・加速度・振幅の各限界が
+        # 近い所で拮抗し、限界いっぱいの激しい経路になりやすい。
+        self._hx = draw_harmonics(self.RANDOM_N_HARM, 0.3, 1.6, 0.4, 1.0)
+        self._hy = draw_harmonics(self.RANDOM_N_HARM, 0.3, 1.6, 0.4, 1.0)
+        # ヨー(オムニ機体、並進と独立): より速い帯域で自由に回す
+        self._hyaw = draw_harmonics(self.RANDOM_N_HARM, 0.4, 5.0, 0.3, 1.5)
+
+        # 使用可能な半幅(中心が壁からmargin以上離れる範囲)
+        usable_x = max(field_width / 2.0 - self.RANDOM_MARGIN, 0.3)
+        usable_y = max(field_height / 2.0 - self.RANDOM_MARGIN, 0.3)
+
+        # 全区間を密サンプリングして実ピークを計測 → 振幅を単一スケールで縮める。
+        # サンプル窓は経路が準周期的なので十分長く取れば最大値を捉えられる。
+        ts = [i * 0.05 for i in range(int(200.0 / 0.05))]
+        max_exc_x = max_exc_y = 1e-9
+        max_v = max_a = 1e-9
+        for t in ts:
+            e, ed, edd = self._envelope(t)
+            sx, sxd, sxdd = self._sum_sines(self._hx, t)
+            sy, syd, sydd = self._sum_sines(self._hy, t)
+            ex, ey = abs(e * sx), abs(e * sy)
+            vx = ed * sx + e * sxd
+            vy = ed * sy + e * syd
+            ax = edd * sx + 2.0 * ed * sxd + e * sxdd
+            ay = edd * sy + 2.0 * ed * syd + e * sydd
+            max_exc_x = max(max_exc_x, ex)
+            max_exc_y = max(max_exc_y, ey)
+            max_v = max(max_v, math.hypot(vx, vy))
+            max_a = max(max_a, math.hypot(ax, ay))
+        s = self.RANDOM_SAFETY * min(
+            usable_x / max_exc_x, usable_y / max_exc_y,
+            self.MAX_VEL / max_v, self.MAX_ACC / max_a)
+        self._hx = [(a * s, w, p) for (a, w, p) in self._hx]
+        self._hy = [(a * s, w, p) for (a, w, p) in self._hy]
+
+        # ヨー: 角速度・角加速度の限界に合わせて別途スケール
+        max_w = max_al = 1e-9
+        for t in ts:
+            e, ed, edd = self._envelope(t)
+            sw, swd, swdd = self._sum_sines(self._hyaw, t)
+            omega = ed * sw + e * swd
+            alpha = edd * sw + 2.0 * ed * swd + e * swdd
+            max_w = max(max_w, abs(omega))
+            max_al = max(max_al, abs(alpha))
+        sy_ = self.RANDOM_SAFETY * min(
+            self.MAX_OMEGA / max_w, self.MAX_ALPHA / max_al)
+        self._hyaw = [(a * sy_, w, p) for (a, w, p) in self._hyaw]
+
+        # 検証用に確定ピークを記録(ランナーが妥当性の証跡としてログする)
+        self.peak_v = max_v * s
+        self.peak_a = max_a * s
+        self.peak_omega = max_w * sy_
+        self.peak_alpha = max_al * sy_
+        self.peak_exc_x = max_exc_x * s
+        self.peak_exc_y = max_exc_y * s
+
+    def _envelope(self, t: float):
+        """静止(t=0でv=a=0)から平滑に走り出す C² エンベロープ e, e', e''。"""
+        tau = self.RANDOM_TAU
+        if t >= tau:
+            return 1.0, 0.0, 0.0
+        u = t / tau
+        # smootherstep: 6u^5-15u^4+10u^3(端点で値0/1、1階・2階微分ゼロ)
+        e = u * u * u * (u * (u * 6.0 - 15.0) + 10.0)
+        ed = (30.0 * u * u * (u * u - 2.0 * u + 1.0)) / tau
+        edd = (60.0 * u * (2.0 * u * u - 3.0 * u + 1.0)) / (tau * tau)
+        return e, ed, edd
+
+    @staticmethod
+    def _sum_sines(harmonics, t: float):
+        """Σ A sin(w t + φ) と その1階・2階時間微分を返す。"""
+        s = sd = sdd = 0.0
+        for (a, w, p) in harmonics:
+            ang = w * t + p
+            sn = math.sin(ang)
+            cs = math.cos(ang)
+            s += a * sn
+            sd += a * w * cs
+            sdd += -a * w * w * sn
+        return s, sd, sdd
+
+    def _state_random(self, t: float, held: bool) -> 'State':
+        e, ed, edd = self._envelope(t)
+        sx, sxd, sxdd = self._sum_sines(self._hx, t)
+        sy, syd, sydd = self._sum_sines(self._hy, t)
+        syaw, syawd, _ = self._sum_sines(self._hyaw, t)
+
+        x = e * sx
+        y = e * sy
+        yaw = e * syaw
+        vx = ed * sx + e * sxd
+        vy = ed * sy + e * syd
+        omega = ed * syaw + e * syawd
+        ax_w = edd * sx + 2.0 * ed * sxd + e * sxdd
+        ay_w = edd * sy + 2.0 * ed * syd + e * sydd
+
+        cos_yaw = math.cos(yaw)
+        sin_yaw = math.sin(yaw)
+        ax_body = cos_yaw * ax_w + sin_yaw * ay_w
+        ay_body = -sin_yaw * ax_w + cos_yaw * ay_w
+
+        if held:
+            return State(t=t, x=x, y=y, yaw=yaw, vx=0.0, vy=0.0, omega=0.0,
+                         ax_body=0.0, ay_body=0.0, az_body=self.GRAVITY)
+        return State(t=t, x=x, y=y, yaw=yaw, vx=vx, vy=vy, omega=omega,
+                     ax_body=ax_body, ay_body=ay_body, az_body=self.GRAVITY)
+
     def _spin_offset_and_rate(self, t: float):
         offset = 0.0
         rate = 0.0
@@ -104,6 +254,8 @@ class Trajectory:
     def state(self, t: float) -> State:
         held = t < self.STARTUP_HOLD_SEC
         t = max(t - self.STARTUP_HOLD_SEC, 0.0)
+        if self.random_mode:
+            return self._state_random(t, held)
         wx, wy = self.wx, self.wy
         # main.md想定(ロボコンは試合開始時にロボットが静止している)に合わせ、
         # x=-A cos(w t) の形で軌道を組む。この形はt=0でv=0(sin(0)=0)を

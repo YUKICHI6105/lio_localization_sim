@@ -95,6 +95,18 @@ def launch_setup(context, *args, **kwargs):
         package='lio_localization', executable='ball_tracking_node',
         name='ball_tracking_node', output='screen')
 
+    # ライブ可視化(WSLg等の表示環境があるとき use_rviz:=true で有効化)。
+    # /scan(壁・円柱の点群)・/odom_fast(推定・青)・/ground_truth_pose(真値・緑)を
+    # map座標で俯瞰表示する。ヘッドレスCIでは既定offにしておく。
+    use_rviz = LaunchConfiguration('use_rviz').perform(context).lower() in ('1', 'true', 'yes')
+    extra = []
+    if use_rviz:
+        rviz_cfg = os.path.join(
+            get_package_share_directory('lio_localization_sim'), 'rviz', 'sim_view.rviz')
+        extra.append(Node(
+            package='rviz2', executable='rviz2', name='rviz2',
+            arguments=['-d', rviz_cfg], output='screen'))
+
     # evaluatorがレポートを書いて終了したらlaunch全体を終了させる
     # (これが無いとシムノード・実ノードが走り続け、次の検証実行と
     #  同一DDSドメイン上で衝突する)。
@@ -106,7 +118,7 @@ def launch_setup(context, *args, **kwargs):
         imu_sim, lidar_sim, evaluator,
         imu_node, backend_node, scan_matching_node, ball_tracking_node,
         shutdown_on_eval_exit,
-    ]
+    ] + extra
 
 
 def generate_launch_description():
@@ -129,5 +141,8 @@ def generate_launch_description():
         DeclareLaunchArgument(
             'field_height', default_value='8.0',
             description='field.yamlと一致させること(真の初期姿勢計算に使用)'),
+        DeclareLaunchArgument(
+            'use_rviz', default_value='false',
+            description='true でrviz2ライブ可視化を起動(WSLg等の表示環境が必要)'),
         OpaqueFunction(function=launch_setup),
     ])
