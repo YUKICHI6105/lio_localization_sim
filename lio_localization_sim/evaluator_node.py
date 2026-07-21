@@ -59,6 +59,12 @@ class EvaluatorNode(Node):
         self.gt_times: list[float] = []
         self.errors: list[tuple] = []  # (t, pos_err, yaw_err_deg)
         self.ball_detections = 0
+        # 真値がまだ届いていない時刻の/odom_fastサンプルを保留する待ち行列。
+        # 保留せずに評価すると_interp_gt()の範囲外分岐が「最後に届いた真値」を
+        # そのまま返すため、真値の古さ×速度がまるごと見かけの位置誤差になる
+        # (ホストジッタで配信が数ms途切れた直後の1サンプルだけが数十mm飛び、
+        #  次のサンプルで正常値に戻る、という物理的にありえない形で観測された)。
+        self.pending_odom: list[tuple] = []
 
         self.gt_sub = self.create_subscription(
             Odometry, '/ground_truth_pose', self.gt_callback, 50)
@@ -84,6 +90,8 @@ class EvaluatorNode(Node):
         yaw = yaw_from_quat(msg.pose.pose.orientation)
         self.gt_samples.append(Sample(t, msg.pose.pose.position.x, msg.pose.pose.position.y, yaw))
         self.gt_times.append(t)
+        # 真値が進んだので、保留していた/odom_fastサンプルを評価できるか試す
+        self._drain_pending()
 
     def ball_callback(self, msg: PoseArray):
         self.ball_detections = len(msg.poses)
@@ -126,16 +134,30 @@ class EvaluatorNode(Node):
             a.yaw + r * wrap_angle(b.yaw - a.yaw))
 
     def odom_callback(self, msg: Odometry):
+        # 真値が時刻tを跨ぐまで評価を保留する(pending_odomのコメント参照)。
+        # 即座に評価すると、真値未着の区間では_interp_gt()が「最後に届いた
+        # 真値」を返すため、真値の古さ×速度が見かけの誤差として混入する。
         t = self._stamp_to_t(msg.header.stamp)
-        gt = self._interp_gt(t)
-        if gt is None:
+        self.pending_odom.append(
+            (t, msg.pose.pose.position.x, msg.pose.pose.position.y,
+             yaw_from_quat(msg.pose.pose.orientation)))
+        self._drain_pending()
+
+    def _drain_pending(self):
+        """真値が追いついた保留サンプルを評価してerrorsへ移す。"""
+        if not self.gt_times or not self.pending_odom:
             return
-        ex = msg.pose.pose.position.x - gt.x
-        ey = msg.pose.pose.position.y - gt.y
-        pos_err = math.hypot(ex, ey)
-        yaw = yaw_from_quat(msg.pose.pose.orientation)
-        yaw_err_deg = math.degrees(abs(wrap_angle(yaw - gt.yaw)))
-        self.errors.append((t, pos_err, yaw_err_deg))
+        latest_gt = self.gt_times[-1]
+        still_pending = []
+        for (t, x, y, yaw) in self.pending_odom:
+            if t > latest_gt:
+                still_pending.append((t, x, y, yaw))
+                continue
+            gt = self._interp_gt(t)
+            pos_err = math.hypot(x - gt.x, y - gt.y)
+            yaw_err_deg = math.degrees(abs(wrap_angle(yaw - gt.yaw)))
+            self.errors.append((t, pos_err, yaw_err_deg))
+        self.pending_odom = still_pending
 
     def _in_any_window(self, t, windows):
         return any(t0 <= t <= t0 + dur for (t0, dur) in windows)
@@ -196,6 +218,7 @@ class EvaluatorNode(Node):
         report.append('main.md 6-A-1 シミュレーション評価レポート')
         report.append('=' * 60)
         report.append(f'総サンプル数: {len(self.errors)}  (定常区間 t>={self.settle_sec}s: {len(steady)})')
+        report.append(f'真値未着のまま評価できなかったサンプル: {len(self.pending_odom)}')
         report.append('')
         report.append('--- 全体（要件A: 定常±10mm, 最大±20mm） ---')
         report.append(f'  位置誤差: mean={mean_all:.2f}mm  RMSE={rmse_all:.2f}mm  max={max_all:.2f}mm')
