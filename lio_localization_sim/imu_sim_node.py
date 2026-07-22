@@ -48,7 +48,19 @@ class ImuSimNode(Node):
         if self.sim_start_time_sec <= 0.0:
             self.sim_start_time_sec = self.get_clock().now().nanoseconds * 1e-9
 
+        # 第三段階センサ異常注入(検知+自己復帰の検証)。窓の間だけIMUを破綻させる。
+        # 真値(gt)は常に配信し続けるので、破綻中の誤差と窓後の復帰を測定できる。
+        # kind: none/dropout(配信停止)/noise(ノイズ激増)/stuck(直近値に固着)
+        self.fault_kind = self.declare_parameter('imu_fault_kind', 'none').value
+        self.fault_start = self.declare_parameter('imu_fault_start', 0.0).value
+        self.fault_dur = self.declare_parameter('imu_fault_dur', 0.0).value
+        self._last_msg = None
+
         self.timer = self.create_timer(0.001, self.on_timer)  # 1kHz
+
+    def _fault_active(self, t):
+        return (self.fault_dur > 0.0 and self.fault_start <= t
+                < self.fault_start + self.fault_dur)
 
         self.get_logger().info(
             f'imu_sim_node started (bias_ax={self.bias_ax}, bias_ay={self.bias_ay}, '
@@ -63,16 +75,30 @@ class ImuSimNode(Node):
         t = now.nanoseconds * 1e-9 - self.sim_start_time_sec
         s = self.traj.state(t)
 
-        msg = Imu()
-        msg.header.stamp = now.to_msg()
-        msg.header.frame_id = self.base_frame_id
-        msg.linear_acceleration.x = s.ax_body + self.bias_ax + self.rng.gauss(0.0, self.accel_noise_sigma)
-        msg.linear_acceleration.y = s.ay_body + self.bias_ay + self.rng.gauss(0.0, self.accel_noise_sigma)
-        msg.linear_acceleration.z = s.az_body + self.rng.gauss(0.0, self.accel_noise_sigma)
-        msg.angular_velocity.x = self.rng.gauss(0.0, self.gyro_noise_sigma)
-        msg.angular_velocity.y = self.rng.gauss(0.0, self.gyro_noise_sigma)
-        msg.angular_velocity.z = s.omega + self.bias_gz + self.rng.gauss(0.0, self.gyro_noise_sigma)
-        self.imu_pub.publish(msg)
+        fault = self.fault_kind if self._fault_active(t) else 'none'
+        if fault == 'dropout':
+            pass  # IMU配信を止める(真値は下で配信し続ける)
+        else:
+            an = self.accel_noise_sigma
+            gn = self.gyro_noise_sigma
+            if fault == 'noise':
+                an *= 50.0  # ノイズ激増(振動・電磁ノイズ相当)
+                gn *= 50.0
+            msg = Imu()
+            msg.header.stamp = now.to_msg()
+            msg.header.frame_id = self.base_frame_id
+            if fault == 'stuck' and self._last_msg is not None:
+                msg = self._last_msg  # 直近値に固着(センサハング相当)
+                msg.header.stamp = now.to_msg()
+            else:
+                msg.linear_acceleration.x = s.ax_body + self.bias_ax + self.rng.gauss(0.0, an)
+                msg.linear_acceleration.y = s.ay_body + self.bias_ay + self.rng.gauss(0.0, an)
+                msg.linear_acceleration.z = s.az_body + self.rng.gauss(0.0, an)
+                msg.angular_velocity.x = self.rng.gauss(0.0, gn)
+                msg.angular_velocity.y = self.rng.gauss(0.0, gn)
+                msg.angular_velocity.z = s.omega + self.bias_gz + self.rng.gauss(0.0, gn)
+            self.imu_pub.publish(msg)
+            self._last_msg = msg
 
         gt = Odometry()
         gt.header.stamp = now.to_msg()

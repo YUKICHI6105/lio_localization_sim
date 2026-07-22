@@ -61,6 +61,9 @@ class Trajectory:
            (壁への食い込み・運動力学違反は起こさない。円柱衝突回避は経路が
            通らない場所にのみ円柱を置くランナー側で担保)。
         """
+        if pattern >= 2000:
+            self._init_stage3(field_width, field_height, pattern)
+            return
         if pattern >= 1000:
             self._init_random(field_width, field_height, seed=pattern)
             return
@@ -112,6 +115,7 @@ class Trajectory:
 
     def _init_random(self, field_width: float, field_height: float, seed: int):
         self.random_mode = True
+        self.stage3 = None
         rng = random.Random(seed)
         # 従来モードの属性(evaluator/plotが参照)を無効値で用意しておく
         self.spin_bursts = []
@@ -205,12 +209,14 @@ class Trajectory:
             sdd += -a * w * w * sn
         return s, sd, sdd
 
-    def _state_random(self, t: float, held: bool) -> 'State':
+    def _base_kinematics(self, t: float):
+        """内部時刻tでの基底運動(位置・速度・世界系加速度・ヨー・角速度)を返す。
+        戻り値: (x, y, yaw, vx, vy, omega, ax_w, ay_w)。stage3のワープ/オーバー
+        シュートはこれを土台に合成する。"""
         e, ed, edd = self._envelope(t)
         sx, sxd, sxdd = self._sum_sines(self._hx, t)
         sy, syd, sydd = self._sum_sines(self._hy, t)
         syaw, syawd, _ = self._sum_sines(self._hyaw, t)
-
         x = e * sx
         y = e * sy
         yaw = e * syaw
@@ -219,17 +225,108 @@ class Trajectory:
         omega = ed * syaw + e * syawd
         ax_w = edd * sx + 2.0 * ed * sxd + e * sxdd
         ay_w = edd * sy + 2.0 * ed * syd + e * sydd
+        return x, y, yaw, vx, vy, omega, ax_w, ay_w
 
+    @staticmethod
+    def _assemble(t, held, x, y, yaw, vx, vy, omega, ax_w, ay_w, gravity):
         cos_yaw = math.cos(yaw)
         sin_yaw = math.sin(yaw)
         ax_body = cos_yaw * ax_w + sin_yaw * ay_w
         ay_body = -sin_yaw * ax_w + cos_yaw * ay_w
-
         if held:
             return State(t=t, x=x, y=y, yaw=yaw, vx=0.0, vy=0.0, omega=0.0,
-                         ax_body=0.0, ay_body=0.0, az_body=self.GRAVITY)
+                         ax_body=0.0, ay_body=0.0, az_body=gravity)
         return State(t=t, x=x, y=y, yaw=yaw, vx=vx, vy=vy, omega=omega,
-                     ax_body=ax_body, ay_body=ay_body, az_body=self.GRAVITY)
+                     ax_body=ax_body, ay_body=ay_body, az_body=gravity)
+
+    def _state_random(self, t: float, held: bool) -> 'State':
+        # stage3(pattern>=2000): 妥当な基底経路に破綻イベントを合成する
+        if getattr(self, 'stage3', None) == 'overlimit':
+            return self._state_overlimit(t, held)
+        if getattr(self, 'stage3', None) == 'collision':
+            return self._state_collision(t, held)
+        x, y, yaw, vx, vy, omega, ax_w, ay_w = self._base_kinematics(t)
+        return self._assemble(t, held, x, y, yaw, vx, vy, omega, ax_w, ay_w,
+                              self.GRAVITY)
+
+    # ----- 第三段階: 破綻シナリオ(運動力学制約外・検知/自己復帰の検証) -----
+    def _init_stage3(self, field_width, field_height, pattern):
+        # pattern = 2000 + kind*100 + seed。kind: 0=限界突破, 1=壁衝突
+        kind = (pattern - 2000) // 100
+        seed = (pattern - 2000) % 100
+        # 基底は妥当なランダム経路(seedで決定的)。これを土台に破綻を合成する。
+        self._init_random(field_width, field_height, seed=3000 + seed)
+        self._field_w = field_width
+        self._field_h = field_height
+        # 破綻イベントの窓(内部時刻。起動ホールド後の走行時間で指定)
+        self.event_t0 = 22.0
+        self.event_dur = 10.0
+        if kind == 0:
+            self.stage3 = 'overlimit'
+            # 時間ワープの倍率: dτ/dt を最大 boost 倍にして速度を限界超へ
+            # (速度∝boost、加速度∝boost²、角速度∝boost、角加速度∝boost²)
+            self.boost = 2.6  # peak_v≈2.6倍→約11m/s(限界5.0超), 加速度は約6.8倍
+        elif kind == 1:
+            self.stage3 = 'collision'
+            # 振幅を(1+overshoot)倍に膨らませ、壁を越えて食い込ませてから戻す
+            self.overshoot = 0.7
+
+    def _warp(self, t):
+        """時間ワープ τ(t), dτ/dt, d²τ/dt²。窓の間だけ dτ/dt を boost 倍にする
+        (raised-cosine バンプで C¹ 連続)。窓外は τ=t+一定オフセット(妥当継続)。"""
+        t0, W, boost = self.event_t0, self.event_dur, self.boost
+        if t <= t0:
+            return t, 1.0, 0.0
+        s = t - t0
+        if s >= W:
+            # 窓通過後は一定オフセット(sin(2π)=0)を足して妥当に継続
+            return t + (boost - 1.0) * 0.5 * W, 1.0, 0.0
+        two_pi = 2.0 * math.pi
+        b = 0.5 * (1.0 - math.cos(two_pi * s / W))         # バンプ 0→1→0
+        bd = (math.pi / W) * math.sin(two_pi * s / W)       # b'
+        # τ = t + (boost-1)∫b, ∫b = 0.5(s - (W/2π)sin(2π s/W))
+        integ = 0.5 * (s - (W / two_pi) * math.sin(two_pi * s / W))
+        tau = t + (boost - 1.0) * integ
+        dtau = 1.0 + (boost - 1.0) * b
+        ddtau = (boost - 1.0) * bd
+        return tau, dtau, ddtau
+
+    def _state_overlimit(self, t: float, held: bool) -> 'State':
+        tau, dtau, ddtau = self._warp(t)
+        x, y, yaw, vx, vy, omega, ax_w, ay_w = self._base_kinematics(tau)
+        # 連鎖律: 実時刻の速度=基底速度×dτ、加速度=基底加速度×dτ²+基底速度×d²τ
+        vxr = vx * dtau
+        vyr = vy * dtau
+        omr = omega * dtau
+        axr = ax_w * dtau * dtau + vx * ddtau
+        ayr = ay_w * dtau * dtau + vy * ddtau
+        return self._assemble(t, held, x, y, yaw, vxr, vyr, omr, axr, ayr,
+                              self.GRAVITY)
+
+    def _collision_bump(self, t):
+        """振幅膨張バンプ f(t), f'(t), f''(t)。窓の間だけ (1+overshoot) 倍。"""
+        t0, W, ov = self.event_t0, self.event_dur, self.overshoot
+        if t <= t0 or t >= t0 + W:
+            return 1.0, 0.0, 0.0
+        s = t - t0
+        two_pi = 2.0 * math.pi
+        b = 0.5 * (1.0 - math.cos(two_pi * s / W))
+        bd = (math.pi / W) * math.sin(two_pi * s / W)
+        bdd = (two_pi * math.pi / (W * W)) * math.cos(two_pi * s / W)
+        return 1.0 + ov * b, ov * bd, ov * bdd
+
+    def _state_collision(self, t: float, held: bool) -> 'State':
+        x0, y0, yaw, vx0, vy0, omega, ax0, ay0 = self._base_kinematics(t)
+        f, fd, fdd = self._collision_bump(t)
+        # 位置=基底×f。速度・加速度は積の微分(位置だけ膨張、ヨーは不変)
+        x = x0 * f
+        y = y0 * f
+        vx = vx0 * f + x0 * fd
+        vy = vy0 * f + y0 * fd
+        ax = ax0 * f + 2.0 * vx0 * fd + x0 * fdd
+        ay = ay0 * f + 2.0 * vy0 * fd + y0 * fdd
+        return self._assemble(t, held, x, y, yaw, vx, vy, omega, ax, ay,
+                              self.GRAVITY)
 
     def _spin_offset_and_rate(self, t: float):
         offset = 0.0

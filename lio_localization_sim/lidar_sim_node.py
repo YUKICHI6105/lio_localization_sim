@@ -55,7 +55,18 @@ class LidarSimNode(Node):
         if self.sim_start_time_sec <= 0.0:
             self.sim_start_time_sec = self.get_clock().now().nanoseconds * 1e-9
 
+        # 第三段階センサ異常注入(検知+自己復帰の検証)。窓の間だけLiDARを破綻させる。
+        # kind: none/dropout(スキャン停止)/outlier(点の一部を乱数距離に置換=遮蔽・
+        # マルチパス・他ロボット乱入相当)
+        self.fault_kind = self.declare_parameter('lidar_fault_kind', 'none').value
+        self.fault_start = self.declare_parameter('lidar_fault_start', 0.0).value
+        self.fault_dur = self.declare_parameter('lidar_fault_dur', 0.0).value
+
         self.timer = self.create_timer(SCAN_PERIOD_SEC, self.on_timer)
+
+    def _fault_active(self, t):
+        return (self.fault_dur > 0.0 and self.fault_start <= t
+                < self.fault_start + self.fault_dur)
 
         self.get_logger().info(
             f'lidar_sim_node started ({len(self.cylinders)} cylinders, '
@@ -128,6 +139,9 @@ class LidarSimNode(Node):
         # デスキュー・評価の両方に系統誤差が乗る(fableのレビュー指摘)。
         now = self.get_clock().now()
         t_start = now.nanoseconds * 1e-9 - self.sim_start_time_sec
+        fault = self.fault_kind if self._fault_active(t_start) else 'none'
+        if fault == 'dropout':
+            return  # スキャン配信を止める(壁補正途絶→③が検知・復帰するはず)
         angle_min = -math.radians(FOV_DEG / 2.0)
         angle_increment = math.radians(FOV_DEG) / (NUM_POINTS - 1)
         time_increment = (SCAN_PERIOD_SEC * ACTIVE_FRACTION) / (NUM_POINTS - 1)
@@ -147,6 +161,10 @@ class LidarSimNode(Node):
             noisy = true_dist + self.rng.gauss(0.0, self.range_noise_sigma)
             if noisy < self.range_min:
                 noisy = self.range_min
+            # outlier注入: 窓中は一部の点を乱数距離に置換(遮蔽・マルチパス・
+            # 他ロボット乱入相当)。半数を壊してICPを激しく攪乱する。
+            if fault == 'outlier' and self.rng.random() < 0.5:
+                noisy = self.rng.uniform(self.range_min, self.range_max)
             ranges.append(noisy)
 
         msg = LaserScan()

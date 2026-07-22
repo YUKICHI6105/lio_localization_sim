@@ -69,13 +69,21 @@ def launch_setup(context, *args, **kwargs):
             'trajectory_pattern': trajectory_pattern}],
         output='screen')
 
+    # ライブ可視化(WSLg等の表示環境があるとき use_rviz:=true で有効化)。
+    # /scan(壁・円柱の点群)・/odom_fast(推定・青)・/ground_truth_pose(真値・緑)を
+    # map座標で俯瞰表示する。ヘッドレスCIでは既定offにしておく。
+    use_rviz = LaunchConfiguration('use_rviz').perform(context).lower() in ('1', 'true', 'yes')
+
     imu_node = Node(
         package='lio_localization', executable='imu_preintegration_node',
         name='imu_preintegration_node',
-        # シミュレーションではTFの購読者がいないため、1kHzのTF配信負荷を止める
+        # 通常のシミュレーションではTFの購読者がいないため、1kHzのTF配信負荷を止める
         # (②は/odom_fastを直接購読しTFを使わない。実機launchでは有効のままにする)。
+        # ただしrviz有効時は購読者ができる: rvizのFixed Frameはmapで、/scanは
+        # base_linkフレームのため、map->odom(③が配信)に加えてodom->base_link(①)が
+        # 無いと点群を変換できず表示が丸ごと落ちる。よってuse_rvizに追従させる。
         # field_configも渡すことで、yamlのdiag_odom_path等(診断)を①に届ける。
-        parameters=[field_config, {'publish_tf': False}],
+        parameters=[field_config, {'publish_tf': use_rviz}],
         output='screen')
     backend_node = Node(
         package='lio_localization', executable='backend_optimizer_node',
@@ -95,10 +103,6 @@ def launch_setup(context, *args, **kwargs):
         package='lio_localization', executable='ball_tracking_node',
         name='ball_tracking_node', output='screen')
 
-    # ライブ可視化(WSLg等の表示環境があるとき use_rviz:=true で有効化)。
-    # /scan(壁・円柱の点群)・/odom_fast(推定・青)・/ground_truth_pose(真値・緑)を
-    # map座標で俯瞰表示する。ヘッドレスCIでは既定offにしておく。
-    use_rviz = LaunchConfiguration('use_rviz').perform(context).lower() in ('1', 'true', 'yes')
     extra = []
     if use_rviz:
         rviz_cfg = os.path.join(
