@@ -1,0 +1,36 @@
+[INFO] [1784819048.414243276] [scan_residual_diag]: map: 22 segments (field 5.572x3.310, thickness 0.033)
+[INFO] [1784819071.355650069] [scan_residual_diag]: scan#200 pose=(-0.371,0.822,0.0deg) pts=1081 inlier=982 outlier=99 | resid mean=16.0mm median=12.8mm p95=41.2mm || perimeter:n=507,mean=18.1mm  interior[1]:n=236,mean=13.3mm  interior[3]:n=171,mean=15.2mm  interior[0]:n=68,mean=12.0mm || OUTLIERS (-2.0,+0.0):n=21,d=102mm  (-2.5,+0.0):n=19,d=101mm  (-0.5,+1.5):n=13,d=66mm  (+0.0,+1.5):n=10,d=57mm  (-1.5,+0.0):n=10,d=82mm
+[INFO] [1784819076.654064075] [scan_residual_diag]: scan#400 pose=(2.318,0.494,0.0deg) pts=1081 inlier=1024 outlier=57 | resid mean=16.1mm median=13.2mm p95=40.4mm || perimeter:n=696,mean=17.4mm  interior[5]:n=88,mean=13.9mm  interior[8]:n=78,mean=14.7mm  interior[3]:n=67,mean=14.4mm  interior[1]:n=49,mean=14.5mm  interior[0]:n=46,mean=8.0mm || OUTLIERS (+2.5,+0.5):n=13,d=59mm  (+3.0,+0.5):n=7,d=64mm  (+2.5,+1.5):n=7,d=67mm  (+0.0,+0.5):n=7,d=74mm  (+2.0,+1.5):n=6,d=71mm
+[INFO] [1784819081.917511757] [scan_residual_diag]: scan#600 pose=(2.318,0.494,0.0deg) pts=1081 inlier=1022 outlier=59 | resid mean=16.1mm median=13.2mm p95=41.8mm || perimeter:n=688,mean=17.7mm  interior[5]:n=84,mean=12.2mm  interior[8]:n=83,mean=14.1mm  interior[3]:n=76,mean=13.3mm  interior[1]:n=46,mean=14.8mm  interior[0]:n=45,mean=7.4mm || OUTLIERS (+2.5,+1.5):n=11,d=58mm  (+2.0,+1.5):n=11,d=71mm  (+2.5,+0.5):n=10,d=58mm  (+3.0,+0.5):n=7,d=53mm  (+1.5,+1.5):n=6,d=61mm
+[INFO] [1784819087.171672174] [scan_residual_diag]: scan#800 pose=(2.318,0.494,0.0deg) pts=1081 inlier=1030 outlier=51 | resid mean=15.6mm median=12.8mm p95=41.0mm || perimeter:n=692,mean=17.1mm  interior[5]:n=88,mean=13.4mm  interior[8]:n=84,mean=14.5mm  interior[3]:n=73,mean=13.2mm  interior[1]:n=48,mean=11.3mm  interior[0]:n=45,mean=7.0mm || OUTLIERS (+3.0,+0.5):n=11,d=62mm  (+2.5,+1.5):n=11,d=59mm  (+2.5,+0.5):n=7,d=67mm  (+2.0,+1.5):n=4,d=60mm  (+0.0,+0.5):n=4,d=65mm
+[INFO] [1784819092.386148497] [scan_residual_diag]: scan#1000 pose=(2.318,0.494,0.0deg) pts=1081 inlier=1036 outlier=45 | resid mean=16.2mm median=13.1mm p95=42.5mm || perimeter:n=703,mean=17.6mm  interior[5]:n=88,mean=13.7mm  interior[8]:n=79,mean=15.4mm  interior[3]:n=74,mean=13.6mm  interior[1]:n=48,mean=16.5mm  interior[0]:n=44,mean=5.8mm || OUTLIERS (+3.0,+0.5):n=9,d=58mm  (+2.5,+0.5):n=8,d=65mm  (+2.5,+1.5):n=8,d=61mm  (+2.0,+1.5):n=5,d=59mm  (+3.0,+1.0):n=3,d=55mm
+[INFO] [1784819097.570516795] [scan_residual_diag]: scan#1200 pose=(2.318,0.494,0.0deg) pts=1081 inlier=1034 outlier=47 | resid mean=16.3mm median=13.4mm p95=41.0mm || perimeter:n=690,mean=17.5mm  interior[5]:n=90,mean=14.8mm  interior[8]:n=85,mean=14.8mm  interior[3]:n=77,mean=14.1mm  interior[1]:n=48,mean=15.6mm  interior[0]:n=44,mean=7.0mm || OUTLIERS (+2.5,+1.5):n=9,d=58mm  (+2.5,+0.5):n=8,d=64mm  (+2.0,+1.5):n=8,d=63mm  (+3.0,+0.5):n=5,d=64mm  (+1.5,+1.5):n=5,d=62mm
+[INFO] [1784819102.916337282] [scan_residual_diag]: scan#1400 pose=(2.318,0.494,0.0deg) pts=1081 inlier=1032 outlier=49 | resid mean=16.2mm median=12.8mm p95=41.9mm || perimeter:n=703,mean=17.5mm  interior[5]:n=87,mean=12.7mm  interior[8]:n=81,mean=14.0mm  interior[3]:n=70,mean=17.3mm  interior[1]:n=47,mean=13.1mm  interior[0]:n=44,mean=8.1mm || OUTLIERS (+3.0,+0.5):n=9,d=63mm  (+2.0,+1.5):n=9,d=60mm  (+2.5,+0.5):n=8,d=64mm  (+0.0,+0.5):n=6,d=55mm  (+2.5,+1.5):n=4,d=63mm
+[INFO] [1784819108.092790024] [scan_residual_diag]: scan#1600 pose=(2.318,0.494,0.0deg) pts=1081 inlier=1042 outlier=39 | resid mean=16.1mm median=13.0mm p95=40.0mm || perimeter:n=703,mean=17.4mm  interior[5]:n=88,mean=14.8mm  interior[8]:n=81,mean=15.6mm  interior[3]:n=78,mean=12.3mm  interior[1]:n=49,mean=13.8mm  interior[0]:n=43,mean=7.9mm || OUTLIERS (+2.5,+0.5):n=12,d=59mm  (+3.0,+0.5):n=6,d=61mm  (+2.5,+1.5):n=5,d=61mm  (+2.0,+1.5):n=5,d=63mm  (+3.0,+1.0):n=2,d=60mm
+[INFO] [1784819113.375741913] [scan_residual_diag]: scan#1800 pose=(2.318,0.494,0.0deg) pts=1081 inlier=1038 outlier=43 | resid mean=16.1mm median=13.3mm p95=40.9mm || perimeter:n=700,mean=17.4mm  interior[5]:n=89,mean=15.9mm  interior[8]:n=84,mean=14.1mm  interior[3]:n=71,mean=13.3mm  interior[1]:n=51,mean=14.7mm  interior[0]:n=43,mean=5.4mm || OUTLIERS (+3.0,+0.5):n=9,d=60mm  (+2.5,+0.5):n=8,d=60mm  (+2.5,+1.5):n=8,d=57mm  (+0.0,+0.5):n=4,d=67mm  (+2.0,+1.5):n=3,d=54mm
+[INFO] [1784819118.571390151] [scan_residual_diag]: scan#2000 pose=(2.318,0.494,0.0deg) pts=1081 inlier=1041 outlier=40 | resid mean=15.9mm median=13.3mm p95=41.6mm || perimeter:n=704,mean=17.2mm  interior[5]:n=88,mean=14.4mm  interior[8]:n=85,mean=15.0mm  interior[3]:n=75,mean=13.9mm  interior[1]:n=46,mean=13.0mm  interior[0]:n=43,mean=6.8mm || OUTLIERS (+2.5,+0.5):n=11,d=65mm  (+2.5,+1.5):n=7,d=64mm  (+3.0,+0.5):n=4,d=61mm  (+2.0,+1.5):n=4,d=63mm  (+0.0,+0.5):n=3,d=64mm
+[INFO] [1784819123.759328403] [scan_residual_diag]: scan#2200 pose=(2.318,0.494,0.0deg) pts=1081 inlier=1025 outlier=56 | resid mean=16.2mm median=13.1mm p95=41.5mm || perimeter:n=694,mean=17.9mm  interior[5]:n=86,mean=12.4mm  interior[8]:n=77,mean=14.0mm  interior[3]:n=74,mean=13.3mm  interior[1]:n=51,mean=13.9mm  interior[0]:n=43,mean=8.3mm || OUTLIERS (+2.0,+1.5):n=13,d=62mm  (+2.5,+0.5):n=10,d=60mm  (+3.0,+0.5):n=8,d=66mm  (+2.5,+1.5):n=6,d=64mm  (+0.0,+0.5):n=5,d=66mm
+[INFO] [1784819128.971400311] [scan_residual_diag]: scan#2400 pose=(2.318,0.494,0.0deg) pts=1081 inlier=1039 outlier=42 | resid mean=15.9mm median=13.2mm p95=39.9mm || perimeter:n=699,mean=17.3mm  interior[5]:n=90,mean=14.3mm  interior[8]:n=84,mean=14.1mm  interior[3]:n=75,mean=13.5mm  interior[1]:n=48,mean=13.9mm  interior[0]:n=43,mean=6.5mm || OUTLIERS (+2.5,+0.5):n=12,d=61mm  (+2.5,+1.5):n=8,d=61mm  (+2.0,+1.5):n=5,d=75mm  (+3.0,+0.5):n=4,d=66mm  (+1.5,+1.5):n=3,d=67mm
+Traceback (most recent call last):
+  File "/home/yukichi6105/ros2_ws/src/lio_localization_sim/tools/scan_residual_diag.py", line 188, in <module>
+    main()
+    ~~~~^^
+  File "/home/yukichi6105/ros2_ws/src/lio_localization_sim/tools/scan_residual_diag.py", line 179, in main
+    rclpy.spin(node)
+    ~~~~~~~~~~^^^^^^
+  File "/opt/ros/lyrical/lib/python3.14/site-packages/rclpy/__init__.py", line 324, in spin
+    executor.spin_once()
+    ~~~~~~~~~~~~~~~~~~^^
+  File "/opt/ros/lyrical/lib/python3.14/site-packages/rclpy/executors.py", line 1020, in spin_once
+    self._spin_once_impl(timeout_sec)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/opt/ros/lyrical/lib/python3.14/site-packages/rclpy/executors.py", line 1000, in _spin_once_impl
+    handler, entity, node = self.wait_for_ready_callbacks(
+                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        timeout_sec, None, wait_condition)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/ros/lyrical/lib/python3.14/site-packages/rclpy/executors.py", line 970, in wait_for_ready_callbacks
+    return next(self._cb_iter)
+  File "/opt/ros/lyrical/lib/python3.14/site-packages/rclpy/executors.py", line 876, in _wait_for_ready_callbacks
+    raise ExternalShutdownException()
+rclpy.executors.ExternalShutdownException

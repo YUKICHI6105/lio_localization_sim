@@ -1,0 +1,39 @@
+[INFO] [1784804904.616644738] [topic_count_diag]: topic_count_diag started (deep reliable queues)
+[INFO] [1784804914.606608182] [topic_count_diag]: no IMU yet
+[INFO] [1784804924.606433172] [topic_count_diag]: no IMU yet
+[INFO] [1784804934.608399554] [topic_count_diag]: sim_span=2.179s || imu n=2180 (1000.5Hz) clock n=2180 (1000.5Hz) scan n=89 (40.8Hz)
+[INFO] [1784804944.608316136] [topic_count_diag]: sim_span=11.996s || imu n=11997 (1000.1Hz) clock n=11997 (1000.1Hz) scan n=480 (40.0Hz)
+[INFO] [1784804954.606917981] [topic_count_diag]: sim_span=21.739s || imu n=21740 (1000.0Hz) clock n=21741 (1000.1Hz) scan n=870 (40.0Hz)
+[INFO] [1784804964.608532781] [topic_count_diag]: sim_span=31.519s || imu n=31520 (1000.0Hz) clock n=31520 (1000.0Hz) scan n=1261 (40.0Hz)
+[INFO] [1784804974.606013191] [topic_count_diag]: sim_span=39.101s || imu n=39102 (1000.0Hz) clock n=39102 (1000.0Hz) scan n=1564 (40.0Hz)
+[INFO] [1784804984.606891011] [topic_count_diag]: sim_span=48.923s || imu n=48924 (1000.0Hz) clock n=48925 (1000.0Hz) scan n=1957 (40.0Hz)
+[INFO] [1784804994.606899199] [topic_count_diag]: sim_span=51.455s || imu n=51456 (1000.0Hz) clock n=51456 (1000.0Hz) scan n=2059 (40.0Hz)
+[INFO] [1784805004.607272477] [topic_count_diag]: sim_span=51.455s || imu n=51456 (1000.0Hz) clock n=51456 (1000.0Hz) scan n=2059 (40.0Hz)
+[INFO] [1784805014.617139084] [topic_count_diag]: sim_span=51.455s || imu n=51456 (1000.0Hz) clock n=51456 (1000.0Hz) scan n=2059 (40.0Hz)
+[INFO] [1784805024.611186813] [topic_count_diag]: sim_span=51.455s || imu n=51456 (1000.0Hz) clock n=51456 (1000.0Hz) scan n=2059 (40.0Hz)
+[INFO] [1784805034.606381992] [topic_count_diag]: sim_span=51.455s || imu n=51456 (1000.0Hz) clock n=51456 (1000.0Hz) scan n=2059 (40.0Hz)
+[INFO] [1784805044.607248406] [topic_count_diag]: sim_span=51.455s || imu n=51456 (1000.0Hz) clock n=51456 (1000.0Hz) scan n=2059 (40.0Hz)
+[INFO] [1784805054.612624792] [topic_count_diag]: sim_span=51.455s || imu n=51456 (1000.0Hz) clock n=51456 (1000.0Hz) scan n=2059 (40.0Hz)
+Traceback (most recent call last):
+  File "/home/yukichi6105/ros2_ws/src/lio_localization_sim/tools/topic_count_diag.py", line 78, in <module>
+    main()
+    ~~~~^^
+  File "/home/yukichi6105/ros2_ws/src/lio_localization_sim/tools/topic_count_diag.py", line 69, in main
+    rclpy.spin(node)
+    ~~~~~~~~~~^^^^^^
+  File "/opt/ros/lyrical/lib/python3.14/site-packages/rclpy/__init__.py", line 324, in spin
+    executor.spin_once()
+    ~~~~~~~~~~~~~~~~~~^^
+  File "/opt/ros/lyrical/lib/python3.14/site-packages/rclpy/executors.py", line 1020, in spin_once
+    self._spin_once_impl(timeout_sec)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/opt/ros/lyrical/lib/python3.14/site-packages/rclpy/executors.py", line 1000, in _spin_once_impl
+    handler, entity, node = self.wait_for_ready_callbacks(
+                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        timeout_sec, None, wait_condition)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/ros/lyrical/lib/python3.14/site-packages/rclpy/executors.py", line 970, in wait_for_ready_callbacks
+    return next(self._cb_iter)
+  File "/opt/ros/lyrical/lib/python3.14/site-packages/rclpy/executors.py", line 876, in _wait_for_ready_callbacks
+    raise ExternalShutdownException()
+rclpy.executors.ExternalShutdownException

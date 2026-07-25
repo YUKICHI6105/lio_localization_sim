@@ -1,0 +1,26 @@
+[INFO] [1784802626.302229697] [wall_bias_diag]: map: 22 segments
+[INFO] [1784802647.892590680] [wall_bias_diag]: scan#40 pose=(-2.289,1.153,0.0deg) unattached=438 || perim_+y: n=365 bias=+5.2mm sd=24.8mm tilt=+0.128deg | perim_-x: n=278 bias=+3.1mm sd=25.4mm tilt=-1.326deg
+[INFO] [1784802651.481826105] [wall_bias_diag]: scan#80 pose=(-1.790,0.380,0.0deg) unattached=607 || perim_+y: n=272 bias=-3.8mm sd=27.6mm tilt=+0.043deg | perim_-x: n=202 bias=-2.1mm sd=27.4mm tilt=-0.070deg
+[INFO] [1784802652.980485984] [wall_bias_diag]: scan#120 pose=(-1.758,0.398,0.0deg) unattached=604 || perim_+y: n=278 bias=-4.6mm sd=28.7mm tilt=+0.030deg | perim_-x: n=199 bias=+2.5mm sd=25.3mm tilt=-0.232deg
+[INFO] [1784802654.329951356] [wall_bias_diag]: scan#160 pose=(-0.410,0.503,0.0deg) unattached=689 || perim_+y: n=290 bias=-0.5mm sd=23.0mm tilt=-0.008deg | perim_-x: n=102 bias=+1.6mm sd=27.6mm tilt=-0.855deg
+[INFO] [1784802655.743372521] [wall_bias_diag]: scan#200 pose=(-0.290,1.096,0.0deg) unattached=603 || perim_+y: n=398 bias=+2.6mm sd=23.5mm tilt=-0.198deg | perim_+x: n=80 bias=-0.9mm sd=27.0mm tilt=-0.240deg
+[INFO] [1784802657.039479838] [wall_bias_diag]: scan#240 pose=(0.386,1.060,0.0deg) unattached=443 || perim_+y: n=521 bias=-0.3mm sd=24.6mm tilt=+0.141deg | perim_+x: n=100 bias=+1.0mm sd=27.8mm tilt=-0.516deg | perim_-x: n=17 bias=+4.9mm sd=24.3mm
+[INFO] [1784802658.639592843] [wall_bias_diag]: scan#280 pose=(1.733,0.662,0.0deg) unattached=455 || perim_+y: n=417 bias=+3.1mm sd=25.2mm tilt=+0.038deg | perim_+x: n=209 bias=-13.3mm sd=29.4mm tilt=+0.317deg
+[INFO] [1784802660.098327226] [wall_bias_diag]: scan#320 pose=(2.319,0.493,0.0deg) unattached=435 || perim_+x: n=337 bias=-2.4mm sd=23.9mm tilt=-0.014deg | perim_+y: n=309 bias=+2.3mm sd=23.4mm tilt=+0.112deg
+[INFO] [1784802661.454616892] [wall_bias_diag]: scan#360 pose=(2.316,0.494,0.0deg) unattached=432 || perim_+x: n=339 bias=-2.7mm sd=25.4mm tilt=-0.341deg | perim_+y: n=310 bias=-0.2mm sd=25.2mm tilt=-0.108deg
+[INFO] [1784802662.851045895] [wall_bias_diag]: scan#400 pose=(2.316,0.494,0.0deg) unattached=442 || perim_+x: n=330 bias=-1.7mm sd=24.9mm tilt=+0.122deg | perim_+y: n=309 bias=+0.3mm sd=24.8mm tilt=+0.056deg
+[INFO] [1784802664.303866932] [wall_bias_diag]: scan#440 pose=(2.316,0.494,0.0deg) unattached=437 || perim_+x: n=336 bias=+0.8mm sd=25.3mm tilt=-0.224deg | perim_+y: n=308 bias=+0.9mm sd=23.5mm tilt=+0.107deg
+[INFO] [1784802666.315957105] [wall_bias_diag]: scan#480 pose=(2.316,0.494,0.0deg) unattached=441 || perim_+x: n=331 bias=-2.5mm sd=26.2mm tilt=-0.266deg | perim_+y: n=309 bias=+1.7mm sd=25.2mm tilt=+0.191deg
+[INFO] [1784802667.743816781] [wall_bias_diag]: scan#520 pose=(2.316,0.494,0.0deg) unattached=438 || perim_+x: n=336 bias=-3.5mm sd=25.3mm tilt=-0.351deg | perim_+y: n=307 bias=-0.4mm sd=24.7mm tilt=+0.058deg
+[INFO] [1784802669.222448327] [wall_bias_diag]: scan#560 pose=(2.316,0.494,0.0deg) unattached=434 || perim_+x: n=337 bias=-3.5mm sd=24.5mm tilt=-0.208deg | perim_+y: n=310 bias=+0.4mm sd=24.7mm tilt=-0.148deg
+[INFO] [1784802670.789928880] [wall_bias_diag]: scan#600 pose=(2.316,0.494,0.0deg) unattached=440 || perim_+x: n=333 bias=-0.4mm sd=26.1mm tilt=+0.028deg | perim_+y: n=308 bias=-1.7mm sd=25.6mm tilt=-0.103deg
+[INFO] [1784802672.195558494] [wall_bias_diag]: scan#640 pose=(2.316,0.494,0.0deg) unattached=433 || perim_+x: n=338 bias=+1.2mm sd=26.4mm tilt=-0.253deg | perim_+y: n=310 bias=+1.3mm sd=23.8mm tilt=-0.065deg
+[INFO] [1784802673.684387850] [wall_bias_diag]: scan#680 pose=(2.316,0.494,0.0deg) unattached=438 || perim_+x: n=336 bias=-0.8mm sd=26.2mm tilt=-0.458deg | perim_+y: n=307 bias=+0.9mm sd=23.3mm tilt=+0.020deg
+[INFO] [1784802674.992015314] [wall_bias_diag]: scan#720 pose=(2.316,0.494,0.0deg) unattached=439 || perim_+x: n=334 bias=+0.3mm sd=27.1mm tilt=-0.447deg | perim_+y: n=308 bias=+0.1mm sd=24.1mm tilt=-0.059deg
+[INFO] [1784802676.174880070] [wall_bias_diag]: scan#760 pose=(2.316,0.494,0.0deg) unattached=441 || perim_+x: n=333 bias=-2.5mm sd=25.0mm tilt=-0.398deg | perim_+y: n=307 bias=+1.7mm sd=24.5mm tilt=+0.010deg
+[INFO] [1784802677.011002809] [wall_bias_diag]: scan#800 pose=(2.316,0.494,0.0deg) unattached=443 || perim_+x: n=331 bias=-1.0mm sd=26.4mm tilt=-0.395deg | perim_+y: n=307 bias=+1.0mm sd=23.6mm tilt=-0.070deg
+[INFO] [1784802677.882477989] [wall_bias_diag]: scan#840 pose=(2.316,0.494,0.0deg) unattached=439 || perim_+x: n=334 bias=+0.8mm sd=24.9mm tilt=-0.677deg | perim_+y: n=308 bias=+0.5mm sd=23.4mm tilt=+0.097deg
+[INFO] [1784802678.747214134] [wall_bias_diag]: scan#880 pose=(2.316,0.494,0.0deg) unattached=439 || perim_+x: n=336 bias=+1.6mm sd=27.8mm tilt=-0.121deg | perim_+y: n=306 bias=+0.9mm sd=24.3mm tilt=+0.030deg
+[INFO] [1784802679.824790250] [wall_bias_diag]: scan#920 pose=(2.316,0.494,0.0deg) unattached=433 || perim_+x: n=339 bias=-1.6mm sd=24.9mm tilt=-0.300deg | perim_+y: n=309 bias=+3.7mm sd=24.6mm tilt=-0.039deg
+[INFO] [1784802681.171309404] [wall_bias_diag]: scan#960 pose=(2.316,0.494,0.0deg) unattached=435 || perim_+x: n=337 bias=+0.5mm sd=26.4mm tilt=-0.091deg | perim_+y: n=309 bias=+0.9mm sd=23.3mm tilt=+0.157deg
+[INFO] [1784802682.882100668] [wall_bias_diag]: scan#1000 pose=(2.316,0.494,0.0deg) unattached=437 || perim_+x: n=337 bias=-1.5mm sd=24.8mm tilt=-0.285deg | perim_+y: n=307 bias=-0.4mm sd=22.8mm tilt=-0.064deg

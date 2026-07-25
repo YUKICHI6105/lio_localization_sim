@@ -1,0 +1,40 @@
+[INFO] [1784816977.261260210] [wall_bias_diag]: map: 22 segments
+[INFO] [1784817017.034831194] [wall_bias_diag]: scan#200 pose=(-1.807,0.408,0.0deg) unattached=600 || perim_+y: n=273 bias=+1.8mm sd=26.3mm tilt=+0.056deg | perim_-x: n=208 bias=-1.2mm sd=27.0mm tilt=-0.280deg
+[INFO] [1784817022.457149903] [wall_bias_diag]: scan#400 pose=(-1.807,0.409,0.0deg) unattached=601 || perim_+y: n=277 bias=+0.4mm sd=26.0mm tilt=-0.003deg | perim_-x: n=203 bias=-1.8mm sd=27.6mm tilt=+0.272deg
+[INFO] [1784817027.571141212] [wall_bias_diag]: scan#600 pose=(-1.807,0.407,0.0deg) unattached=599 || perim_+y: n=275 bias=-1.1mm sd=28.0mm tilt=+0.060deg | perim_-x: n=207 bias=+1.8mm sd=25.9mm tilt=-0.223deg
+[INFO] [1784817032.693626214] [wall_bias_diag]: scan#800 pose=(-1.806,0.408,0.0deg) unattached=596 || perim_+y: n=276 bias=+0.9mm sd=26.3mm tilt=+0.020deg | perim_-x: n=209 bias=+2.0mm sd=27.1mm tilt=+0.293deg
+[INFO] [1784817038.013737553] [wall_bias_diag]: scan#1000 pose=(-1.806,0.408,0.0deg) unattached=595 || perim_+y: n=279 bias=+2.6mm sd=26.9mm tilt=+0.028deg | perim_-x: n=207 bias=-0.4mm sd=26.3mm tilt=+0.305deg
+[INFO] [1784817043.567408591] [wall_bias_diag]: scan#1200 pose=(-1.804,0.408,0.0deg) unattached=599 || perim_+y: n=274 bias=+0.2mm sd=26.5mm tilt=+0.017deg | perim_-x: n=208 bias=+3.1mm sd=26.7mm tilt=-0.014deg
+[INFO] [1784817048.864471083] [wall_bias_diag]: scan#1400 pose=(-1.805,0.407,0.0deg) unattached=594 || perim_+y: n=279 bias=-0.5mm sd=26.9mm tilt=+0.042deg | perim_-x: n=208 bias=-0.4mm sd=26.2mm tilt=+0.589deg
+[INFO] [1784817054.157613300] [wall_bias_diag]: scan#1600 pose=(-1.806,0.407,0.0deg) unattached=604 || perim_+y: n=269 bias=-0.3mm sd=25.8mm tilt=-0.013deg | perim_-x: n=208 bias=+2.1mm sd=27.7mm tilt=-0.520deg
+[INFO] [1784817059.361552552] [wall_bias_diag]: scan#1800 pose=(-1.805,0.409,0.0deg) unattached=601 || perim_+y: n=278 bias=+1.3mm sd=24.2mm tilt=+0.022deg | perim_-x: n=202 bias=+1.7mm sd=27.9mm tilt=-0.020deg
+[INFO] [1784817064.519279951] [wall_bias_diag]: scan#2000 pose=(-1.806,0.407,0.0deg) unattached=594 || perim_+y: n=279 bias=+2.1mm sd=26.1mm tilt=-0.013deg | perim_-x: n=208 bias=+0.7mm sd=25.6mm tilt=+0.473deg
+[INFO] [1784817070.083571280] [wall_bias_diag]: scan#2200 pose=(-1.805,0.407,0.0deg) unattached=599 || perim_+y: n=276 bias=+2.1mm sd=28.4mm tilt=+0.015deg | perim_-x: n=206 bias=+3.0mm sd=26.1mm tilt=-0.365deg
+[INFO] [1784817075.381442642] [wall_bias_diag]: scan#2400 pose=(-1.808,0.409,0.0deg) unattached=596 || perim_+y: n=277 bias=+1.7mm sd=25.6mm tilt=-0.017deg | perim_-x: n=208 bias=-0.8mm sd=25.0mm tilt=+0.273deg
+Traceback (most recent call last):
+  File "/home/yukichi6105/ros2_ws/src/lio_localization_sim/tools/wall_bias_diag.py", line 215, in <module>
+    main()
+    ~~~~^^
+  File "/home/yukichi6105/ros2_ws/src/lio_localization_sim/tools/wall_bias_diag.py", line 206, in main
+    rclpy.spin(node)
+    ~~~~~~~~~~^^^^^^
+  File "/opt/ros/lyrical/lib/python3.14/site-packages/rclpy/__init__.py", line 324, in spin
+    executor.spin_once()
+    ~~~~~~~~~~~~~~~~~~^^
+  File "/opt/ros/lyrical/lib/python3.14/site-packages/rclpy/executors.py", line 1020, in spin_once
+    self._spin_once_impl(timeout_sec)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/opt/ros/lyrical/lib/python3.14/site-packages/rclpy/executors.py", line 1000, in _spin_once_impl
+    handler, entity, node = self.wait_for_ready_callbacks(
+                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        timeout_sec, None, wait_condition)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/ros/lyrical/lib/python3.14/site-packages/rclpy/executors.py", line 970, in wait_for_ready_callbacks
+    return next(self._cb_iter)
+  File "/opt/ros/lyrical/lib/python3.14/site-packages/rclpy/executors.py", line 848, in _wait_for_ready_callbacks
+    wait_set = _rclpy.WaitSet(
+        entity_count.num_subscriptions,
+    ...<4 lines>...
+        entity_count.num_events,
+        self._context.handle)
+rclpy._rclpy_pybind11.RCLError: failed to initialize wait set: the given context is not valid, either rcl_init() was not called or rcl_shutdown() was called., at ./src/rcl/wait.c:110

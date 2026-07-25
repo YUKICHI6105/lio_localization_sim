@@ -1,0 +1,8 @@
+[INFO] [1784806684.934959212] [icp_seed_mode_diag]: icp_seed_mode_diag: recording 55.0s, 22 segments, corr=0.2m
+[INFO] [1784806759.281973301] [icp_seed_mode_diag]: recorded 2240 scans; running three seeding modes
+[INFO] [1784806821.753824038] [icp_seed_mode_diag]: ====================================================================================================
+[INFO] [1784806821.754282512] [icp_seed_mode_diag]: seed perturbation applied to "offset": dx=+6.79mm dy=-13.33mm (|14.96|mm)
+[INFO] [1784806821.757188343] [icp_seed_mode_diag]: truth     n=1840  dx=  -2.15+- 1.13mm dy=  +0.34+- 1.83mm |bias|=  2.18mm RMSE=  3.06mm dyaw=+0.0377deg
+[INFO] [1784806821.758197319] [icp_seed_mode_diag]: offset    n=1840  dx=  -2.15+- 1.13mm dy=  +0.35+- 1.83mm |bias|=  2.18mm RMSE=  3.07mm dyaw=+0.0384deg
+[INFO] [1784806821.759198621] [icp_seed_mode_diag]: chained   n=1840  dx=-6226.41+- 0.00mm dy=+2273.08+- 0.00mm |bias|=6628.35mm RMSE=6628.35mm dyaw=+21.6419deg
+[INFO] [1784806821.759465958] [icp_seed_mode_diag]: ====================================================================================================

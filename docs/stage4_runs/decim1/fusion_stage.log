@@ -1,0 +1,61 @@
+[INFO] [1784814972.842554990] [fusion_stage_diag]: fusion_stage_diag started (settle=8.0s)
+[INFO] [1784815033.322640621] [fusion_stage_diag]: ==============================================================================
+[INFO] [1784815033.323151757] [fusion_stage_diag]: --- stage vs ground truth (signed, settled samples only) ---
+[INFO] [1784815033.323532107] [fusion_stage_diag]: scan_match wall.corrected_pose: n=62 dx=+6.68+-1.41mm dy=-12.88+-1.56mm |bias|=14.52mm dyaw=+0.2900+-0.0423deg
+[INFO] [1784815033.323873404] [fusion_stage_diag]: state_estimate (fused)      : n=64 dx=+6.87+-0.45mm dy=-13.07+-0.62mm |bias|=14.76mm dyaw=+0.3441+-0.0077deg
+[INFO] [1784815033.325016795] [fusion_stage_diag]: odom_fast (evaluated)       : n=1860 dx=+6.88+-0.49mm dy=-13.07+-0.64mm |bias|=14.77mm dyaw=+0.3452+-0.0079deg
+[INFO] [1784815033.325337779] [fusion_stage_diag]: --- stamp regularity ---
+[INFO] [1784815033.326739793] [fusion_stage_diag]: imu  stamp dt: n=4601 mean=2.173ms (nominal 4.000) sd=3.876ms min=1.000 max=43.000
+[INFO] [1784815033.336282500] [fusion_stage_diag]: scan stamp dt: n=399 mean=25.003ms (nominal 25.000) sd=0.050ms min=25.000 max=26.000
+[INFO] [1784815033.337705381] [fusion_stage_diag]: scan stamp - newest imu stamp: n=400 mean=-3.042ms min=-33.000 max=+4.000
+[INFO] [1784815033.339515119] [fusion_stage_diag]: estimated bias: gyro_z mean=+0.004345rad/s (last=+0.004437)  |accel_xy| mean=0.052646m/s^2
+[INFO] [1784815043.649826632] [fusion_stage_diag]: ==============================================================================
+[INFO] [1784815043.651881810] [fusion_stage_diag]: --- stage vs ground truth (signed, settled samples only) ---
+[INFO] [1784815043.652866738] [fusion_stage_diag]: scan_match wall.corrected_pose: n=372 dx=+6.69+-1.42mm dy=-13.14+-1.63mm |bias|=14.74mm dyaw=+0.2963+-0.0448deg
+[INFO] [1784815043.655773581] [fusion_stage_diag]: state_estimate (fused)      : n=404 dx=+6.88+-0.46mm dy=-13.26+-0.61mm |bias|=14.94mm dyaw=+0.3259+-0.0108deg
+[INFO] [1784815043.664220605] [fusion_stage_diag]: odom_fast (evaluated)       : n=10430 dx=+6.92+-0.49mm dy=-13.26+-0.67mm |bias|=14.95mm dyaw=+0.3271+-0.0113deg
+[INFO] [1784815043.664661945] [fusion_stage_diag]: --- stamp regularity ---
+[INFO] [1784815043.666951095] [fusion_stage_diag]: imu  stamp dt: n=9880 mean=2.023ms (nominal 4.000) sd=3.539ms min=1.000 max=55.000
+[INFO] [1784815043.667555028] [fusion_stage_diag]: scan stamp dt: n=799 mean=25.001ms (nominal 25.000) sd=0.035ms min=25.000 max=26.000
+[INFO] [1784815043.668123807] [fusion_stage_diag]: scan stamp - newest imu stamp: n=800 mean=-2.598ms min=-55.000 max=+4.000
+[INFO] [1784815043.668623779] [fusion_stage_diag]: estimated bias: gyro_z mean=+0.004623rad/s (last=+0.004810)  |accel_xy| mean=0.054376m/s^2
+[INFO] [1784815054.070157488] [fusion_stage_diag]: ==============================================================================
+[INFO] [1784815054.072263778] [fusion_stage_diag]: --- stage vs ground truth (signed, settled samples only) ---
+[INFO] [1784815054.077972781] [fusion_stage_diag]: scan_match wall.corrected_pose: n=686 dx=+6.71+-1.44mm dy=-13.13+-1.65mm |bias|=14.74mm dyaw=+0.2952+-0.0445deg
+[INFO] [1784815054.078952085] [fusion_stage_diag]: state_estimate (fused)      : n=746 dx=+6.86+-0.47mm dy=-13.22+-0.57mm |bias|=14.89mm dyaw=+0.3161+-0.0138deg
+[INFO] [1784815054.117854779] [fusion_stage_diag]: odom_fast (evaluated)       : n=19053 dx=+6.89+-0.50mm dy=-13.22+-0.62mm |bias|=14.91mm dyaw=+0.3170+-0.0145deg
+[INFO] [1784815054.118350788] [fusion_stage_diag]: --- stamp regularity ---
+[INFO] [1784815054.130566578] [fusion_stage_diag]: imu  stamp dt: n=15302 mean=1.961ms (nominal 4.000) sd=3.339ms min=1.000 max=55.000
+[INFO] [1784815054.132609485] [fusion_stage_diag]: scan stamp dt: n=1199 mean=25.001ms (nominal 25.000) sd=0.029ms min=25.000 max=26.000
+[INFO] [1784815054.136977286] [fusion_stage_diag]: scan stamp - newest imu stamp: n=1200 mean=-2.341ms min=-55.000 max=+4.000
+[INFO] [1784815054.137664416] [fusion_stage_diag]: estimated bias: gyro_z mean=+0.004748rad/s (last=+0.004942)  |accel_xy| mean=0.055165m/s^2
+[INFO] [1784815064.397756146] [fusion_stage_diag]: ==============================================================================
+[INFO] [1784815064.398480680] [fusion_stage_diag]: --- stage vs ground truth (signed, settled samples only) ---
+[INFO] [1784815064.399701177] [fusion_stage_diag]: scan_match wall.corrected_pose: n=1010 dx=+6.69+-1.46mm dy=-13.14+-1.65mm |bias|=14.75mm dyaw=+0.2959+-0.0440deg
+[INFO] [1784815064.400870435] [fusion_stage_diag]: state_estimate (fused)      : n=1097 dx=+6.81+-0.49mm dy=-13.22+-0.54mm |bias|=14.87mm dyaw=+0.3105+-0.0143deg
+[INFO] [1784815064.424461399] [fusion_stage_diag]: odom_fast (evaluated)       : n=27059 dx=+6.84+-0.52mm dy=-13.23+-0.58mm |bias|=14.89mm dyaw=+0.3115+-0.0150deg
+[INFO] [1784815064.425714458] [fusion_stage_diag]: --- stamp regularity ---
+[INFO] [1784815064.435905521] [fusion_stage_diag]: imu  stamp dt: n=20882 mean=1.915ms (nominal 4.000) sd=3.223ms min=1.000 max=55.000
+[INFO] [1784815064.437004775] [fusion_stage_diag]: scan stamp dt: n=1599 mean=25.001ms (nominal 25.000) sd=0.025ms min=25.000 max=26.000
+[INFO] [1784815064.437664286] [fusion_stage_diag]: scan stamp - newest imu stamp: n=1600 mean=-2.262ms min=-55.000 max=+4.000
+[INFO] [1784815064.438297419] [fusion_stage_diag]: estimated bias: gyro_z mean=+0.004815rad/s (last=+0.004972)  |accel_xy| mean=0.055662m/s^2
+[INFO] [1784815075.081787133] [fusion_stage_diag]: ==============================================================================
+[INFO] [1784815075.082399151] [fusion_stage_diag]: --- stage vs ground truth (signed, settled samples only) ---
+[INFO] [1784815075.083776305] [fusion_stage_diag]: scan_match wall.corrected_pose: n=1336 dx=+6.70+-1.48mm dy=-13.15+-1.63mm |bias|=14.76mm dyaw=+0.2956+-0.0440deg
+[INFO] [1784815075.085252494] [fusion_stage_diag]: state_estimate (fused)      : n=1455 dx=+6.79+-0.50mm dy=-13.21+-0.54mm |bias|=14.86mm dyaw=+0.3070+-0.0140deg
+[INFO] [1784815075.124581156] [fusion_stage_diag]: odom_fast (evaluated)       : n=35667 dx=+6.81+-0.54mm dy=-13.22+-0.59mm |bias|=14.87mm dyaw=+0.3078+-0.0147deg
+[INFO] [1784815075.125321200] [fusion_stage_diag]: --- stamp regularity ---
+[INFO] [1784815075.138391416] [fusion_stage_diag]: imu  stamp dt: n=25874 mean=1.932ms (nominal 4.000) sd=3.265ms min=1.000 max=55.000
+[INFO] [1784815075.139326775] [fusion_stage_diag]: scan stamp dt: n=2000 mean=25.000ms (nominal 25.000) sd=0.022ms min=25.000 max=26.000
+[INFO] [1784815075.139986270] [fusion_stage_diag]: scan stamp - newest imu stamp: n=2001 mean=-2.290ms min=-55.000 max=+4.000
+[INFO] [1784815075.140762819] [fusion_stage_diag]: estimated bias: gyro_z mean=+0.004853rad/s (last=+0.004984)  |accel_xy| mean=0.055998m/s^2
+[INFO] [1784815085.448084361] [fusion_stage_diag]: ==============================================================================
+[INFO] [1784815085.448618836] [fusion_stage_diag]: --- stage vs ground truth (signed, settled samples only) ---
+[INFO] [1784815085.450803206] [fusion_stage_diag]: scan_match wall.corrected_pose: n=1656 dx=+6.71+-1.48mm dy=-13.17+-1.64mm |bias|=14.78mm dyaw=+0.2961+-0.0440deg
+[INFO] [1784815085.452572523] [fusion_stage_diag]: state_estimate (fused)      : n=1809 dx=+6.78+-0.50mm dy=-13.23+-0.55mm |bias|=14.86mm dyaw=+0.3050+-0.0133deg
+[INFO] [1784815085.489175221] [fusion_stage_diag]: odom_fast (evaluated)       : n=43831 dx=+6.80+-0.54mm dy=-13.23+-0.59mm |bias|=14.88mm dyaw=+0.3057+-0.0141deg
+[INFO] [1784815085.489676808] [fusion_stage_diag]: --- stamp regularity ---
+[INFO] [1784815085.498727470] [fusion_stage_diag]: imu  stamp dt: n=31409 mean=1.910ms (nominal 4.000) sd=3.213ms min=1.000 max=63.000
+[INFO] [1784815085.508015473] [fusion_stage_diag]: scan stamp dt: n=2399 mean=25.000ms (nominal 25.000) sd=0.020ms min=25.000 max=26.000
+[INFO] [1784815085.509002342] [fusion_stage_diag]: scan stamp - newest imu stamp: n=2400 mean=-2.230ms min=-55.000 max=+4.000
+[INFO] [1784815085.509770553] [fusion_stage_diag]: estimated bias: gyro_z mean=+0.004879rad/s (last=+0.004979)  |accel_xy| mean=0.056256m/s^2

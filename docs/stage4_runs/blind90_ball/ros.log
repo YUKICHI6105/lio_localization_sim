@@ -1,0 +1,95 @@
+[INFO] [launch]: All log files can be found below /home/yukichi6105/.ros/log/2026-07-23-19-06-56-768748-fuku-pc-83226
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [default_server_endpoint-1]: process started with pid [83297]
+[default_server_endpoint-1] /opt/ros/lyrical/lib/python3.14/site-packages/rclpy/executors.py:1073: UserWarning: MultiThreadedExecutor is used with a single thread.
+[default_server_endpoint-1] Use the SingleThreadedExecutor instead.
+[default_server_endpoint-1]   warnings.warn(
+[default_server_endpoint-1] [INFO] [1784801217.878217395] [unity_endpoint]: Starting server on 0.0.0.0:10000
+[INFO] [imu_preintegration_node-2]: process started with pid [83335]
+[INFO] [backend_optimizer_node-3]: process started with pid [83336]
+[INFO] [laser_scan_matching_node-4]: process started with pid [83337]
+[INFO] [ball_tracking_node-5]: process started with pid [83338]
+[INFO] [evaluator_node-6]: process started with pid [83339]
+[ball_tracking_node-5] [INFO] [1784801222.134749759] [ball_tracking_node]: ball_tracking_node started
+[laser_scan_matching_node-4] [INFO] [1784801222.138035908] [laser_scan_matching_node]: laser_scan_matching_node started (0 cylinders, 9 internal walls, field 5.572x3.310m, initial seed=(-2.419, 1.354, 0.000))
+[imu_preintegration_node-2] [INFO] [1784801222.146106814] [imu_preintegration_node]: imu_preintegration_node started (waiting for first /state_estimate)
+[backend_optimizer_node-3] [INFO] [1784801222.149928347] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[backend_optimizer_node-3] [INFO] [1784801222.150140987] [backend_optimizer_node]: backend_optimizer_node started (0 cylinders registered)
+[evaluator_node-6] [INFO] [1784801223.835673932] [unity_evaluator_node]: evaluator_node started: will run for 60.0s then report
+[default_server_endpoint-1] [INFO] [1784801250.488164434] [unity_endpoint]: Connection from 127.0.0.1
+[default_server_endpoint-1] [WARN] [1784801250.540249719] [rcl.logging_rosout]: Publisher already registered for node name: 'unity_endpoint'. If this is due to multiple nodes with the same name then all logs for the logger named 'unity_endpoint' will go out over the existing publisher. As soon as any node with that name is destructed it will unregister the publisher, preventing any further logs for that name from being published on the rosout topic.
+[default_server_endpoint-1] [INFO] [1784801250.970544019] [unity_endpoint]: RegisterSubscriber(/odom_fast, <class 'nav_msgs.msg._odometry.Odometry'>) OK
+[default_server_endpoint-1] [WARN] [1784801250.985595153] [rcl.logging_rosout]: Publisher already registered for node name: 'unity_endpoint'. If this is due to multiple nodes with the same name then all logs for the logger named 'unity_endpoint' will go out over the existing publisher. As soon as any node with that name is destructed it will unregister the publisher, preventing any further logs for that name from being published on the rosout topic.
+[default_server_endpoint-1] [INFO] [1784801251.011646391] [unity_endpoint]: RegisterSubscriber(/tf, <class 'tf2_msgs.msg._tf_message.TFMessage'>) OK
+[default_server_endpoint-1] [WARN] [1784801251.012215344] [rcl.logging_rosout]: Publisher already registered for node name: 'unity_endpoint'. If this is due to multiple nodes with the same name then all logs for the logger named 'unity_endpoint' will go out over the existing publisher. As soon as any node with that name is destructed it will unregister the publisher, preventing any further logs for that name from being published on the rosout topic.
+[default_server_endpoint-1] [INFO] [1784801251.041908027] [unity_endpoint]: RegisterPublisher(/clock, <class 'rosgraph_msgs.msg._clock.Clock'>) OK
+[default_server_endpoint-1] [WARN] [1784801251.242513670] [rcl.logging_rosout]: Publisher already registered for node name: 'unity_endpoint'. If this is due to multiple nodes with the same name then all logs for the logger named 'unity_endpoint' will go out over the existing publisher. As soon as any node with that name is destructed it will unregister the publisher, preventing any further logs for that name from being published on the rosout topic.
+[default_server_endpoint-1] [INFO] [1784801251.271901397] [unity_endpoint]: RegisterPublisher(/scan, <class 'sensor_msgs.msg._laser_scan.LaserScan'>) OK
+[default_server_endpoint-1] [WARN] [1784801251.272600539] [rcl.logging_rosout]: Publisher already registered for node name: 'unity_endpoint'. If this is due to multiple nodes with the same name then all logs for the logger named 'unity_endpoint' will go out over the existing publisher. As soon as any node with that name is destructed it will unregister the publisher, preventing any further logs for that name from being published on the rosout topic.
+[default_server_endpoint-1] [INFO] [1784801251.315489977] [unity_endpoint]: RegisterPublisher(/ground_truth_pose, <class 'nav_msgs.msg._odometry.Odometry'>) OK
+[default_server_endpoint-1] [WARN] [1784801251.316450954] [rcl.logging_rosout]: Publisher already registered for node name: 'unity_endpoint'. If this is due to multiple nodes with the same name then all logs for the logger named 'unity_endpoint' will go out over the existing publisher. As soon as any node with that name is destructed it will unregister the publisher, preventing any further logs for that name from being published on the rosout topic.
+[default_server_endpoint-1] [INFO] [1784801251.361578837] [unity_endpoint]: RegisterPublisher(/imu/data, <class 'sensor_msgs.msg._imu.Imu'>) OK
+[default_server_endpoint-1] [WARN] [1784801251.362843297] [rcl.logging_rosout]: Publisher already registered for node name: 'unity_endpoint'. If this is due to multiple nodes with the same name then all logs for the logger named 'unity_endpoint' will go out over the existing publisher. As soon as any node with that name is destructed it will unregister the publisher, preventing any further logs for that name from being published on the rosout topic.
+[default_server_endpoint-1] [INFO] [1784801251.385385849] [unity_endpoint]: RegisterPublisher(/clock, <class 'rosgraph_msgs.msg._clock.Clock'>) OK
+[default_server_endpoint-1] [INFO] [1784801251.433879382] [unity_endpoint]: RegisterPublisher(/scan, <class 'sensor_msgs.msg._laser_scan.LaserScan'>) OK
+[default_server_endpoint-1] [WARN] [1784801251.434528611] [rcl.logging_rosout]: Publisher already registered for node name: 'unity_endpoint'. If this is due to multiple nodes with the same name then all logs for the logger named 'unity_endpoint' will go out over the existing publisher. As soon as any node with that name is destructed it will unregister the publisher, preventing any further logs for that name from being published on the rosout topic.
+[default_server_endpoint-1] [INFO] [1784801251.471189086] [unity_endpoint]: RegisterPublisher(/ground_truth_pose, <class 'nav_msgs.msg._odometry.Odometry'>) OK
+[default_server_endpoint-1] [INFO] [1784801251.522539526] [unity_endpoint]: RegisterPublisher(/imu/data, <class 'sensor_msgs.msg._imu.Imu'>) OK
+[backend_optimizer_node-3] [ERROR] [1784801253.450379868] [backend_optimizer_node]: IMU signal LOST (no IMU for 2.00s > 2.00s). Self-localization is the dead-reckoning backbone and cannot continue without it: entering FAIL-SAFE HALT (freezing estimate, no further graph updates).
+[imu_preintegration_node-2] [ERROR] [1784801253.496381409] [imu_preintegration_node]: IMU signal LOST (no IMU for 2.04s > 2.00s): stopping /odom_fast. IMU is the dead-reckoning backbone; recovery is not possible, restart required.
+[backend_optimizer_node-3] [ERROR] [1784801256.997773976] [backend_optimizer_node]: FAIL-SAFE HALT active (IMU lost): ignoring scan corrections, self-localization is frozen and must be restarted.
+[backend_optimizer_node-3] [ERROR] [1784801262.336090036] [backend_optimizer_node]: FAIL-SAFE HALT active (IMU lost): ignoring scan corrections, self-localization is frozen and must be restarted.
+[evaluator_node-6] [WARN] [1784801263.353456305] [unity_evaluator_node]: no /odom_fast samples matched to ground truth yet
+[backend_optimizer_node-3] [ERROR] [1784801264.430004036] [backend_optimizer_node]: FAIL-SAFE HALT active (IMU lost): ignoring scan corrections, self-localization is frozen and must be restarted.
+[laser_scan_matching_node-4] [WARN] [1784801265.770764763] [laser_scan_matching_node]: wall match rejected by quality check: mean_residual=0.094m (<=0.090) inlier_ratio=0.63 (>=0.40)
+[backend_optimizer_node-3] [ERROR] [1784801266.472840354] [backend_optimizer_node]: FAIL-SAFE HALT active (IMU lost): ignoring scan corrections, self-localization is frozen and must be restarted.
+[laser_scan_matching_node-4] [WARN] [1784801267.965817771] [laser_scan_matching_node]: wall match rejected by quality check: mean_residual=0.095m (<=0.090) inlier_ratio=0.62 (>=0.40)
+[evaluator_node-6] [WARN] [1784801268.539980535] [unity_evaluator_node]: no /odom_fast samples matched to ground truth yet
+[backend_optimizer_node-3] [ERROR] [1784801268.632845735] [backend_optimizer_node]: FAIL-SAFE HALT active (IMU lost): ignoring scan corrections, self-localization is frozen and must be restarted.
+[laser_scan_matching_node-4] [WARN] [1784801270.069707414] [laser_scan_matching_node]: wall match rejected by quality check: mean_residual=0.098m (<=0.090) inlier_ratio=0.55 (>=0.40)
+[backend_optimizer_node-3] [ERROR] [1784801270.717317292] [backend_optimizer_node]: FAIL-SAFE HALT active (IMU lost): ignoring scan corrections, self-localization is frozen and must be restarted.
+[laser_scan_matching_node-4] [WARN] [1784801272.679878046] [laser_scan_matching_node]: wall match rejected by quality check: mean_residual=0.090m (<=0.090) inlier_ratio=0.63 (>=0.40)
+[backend_optimizer_node-3] [ERROR] [1784801273.728985619] [backend_optimizer_node]: FAIL-SAFE HALT active (IMU lost): ignoring scan corrections, self-localization is frozen and must be restarted.
+[evaluator_node-6] [WARN] [1784801275.191813855] [unity_evaluator_node]: no /odom_fast samples matched to ground truth yet
+[laser_scan_matching_node-4] [WARN] [1784801275.922647918] [laser_scan_matching_node]: wall match rejected by quality check: mean_residual=0.093m (<=0.090) inlier_ratio=0.59 (>=0.40)
+[backend_optimizer_node-3] [ERROR] [1784801276.651674037] [backend_optimizer_node]: FAIL-SAFE HALT active (IMU lost): ignoring scan corrections, self-localization is frozen and must be restarted.
+[laser_scan_matching_node-4] [WARN] [1784801279.082559377] [laser_scan_matching_node]: wall match rejected by quality check: mean_residual=0.092m (<=0.090) inlier_ratio=0.63 (>=0.40)
+[backend_optimizer_node-3] [ERROR] [1784801279.923325791] [backend_optimizer_node]: FAIL-SAFE HALT active (IMU lost): ignoring scan corrections, self-localization is frozen and must be restarted.
+[laser_scan_matching_node-4] [WARN] [1784801282.846409031] [laser_scan_matching_node]: wall match rejected by quality check: mean_residual=0.100m (<=0.090) inlier_ratio=0.57 (>=0.40)
+[evaluator_node-6] [WARN] [1784801283.660901485] [unity_evaluator_node]: no /odom_fast samples matched to ground truth yet
+[backend_optimizer_node-3] [ERROR] [1784801283.930942188] [backend_optimizer_node]: FAIL-SAFE HALT active (IMU lost): ignoring scan corrections, self-localization is frozen and must be restarted.
+[laser_scan_matching_node-4] [WARN] [1784801286.599874169] [laser_scan_matching_node]: wall match rejected by quality check: mean_residual=0.099m (<=0.090) inlier_ratio=0.60 (>=0.40)
+[backend_optimizer_node-3] [ERROR] [1784801287.509150676] [backend_optimizer_node]: FAIL-SAFE HALT active (IMU lost): ignoring scan corrections, self-localization is frozen and must be restarted.
+[laser_scan_matching_node-4] [WARN] [1784801289.747314547] [laser_scan_matching_node]: wall match rejected by quality check: mean_residual=0.093m (<=0.090) inlier_ratio=0.62 (>=0.40)
+[backend_optimizer_node-3] [ERROR] [1784801290.606150627] [backend_optimizer_node]: FAIL-SAFE HALT active (IMU lost): ignoring scan corrections, self-localization is frozen and must be restarted.
+[evaluator_node-6] [WARN] [1784801292.148738306] [unity_evaluator_node]: no /odom_fast samples matched to ground truth yet
+[laser_scan_matching_node-4] [WARN] [1784801293.223657558] [laser_scan_matching_node]: wall match rejected by quality check: mean_residual=0.093m (<=0.090) inlier_ratio=0.58 (>=0.40)
+[backend_optimizer_node-3] [ERROR] [1784801293.988256864] [backend_optimizer_node]: FAIL-SAFE HALT active (IMU lost): ignoring scan corrections, self-localization is frozen and must be restarted.
+[laser_scan_matching_node-4] [WARN] [1784801296.410037417] [laser_scan_matching_node]: wall match rejected by quality check: mean_residual=0.090m (<=0.090) inlier_ratio=0.55 (>=0.40)
+[backend_optimizer_node-3] [ERROR] [1784801297.421642547] [backend_optimizer_node]: FAIL-SAFE HALT active (IMU lost): ignoring scan corrections, self-localization is frozen and must be restarted.
+[laser_scan_matching_node-4] [WARN] [1784801299.382646816] [laser_scan_matching_node]: wall match rejected by quality check: mean_residual=0.093m (<=0.090) inlier_ratio=0.59 (>=0.40)
+[evaluator_node-6] [WARN] [1784801299.819128445] [unity_evaluator_node]: no /odom_fast samples matched to ground truth yet
+[backend_optimizer_node-3] [ERROR] [1784801300.099316343] [backend_optimizer_node]: FAIL-SAFE HALT active (IMU lost): ignoring scan corrections, self-localization is frozen and must be restarted.
+[laser_scan_matching_node-4] [WARN] [1784801301.993424040] [laser_scan_matching_node]: wall match rejected by quality check: mean_residual=0.093m (<=0.090) inlier_ratio=0.62 (>=0.40)
+[backend_optimizer_node-3] [ERROR] [1784801302.892282418] [backend_optimizer_node]: FAIL-SAFE HALT active (IMU lost): ignoring scan corrections, self-localization is frozen and must be restarted.
+[laser_scan_matching_node-4] [WARN] [1784801304.658419037] [laser_scan_matching_node]: wall match rejected by quality check: mean_residual=0.092m (<=0.090) inlier_ratio=0.60 (>=0.40)
+[backend_optimizer_node-3] [ERROR] [1784801305.276836745] [backend_optimizer_node]: FAIL-SAFE HALT active (IMU lost): ignoring scan corrections, self-localization is frozen and must be restarted.
+[evaluator_node-6] [WARN] [1784801306.019780337] [unity_evaluator_node]: no /odom_fast samples matched to ground truth yet
+[laser_scan_matching_node-4] [WARN] [1784801306.731593502] [laser_scan_matching_node]: wall match rejected by quality check: mean_residual=0.094m (<=0.090) inlier_ratio=0.61 (>=0.40)
+[backend_optimizer_node-3] [ERROR] [1784801307.390316298] [backend_optimizer_node]: FAIL-SAFE HALT active (IMU lost): ignoring scan corrections, self-localization is frozen and must be restarted.
+[laser_scan_matching_node-4] [WARN] [1784801309.343699937] [laser_scan_matching_node]: wall match rejected by quality check: mean_residual=0.094m (<=0.090) inlier_ratio=0.60 (>=0.40)
+[backend_optimizer_node-3] [ERROR] [1784801310.040695835] [backend_optimizer_node]: FAIL-SAFE HALT active (IMU lost): ignoring scan corrections, self-localization is frozen and must be restarted.
+[laser_scan_matching_node-4] [WARN] [1784801311.538078644] [laser_scan_matching_node]: wall match rejected by quality check: mean_residual=0.095m (<=0.090) inlier_ratio=0.61 (>=0.40)
+[evaluator_node-6] [WARN] [1784801311.742916967] [unity_evaluator_node]: no /odom_fast samples matched to ground truth yet
+[backend_optimizer_node-3] [ERROR] [1784801312.139376606] [backend_optimizer_node]: FAIL-SAFE HALT active (IMU lost): ignoring scan corrections, self-localization is frozen and must be restarted.
+[laser_scan_matching_node-4] [WARN] [1784801313.675376311] [laser_scan_matching_node]: wall match rejected by quality check: mean_residual=0.099m (<=0.090) inlier_ratio=0.57 (>=0.40)
+[backend_optimizer_node-3] [ERROR] [1784801314.369108366] [backend_optimizer_node]: FAIL-SAFE HALT active (IMU lost): ignoring scan corrections, self-localization is frozen and must be restarted.
+[laser_scan_matching_node-4] [WARN] [1784801315.934123790] [laser_scan_matching_node]: wall match rejected by quality check: mean_residual=0.093m (<=0.090) inlier_ratio=0.57 (>=0.40)
+[backend_optimizer_node-3] [ERROR] [1784801316.563724932] [backend_optimizer_node]: FAIL-SAFE HALT active (IMU lost): ignoring scan corrections, self-localization is frozen and must be restarted.
+[evaluator_node-6] [WARN] [1784801317.215654873] [unity_evaluator_node]: no /odom_fast samples matched to ground truth yet
+[laser_scan_matching_node-4] [WARN] [1784801318.124981986] [laser_scan_matching_node]: wall match rejected by quality check: mean_residual=0.093m (<=0.090) inlier_ratio=0.60 (>=0.40)
+[backend_optimizer_node-3] [ERROR] [1784801318.740519230] [backend_optimizer_node]: FAIL-SAFE HALT active (IMU lost): ignoring scan corrections, self-localization is frozen and must be restarted.
+[laser_scan_matching_node-4] [WARN] [1784801320.470406402] [laser_scan_matching_node]: wall match rejected by quality check: mean_residual=0.095m (<=0.090) inlier_ratio=0.60 (>=0.40)
+[backend_optimizer_node-3] [ERROR] [1784801321.099942601] [backend_optimizer_node]: FAIL-SAFE HALT active (IMU lost): ignoring scan corrections, self-localization is frozen and must be restarted.
+[default_server_endpoint-1] [ERROR] [1784801321.769725448] [unity_endpoint]: Exception: No more data available
+[default_server_endpoint-1] [INFO] [1784801321.771012060] [unity_endpoint]: Disconnected from 127.0.0.1

@@ -1,0 +1,22 @@
+
+Aborting batchmode due to fatal error:
+Could not allocate memory: System out of memory!
+Trying to allocate: 24B with 16 alignment. MemoryLabel: GfxThread
+Allocation happened at: Line:1409 in C:\build\output\unity\unity\Runtime\GfxDevice\threaded\GfxDeviceClient.cpp
+Memory overview
+
+[ ALLOC_MEMORYPROFILER ] used: 613168B &s| reserved: 299847575744B 
+[ ALLOC_TEMP_TLS ] used: 0B &s| reserved: 299847575744B 
+[ ALLOC_DEFAULT ] used: 29403816B &s| reserved: 299847575744B 
+[ ALLOC_TEMP_JOB_1_FRAME ] used: 0B &s| reserved: 299847575744B 
+[ ALLOC_TEMP_JOB_2_FRAMES ] used: 0B &s| reserved: 299847575744B 
+[ ALLOC_TEMP_JOB_4_FRAMES (JobTemp) ] used: 0B &s| reserved: 299847575744B 
+[ ALLOC_TEMP_JOB_ASYNC (Background) ] used: 0B &s| reserved: 299847575744B 
+[ ALLOC_GFX ] used: 56608B &s| reserved: 299847575744B 
+[ ALLOC_CACHEOBJECTS ] used: 749840B &s| reserved: 299847575744B 
+[ ALLOC_TYPETREE ] used: 807952B &s| reserved: 299847575744B 
+[ ALLOC_PROFILER ] used: 175920B &s| reserved: 299847575744B 
+[ ALLOC_PROFILER_EDITOR ] used: 0B &s| reserved: 299847575744B 
+
+
+

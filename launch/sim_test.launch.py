@@ -135,7 +135,7 @@ def generate_launch_description():
             description='main.mdのフィールド形状・固定円柱リスト(実ノードとシムノードで共有)'),
         DeclareLaunchArgument(
             'trajectory_pattern', default_value='0',
-            description='検証軌道パターン(0=既定/1=高速並進/2=スピン多発/3=壁際周回。trajectory.py参照)'),
+            description='検証軌道パターン(0=既定/1=高速並進/2=スピン多発/3=壁際周回/4=左スタートからビンゴ手前)'),
         DeclareLaunchArgument(
             'duration_sec', default_value='180.0',
             description='評価を実行する秒数(main.md想定の3分間走行)'),

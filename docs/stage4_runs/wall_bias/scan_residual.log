@@ -1,0 +1,40 @@
+[INFO] [1784816977.261286337] [scan_residual_diag]: map: 22 segments (field 5.572x3.310, thickness 0.033)
+[INFO] [1784817017.023994169] [scan_residual_diag]: scan#200 pose=(-1.807,0.408,0.0deg) pts=1081 inlier=937 outlier=144 | resid mean=16.1mm median=13.2mm p95=40.9mm || perimeter:n=577,mean=18.1mm  interior[0]:n=160,mean=10.1mm  interior[1]:n=105,mean=14.0mm  interior[3]:n=95,mean=15.7mm || OUTLIERS (-2.5,+0.0):n=64,d=116mm  (-2.0,+0.0):n=31,d=138mm  (-2.0,+1.5):n=10,d=69mm  (-2.5,+1.5):n=9,d=56mm  (-2.5,+0.5):n=6,d=58mm
+[INFO] [1784817022.452294728] [scan_residual_diag]: scan#400 pose=(-1.807,0.409,0.0deg) pts=1081 inlier=934 outlier=147 | resid mean=16.0mm median=12.8mm p95=40.4mm || perimeter:n=576,mean=18.1mm  interior[0]:n=157,mean=10.4mm  interior[1]:n=106,mean=14.4mm  interior[3]:n=95,mean=13.7mm || OUTLIERS (-2.5,+0.0):n=63,d=118mm  (-2.0,+0.0):n=33,d=136mm  (-2.5,+1.5):n=8,d=62mm  (-2.5,+0.5):n=8,d=72mm  (-1.5,+1.5):n=6,d=60mm
+[INFO] [1784817027.577869840] [scan_residual_diag]: scan#600 pose=(-1.807,0.407,0.0deg) pts=1081 inlier=933 outlier=148 | resid mean=16.3mm median=13.1mm p95=41.0mm || perimeter:n=576,mean=18.8mm  interior[0]:n=157,mean=10.1mm  interior[1]:n=107,mean=13.3mm  interior[3]:n=93,mean=14.4mm || OUTLIERS (-2.5,+0.0):n=59,d=113mm  (-2.0,+0.0):n=37,d=135mm  (-2.0,+1.5):n=11,d=65mm  (-2.5,+1.5):n=10,d=66mm  (-1.5,+1.5):n=7,d=55mm
+[INFO] [1784817032.682035759] [scan_residual_diag]: scan#800 pose=(-1.806,0.408,0.0deg) pts=1081 inlier=937 outlier=144 | resid mean=15.5mm median=12.9mm p95=40.7mm || perimeter:n=576,mean=17.7mm  interior[0]:n=158,mean=10.4mm  interior[1]:n=107,mean=12.0mm  interior[3]:n=96,mean=14.0mm || OUTLIERS (-2.5,+0.0):n=64,d=118mm  (-2.0,+0.0):n=31,d=141mm  (-1.5,+1.5):n=7,d=58mm  (-2.0,+1.5):n=7,d=59mm  (-2.5,+1.5):n=5,d=56mm
+[INFO] [1784817038.004420265] [scan_residual_diag]: scan#1000 pose=(-1.806,0.408,0.0deg) pts=1081 inlier=944 outlier=137 | resid mean=16.1mm median=13.0mm p95=42.5mm || perimeter:n=582,mean=18.9mm  interior[0]:n=158,mean=9.5mm  interior[1]:n=108,mean=12.0mm  interior[3]:n=96,mean=14.8mm || OUTLIERS (-2.5,+0.0):n=63,d=115mm  (-2.0,+0.0):n=33,d=139mm  (-1.5,+1.5):n=8,d=58mm  (-1.0,+1.5):n=6,d=61mm  (-2.5,+0.5):n=6,d=66mm
+[INFO] [1784817043.567478318] [scan_residual_diag]: scan#1200 pose=(-1.804,0.408,0.0deg) pts=1081 inlier=932 outlier=149 | resid mean=15.9mm median=13.0mm p95=41.0mm || perimeter:n=573,mean=18.1mm  interior[0]:n=156,mean=10.5mm  interior[1]:n=106,mean=13.0mm  interior[3]:n=97,mean=14.8mm || OUTLIERS (-2.5,+0.0):n=63,d=117mm  (-2.0,+0.0):n=32,d=139mm  (-1.0,+1.5):n=8,d=57mm  (-1.5,+1.5):n=8,d=59mm  (-3.0,+0.5):n=8,d=61mm
+[INFO] [1784817048.842483222] [scan_residual_diag]: scan#1400 pose=(-1.805,0.407,0.0deg) pts=1081 inlier=946 outlier=135 | resid mean=16.2mm median=12.8mm p95=42.0mm || perimeter:n=583,mean=18.3mm  interior[0]:n=160,mean=9.7mm  interior[1]:n=110,mean=13.1mm  interior[3]:n=93,mean=17.4mm || OUTLIERS (-2.5,+0.0):n=65,d=113mm  (-2.0,+0.0):n=32,d=139mm  (-2.0,+1.5):n=11,d=60mm  (-2.5,+0.5):n=9,d=57mm  (+0.0,+0.5):n=4,d=62mm
+[INFO] [1784817054.150475497] [scan_residual_diag]: scan#1600 pose=(-1.806,0.407,0.0deg) pts=1081 inlier=940 outlier=141 | resid mean=15.9mm median=13.4mm p95=39.4mm || perimeter:n=582,mean=18.5mm  interior[0]:n=157,mean=9.7mm  interior[1]:n=107,mean=12.6mm  interior[3]:n=94,mean=13.9mm || OUTLIERS (-2.5,+0.0):n=65,d=116mm  (-2.0,+0.0):n=31,d=139mm  (-2.0,+1.5):n=6,d=62mm  (-3.0,+0.5):n=6,d=58mm  (-1.0,+1.5):n=5,d=61mm
+[INFO] [1784817059.349849514] [scan_residual_diag]: scan#1800 pose=(-1.805,0.409,0.0deg) pts=1081 inlier=945 outlier=136 | resid mean=16.0mm median=12.6mm p95=42.0mm || perimeter:n=586,mean=17.9mm  interior[0]:n=157,mean=9.3mm  interior[1]:n=108,mean=15.4mm  interior[3]:n=94,mean=15.9mm || OUTLIERS (-2.5,+0.0):n=61,d=114mm  (-2.0,+0.0):n=34,d=137mm  (-1.5,+1.5):n=9,d=58mm  (-2.5,+0.5):n=7,d=66mm  (-3.0,+0.5):n=6,d=60mm
+[INFO] [1784817064.519955426] [scan_residual_diag]: scan#2000 pose=(-1.806,0.407,0.0deg) pts=1081 inlier=939 outlier=142 | resid mean=15.4mm median=12.7mm p95=41.8mm || perimeter:n=584,mean=17.4mm  interior[0]:n=158,mean=10.3mm  interior[1]:n=106,mean=14.3mm  interior[3]:n=91,mean=12.8mm || OUTLIERS (-2.5,+0.0):n=64,d=115mm  (-2.0,+0.0):n=31,d=145mm  (-2.5,+0.5):n=8,d=64mm  (-2.0,+1.5):n=6,d=64mm  (+0.0,+0.5):n=4,d=71mm
+[INFO] [1784817070.090548594] [scan_residual_diag]: scan#2200 pose=(-1.805,0.407,0.0deg) pts=1081 inlier=932 outlier=149 | resid mean=16.0mm median=12.9mm p95=40.6mm || perimeter:n=574,mean=18.6mm  interior[0]:n=157,mean=9.8mm  interior[1]:n=106,mean=12.9mm  interior[3]:n=95,mean=14.1mm || OUTLIERS (-2.5,+0.0):n=66,d=116mm  (-2.0,+0.0):n=32,d=142mm  (-2.0,+1.5):n=10,d=66mm  (-1.0,+1.5):n=7,d=60mm  (-2.5,+1.5):n=7,d=56mm
+[INFO] [1784817075.386469035] [scan_residual_diag]: scan#2400 pose=(-1.808,0.409,0.0deg) pts=1081 inlier=948 outlier=133 | resid mean=16.0mm median=13.3mm p95=41.1mm || perimeter:n=590,mean=18.7mm  interior[0]:n=156,mean=9.2mm  interior[1]:n=106,mean=11.8mm  interior[3]:n=96,mean=15.5mm || OUTLIERS (-2.5,+0.0):n=67,d=118mm  (-2.0,+0.0):n=28,d=140mm  (-2.0,+1.5):n=6,d=72mm  (-1.5,+1.5):n=5,d=64mm  (-2.5,+1.5):n=5,d=62mm
+Traceback (most recent call last):
+  File "/home/yukichi6105/ros2_ws/src/lio_localization_sim/tools/scan_residual_diag.py", line 188, in <module>
+    main()
+    ~~~~^^
+  File "/home/yukichi6105/ros2_ws/src/lio_localization_sim/tools/scan_residual_diag.py", line 179, in main
+    rclpy.spin(node)
+    ~~~~~~~~~~^^^^^^
+  File "/opt/ros/lyrical/lib/python3.14/site-packages/rclpy/__init__.py", line 324, in spin
+    executor.spin_once()
+    ~~~~~~~~~~~~~~~~~~^^
+  File "/opt/ros/lyrical/lib/python3.14/site-packages/rclpy/executors.py", line 1020, in spin_once
+    self._spin_once_impl(timeout_sec)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/opt/ros/lyrical/lib/python3.14/site-packages/rclpy/executors.py", line 1000, in _spin_once_impl
+    handler, entity, node = self.wait_for_ready_callbacks(
+                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        timeout_sec, None, wait_condition)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/ros/lyrical/lib/python3.14/site-packages/rclpy/executors.py", line 970, in wait_for_ready_callbacks
+    return next(self._cb_iter)
+  File "/opt/ros/lyrical/lib/python3.14/site-packages/rclpy/executors.py", line 848, in _wait_for_ready_callbacks
+    wait_set = _rclpy.WaitSet(
+        entity_count.num_subscriptions,
+    ...<4 lines>...
+        entity_count.num_events,
+        self._context.handle)
+rclpy._rclpy_pybind11.RCLError: failed to initialize wait set: the given context is not valid, either rcl_init() was not called or rcl_shutdown() was called., at ./src/rcl/wait.c:110

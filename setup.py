@@ -15,6 +15,10 @@ setup(
         ('share/' + package_name, ['package.xml']),
         (os.path.join('share', package_name, 'launch'), glob('launch/*.launch.py')),
         (os.path.join('share', package_name, 'rviz'), glob('rviz/*.rviz')),
+        (os.path.join('share', package_name, 'worlds'), glob('worlds/*.sdf')),
+        (os.path.join('share', package_name, 'config'),
+            glob('config/*.yaml') + glob('config/*.json')
+            + glob('config/*.config')),
     ],
     install_requires=['setuptools', 'numpy'],
     zip_safe=True,
@@ -27,6 +31,7 @@ setup(
             'imu_sim_node = lio_localization_sim.imu_sim_node:main',
             'lidar_sim_node = lio_localization_sim.lidar_sim_node:main',
             'evaluator_node = lio_localization_sim.evaluator_node:main',
+            'gazebo_driver_node = lio_localization_sim.gazebo_driver_node:main',
         ],
     },
 )

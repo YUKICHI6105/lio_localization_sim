@@ -1,0 +1,115 @@
+<?xml version="1.0"?>
+<!--
+  Chiba University Robot Contest 2026 field, first engineering model.
+  Confirmed by the rule PDF overhead drawing: 5.638 x 3.376 m; frame width
+  0.033 m; goal end 1.900 m; start end 1.240 m; each green start rectangle
+  0.800 x 0.600 m; each notes strip 0.250 m wide. Notes are 0.150 m diameter
+  and 0.200 kg; bingo is 3 x 3.
+
+  The rule text separately says 0.038 m walls; the dimensioned overhead view
+  is used here. Bingo clear cells are 0.260 m square, vertical members are
+  0.040 m wide, and horizontal shelves are 0.020 m thick.
+-->
+<sdf version="1.9">
+  <world name="robocon2026">
+    <!-- Field-only validation does not need the 1 kHz integration used by
+         the IMU model.  250 Hz is sufficient for 150 mm / 200 g notes and
+         cuts idle rigid-body work to one quarter. -->
+    <physics name="4ms_low_cpu" type="ignored">
+      <max_step_size>0.004</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+      <real_time_update_rate>250</real_time_update_rate>
+    </physics>
+    <plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics"/>
+    <plugin filename="gz-sim-user-commands-system" name="gz::sim::systems::UserCommands"/>
+    <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster">
+      <!-- 15 Hz is sufficient for field inspection and avoids 60 Hz GUI state traffic. -->
+      <state_hertz>15</state_hertz>
+    </plugin>
+    <gravity>0 0 -9.80665</gravity>
+    <scene><ambient>0.8 0.8 0.8 1</ambient><background>0.65 0.78 0.9 1</background><shadows>false</shadows></scene>
+    <light type="directional" name="sun"><pose>0 0 10 0 0 0</pose><direction>-0.4 0.2 -1</direction><diffuse>1 1 1 1</diffuse><cast_shadows>false</cast_shadows></light>
+    <!-- Static-inspection GUI: avoid the heavyweight default plugin set. -->
+    <gui fullscreen="0">
+      <plugin filename="MinimalScene" name="3D View">
+        <gz-gui><title>Robocon 2026 Field</title><property type="bool" key="showTitleBar">false</property><property type="string" key="state">docked</property></gz-gui>
+        <engine>ogre2</engine><scene>scene</scene>
+        <ambient_light>0.8 0.8 0.8</ambient_light><background_color>0.65 0.78 0.9</background_color>
+        <camera_pose>-6 -6 7 0 0.72 0.78</camera_pose>
+      </plugin>
+      <plugin filename="GzSceneManager" name="Scene Manager"/>
+    </gui>
+
+    <!-- Coordinate convention: +X start -> bingo, +Y left, origin at field centre. -->
+    <model name="competition_floor"><static>true</static><link name="floor">
+      <collision name="floor_collision"><pose>0 0 -0.01 0 0 0</pose><geometry><box><size>5.638 3.376 0.02</size></box></geometry></collision>
+      <visual name="base"><pose>0 0 -0.01 0 0 0</pose><geometry><box><size>5.638 3.376 0.02</size></box></geometry><material><ambient>0.72 0.72 0.72 1</ambient><diffuse>0.84 0.84 0.84 1</diffuse></material></visual>
+      <!-- Zone overlays are visual-only and sit 11 mm above the base. -->
+      <visual name="start_left"><pose>-2.419 1.369 0.011 0 0 0</pose><geometry><box><size>0.800 0.600 0.002</size></box></geometry><material><ambient>0.05 0.55 0.12 1</ambient><diffuse>0.08 0.82 0.18 1</diffuse></material></visual>
+      <visual name="start_right"><pose>-2.419 -1.369 0.011 0 0 0</pose><geometry><box><size>0.800 0.600 0.002</size></box></geometry><material><ambient>0.05 0.55 0.12 1</ambient><diffuse>0.08 0.82 0.18 1</diffuse></material></visual>
+      <visual name="notes_left"><pose>-2.199 0.1415 0.011 0 0 0</pose><geometry><box><size>1.240 0.250 0.002</size></box></geometry><material><ambient>0.03 0.20 0.62 1</ambient><diffuse>0.04 0.32 0.95 1</diffuse></material></visual>
+      <visual name="notes_right"><pose>-2.199 -0.1415 0.011 0 0 0</pose><geometry><box><size>1.240 0.250 0.002</size></box></geometry><material><ambient>0.03 0.20 0.62 1</ambient><diffuse>0.04 0.32 0.95 1</diffuse></material></visual>
+      <visual name="slalom"><pose>-0.330 0 0.011 0 0 0</pose><geometry><box><size>2.498 3.343 0.002</size></box></geometry><material><ambient>0.55 0.03 0.03 1</ambient><diffuse>0.75 0.04 0.04 1</diffuse></material></visual>
+      <visual name="goal"><pose>1.869 0 0.011 0 0 0</pose><geometry><box><size>1.900 3.343 0.002</size></box></geometry><material><ambient>0.72 0.68 0.02 1</ambient><diffuse>0.95 0.90 0.04 1</diffuse></material></visual>
+    </link></model>
+
+    <!-- The dimensioned overhead drawing's 33 mm width is used.  Rule text
+         section 3.2 separately says 38 mm; the conflict remains documented. -->
+    <model name="field_walls"><static>true</static><link name="walls">
+      <collision name="start_end"><pose>-2.8025 0 0.05 0 0 0</pose><geometry><box><size>0.033 3.376 0.1</size></box></geometry></collision>
+      <collision name="bingo_end"><pose>2.8025 0 0.05 0 0 0</pose><geometry><box><size>0.033 3.376 0.1</size></box></geometry></collision>
+      <collision name="left_side"><pose>0 1.6715 0.05 0 0 0</pose><geometry><box><size>5.605 0.033 0.1</size></box></geometry></collision>
+      <collision name="right_side"><pose>0 -1.6715 0.05 0 0 0</pose><geometry><box><size>5.605 0.033 0.1</size></box></geometry></collision>
+      <collision name="centre_to_bingo"><pose>-0.47825 0 0.05 0 0 0</pose><geometry><box><size>4.6485 0.033 0.1</size></box></geometry></collision>
+      <!-- Three 800 mm slalom cells require two internal baffles per lane. -->
+      <collision name="baffle_l1"><pose>-0.779 1.269 0.05 0 0 0</pose><geometry><box><size>0.033 0.800 0.1</size></box></geometry></collision>
+      <collision name="baffle_r1"><pose>-0.779 -1.269 0.05 0 0 0</pose><geometry><box><size>0.033 0.800 0.1</size></box></geometry></collision>
+      <collision name="baffle_l2"><pose>0.021 0.419 0.05 0 0 0</pose><geometry><box><size>0.033 0.800 0.1</size></box></geometry></collision>
+      <collision name="baffle_r2"><pose>0.021 -0.419 0.05 0 0 0</pose><geometry><box><size>0.033 0.800 0.1</size></box></geometry></collision>
+      <visual name="wall_visual"><geometry><box><size>0.001 0.001 0.001</size></box></geometry></visual>
+      <visual name="v_start_end"><pose>-2.8025 0 0.05 0 0 0</pose><geometry><box><size>0.033 3.376 0.1</size></box></geometry><material><diffuse>0.9 0.9 0.92 1</diffuse></material></visual>
+      <visual name="v_bingo_end"><pose>2.8025 0 0.05 0 0 0</pose><geometry><box><size>0.033 3.376 0.1</size></box></geometry><material><diffuse>0.9 0.9 0.92 1</diffuse></material></visual>
+      <visual name="v_left_side"><pose>0 1.6715 0.05 0 0 0</pose><geometry><box><size>5.605 0.033 0.1</size></box></geometry><material><diffuse>0.9 0.9 0.92 1</diffuse></material></visual>
+      <visual name="v_right_side"><pose>0 -1.6715 0.05 0 0 0</pose><geometry><box><size>5.605 0.033 0.1</size></box></geometry><material><diffuse>0.9 0.9 0.92 1</diffuse></material></visual>
+      <visual name="v_centre_to_bingo"><pose>-0.47825 0 0.05 0 0 0</pose><geometry><box><size>4.6485 0.033 0.1</size></box></geometry><material><diffuse>0.95 0.95 0.95 1</diffuse></material></visual>
+      <visual name="v_l1"><pose>-0.779 1.269 0.05 0 0 0</pose><geometry><box><size>0.033 0.800 0.1</size></box></geometry><material><diffuse>0.95 0.95 0.95 1</diffuse></material></visual>
+      <visual name="v_r1"><pose>-0.779 -1.269 0.05 0 0 0</pose><geometry><box><size>0.033 0.800 0.1</size></box></geometry><material><diffuse>0.95 0.95 0.95 1</diffuse></material></visual>
+      <visual name="v_l2"><pose>0.021 0.419 0.05 0 0 0</pose><geometry><box><size>0.033 0.800 0.1</size></box></geometry><material><diffuse>0.95 0.95 0.95 1</diffuse></material></visual>
+      <visual name="v_r2"><pose>0.021 -0.419 0.05 0 0 0</pose><geometry><box><size>0.033 0.800 0.1</size></box></geometry><material><diffuse>0.95 0.95 0.95 1</diffuse></material></visual>
+    </link></model>
+
+    <!--
+      3 x 3 bingo from the elevation drawing: 260 mm square clear cells,
+      40 mm vertical members, 20 mm shelves, and a 900 mm top. Its far
+      X edge is flush with the inner face of the end wall (x=2.786), so
+      the 940 mm-wide unit is centred at x=2.316. Shelf depth is 300 mm
+      into each team's side of the X-Z grid plane.
+    -->
+    <model name="bingo"><static>true</static><pose>2.316 0 0 0 0 0</pose><link name="frame">
+      <!-- Posts span z=40..900 mm; shelf gaps are exactly 260 mm. -->
+      <collision name="post0"><pose>-0.45 0 0.47 0 0 0</pose><geometry><box><size>0.04 0.60 0.86</size></box></geometry></collision><visual name="post0v"><pose>-0.45 0 0.47 0 0 0</pose><geometry><box><size>0.04 0.60 0.86</size></box></geometry><material><diffuse>0.82 0.84 0.88 1</diffuse></material></visual>
+      <collision name="post1"><pose>-0.15 0 0.47 0 0 0</pose><geometry><box><size>0.04 0.60 0.86</size></box></geometry></collision><visual name="post1v"><pose>-0.15 0 0.47 0 0 0</pose><geometry><box><size>0.04 0.60 0.86</size></box></geometry><material><diffuse>0.82 0.84 0.88 1</diffuse></material></visual>
+      <collision name="post2"><pose>0.15 0 0.47 0 0 0</pose><geometry><box><size>0.04 0.60 0.86</size></box></geometry></collision><visual name="post2v"><pose>0.15 0 0.47 0 0 0</pose><geometry><box><size>0.04 0.60 0.86</size></box></geometry><material><diffuse>0.82 0.84 0.88 1</diffuse></material></visual>
+      <collision name="post3"><pose>0.45 0 0.47 0 0 0</pose><geometry><box><size>0.04 0.60 0.86</size></box></geometry></collision><visual name="post3v"><pose>0.45 0 0.47 0 0 0</pose><geometry><box><size>0.04 0.60 0.86</size></box></geometry><material><diffuse>0.82 0.84 0.88 1</diffuse></material></visual>
+      <collision name="shelf0"><pose>0 0 0.05 0 0 0</pose><geometry><box><size>0.94 0.60 0.02</size></box></geometry></collision><visual name="shelf0v"><pose>0 0 0.05 0 0 0</pose><geometry><box><size>0.94 0.60 0.02</size></box></geometry><material><diffuse>0.82 0.84 0.88 1</diffuse></material></visual>
+      <collision name="shelf1"><pose>0 0 0.33 0 0 0</pose><geometry><box><size>0.94 0.60 0.02</size></box></geometry></collision><visual name="shelf1v"><pose>0 0 0.33 0 0 0</pose><geometry><box><size>0.94 0.60 0.02</size></box></geometry><material><diffuse>0.82 0.84 0.88 1</diffuse></material></visual>
+      <collision name="shelf2"><pose>0 0 0.61 0 0 0</pose><geometry><box><size>0.94 0.60 0.02</size></box></geometry></collision><visual name="shelf2v"><pose>0 0 0.61 0 0 0</pose><geometry><box><size>0.94 0.60 0.02</size></box></geometry><material><diffuse>0.82 0.84 0.88 1</diffuse></material></visual>
+      <collision name="shelf3"><pose>0 0 0.89 0 0 0</pose><geometry><box><size>0.94 0.60 0.02</size></box></geometry></collision><visual name="shelf3v"><pose>0 0 0.89 0 0 0</pose><geometry><box><size>0.94 0.60 0.02</size></box></geometry><material><diffuse>0.82 0.84 0.88 1</diffuse></material></visual>
+    </link></model>
+
+    <!-- Six 150 mm / 200 g notes per team, equally spaced on the two 250 mm
+         notes strips beside the centre wall as shown by the overhead view. -->
+    <model name="blue_note_0"><pose>-2.699 -0.125 0.075 0 0 0</pose><link name="note"><inertial><mass>0.2</mass><inertia><ixx>0.00045</ixx><iyy>0.00045</iyy><izz>0.00045</izz></inertia></inertial><collision name="c"><geometry><sphere><radius>0.075</radius></sphere></geometry></collision><visual name="v"><geometry><sphere><radius>0.075</radius></sphere></geometry><material><diffuse>0.03 0.25 0.95 1</diffuse></material></visual></link></model>
+    <model name="blue_note_1"><pose>-2.499 -0.125 0.075 0 0 0</pose><link name="note"><inertial><mass>0.2</mass><inertia><ixx>0.00045</ixx><iyy>0.00045</iyy><izz>0.00045</izz></inertia></inertial><collision name="c"><geometry><sphere><radius>0.075</radius></sphere></geometry></collision><visual name="v"><geometry><sphere><radius>0.075</radius></sphere></geometry><material><diffuse>0.03 0.25 0.95 1</diffuse></material></visual></link></model>
+    <model name="blue_note_2"><pose>-2.299 -0.125 0.075 0 0 0</pose><link name="note"><inertial><mass>0.2</mass><inertia><ixx>0.00045</ixx><iyy>0.00045</iyy><izz>0.00045</izz></inertia></inertial><collision name="c"><geometry><sphere><radius>0.075</radius></sphere></geometry></collision><visual name="v"><geometry><sphere><radius>0.075</radius></sphere></geometry><material><diffuse>0.03 0.25 0.95 1</diffuse></material></visual></link></model>
+    <model name="blue_note_3"><pose>-2.099 -0.125 0.075 0 0 0</pose><link name="note"><inertial><mass>0.2</mass><inertia><ixx>0.00045</ixx><iyy>0.00045</iyy><izz>0.00045</izz></inertia></inertial><collision name="c"><geometry><sphere><radius>0.075</radius></sphere></geometry></collision><visual name="v"><geometry><sphere><radius>0.075</radius></sphere></geometry><material><diffuse>0.03 0.25 0.95 1</diffuse></material></visual></link></model>
+    <model name="blue_note_4"><pose>-1.899 -0.125 0.075 0 0 0</pose><link name="note"><inertial><mass>0.2</mass><inertia><ixx>0.00045</ixx><iyy>0.00045</iyy><izz>0.00045</izz></inertia></inertial><collision name="c"><geometry><sphere><radius>0.075</radius></sphere></geometry></collision><visual name="v"><geometry><sphere><radius>0.075</radius></sphere></geometry><material><diffuse>0.03 0.25 0.95 1</diffuse></material></visual></link></model>
+    <model name="blue_note_5"><pose>-1.699 -0.125 0.075 0 0 0</pose><link name="note"><inertial><mass>0.2</mass><inertia><ixx>0.00045</ixx><iyy>0.00045</iyy><izz>0.00045</izz></inertia></inertial><collision name="c"><geometry><sphere><radius>0.075</radius></sphere></geometry></collision><visual name="v"><geometry><sphere><radius>0.075</radius></sphere></geometry><material><diffuse>0.03 0.25 0.95 1</diffuse></material></visual></link></model>
+    <model name="orange_note_0"><pose>-2.699 0.125 0.075 0 0 0</pose><link name="note"><inertial><mass>0.2</mass><inertia><ixx>0.00045</ixx><iyy>0.00045</iyy><izz>0.00045</izz></inertia></inertial><collision name="c"><geometry><sphere><radius>0.075</radius></sphere></geometry></collision><visual name="v"><geometry><sphere><radius>0.075</radius></sphere></geometry><material><diffuse>1 0.30 0.02 1</diffuse></material></visual></link></model>
+    <model name="orange_note_1"><pose>-2.499 0.125 0.075 0 0 0</pose><link name="note"><inertial><mass>0.2</mass><inertia><ixx>0.00045</ixx><iyy>0.00045</iyy><izz>0.00045</izz></inertia></inertial><collision name="c"><geometry><sphere><radius>0.075</radius></sphere></geometry></collision><visual name="v"><geometry><sphere><radius>0.075</radius></sphere></geometry><material><diffuse>1 0.30 0.02 1</diffuse></material></visual></link></model>
+    <model name="orange_note_2"><pose>-2.299 0.125 0.075 0 0 0</pose><link name="note"><inertial><mass>0.2</mass><inertia><ixx>0.00045</ixx><iyy>0.00045</iyy><izz>0.00045</izz></inertia></inertial><collision name="c"><geometry><sphere><radius>0.075</radius></sphere></geometry></collision><visual name="v"><geometry><sphere><radius>0.075</radius></sphere></geometry><material><diffuse>1 0.30 0.02 1</diffuse></material></visual></link></model>
+    <model name="orange_note_3"><pose>-2.099 0.125 0.075 0 0 0</pose><link name="note"><inertial><mass>0.2</mass><inertia><ixx>0.00045</ixx><iyy>0.00045</iyy><izz>0.00045</izz></inertia></inertial><collision name="c"><geometry><sphere><radius>0.075</radius></sphere></geometry></collision><visual name="v"><geometry><sphere><radius>0.075</radius></sphere></geometry><material><diffuse>1 0.30 0.02 1</diffuse></material></visual></link></model>
+    <model name="orange_note_4"><pose>-1.899 0.125 0.075 0 0 0</pose><link name="note"><inertial><mass>0.2</mass><inertia><ixx>0.00045</ixx><iyy>0.00045</iyy><izz>0.00045</izz></inertia></inertial><collision name="c"><geometry><sphere><radius>0.075</radius></sphere></geometry></collision><visual name="v"><geometry><sphere><radius>0.075</radius></sphere></geometry><material><diffuse>1 0.30 0.02 1</diffuse></material></visual></link></model>
+    <model name="orange_note_5"><pose>-1.699 0.125 0.075 0 0 0</pose><link name="note"><inertial><mass>0.2</mass><inertia><ixx>0.00045</ixx><iyy>0.00045</iyy><izz>0.00045</izz></inertia></inertial><collision name="c"><geometry><sphere><radius>0.075</radius></sphere></geometry></collision><visual name="v"><geometry><sphere><radius>0.075</radius></sphere></geometry><material><diffuse>1 0.30 0.02 1</diffuse></material></visual></link></model>
+  </world>
+</sdf>

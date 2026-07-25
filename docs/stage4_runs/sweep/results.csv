@@ -1,0 +1,2 @@
+mode,hold,sigma,rep,status,eval_mean,eval_rmse,eval_max,verdict,windows,detections,inside_n,inside_mean,inside_p95,inside_max,outside_n,outside_mean,outside_p95,outside_max
+off,0.15,0.003,1,nodata,,,,FAIL,,0,,,,,,,,

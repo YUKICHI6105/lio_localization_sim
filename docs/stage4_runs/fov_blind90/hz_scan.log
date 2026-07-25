@@ -1,0 +1,133 @@
+19:23:35 average rate: 7.615
+19:23:35 	min: 0.005s max: 2.075s std dev: 0.41565s window: 23
+19:23:36 average rate: 11.089
+19:23:36 	min: 0.000s max: 2.075s std dev: 0.33208s window: 37
+19:23:38 average rate: 14.698
+19:23:38 	min: 0.000s max: 2.048s std dev: 0.28352s window: 50
+19:23:39 average rate: 39.262
+19:23:39 	min: 0.000s max: 0.058s std dev: 0.01281s window: 50
+19:23:40 average rate: 38.407
+19:23:40 	min: 0.000s max: 0.081s std dev: 0.01756s window: 50
+19:23:41 average rate: 37.145
+19:23:41 	min: 0.000s max: 0.084s std dev: 0.01819s window: 50
+19:23:42 average rate: 42.264
+19:23:42 	min: 0.001s max: 0.079s std dev: 0.01657s window: 50
+19:23:43 average rate: 43.563
+19:23:43 	min: 0.000s max: 0.057s std dev: 0.01411s window: 50
+19:23:44 average rate: 37.838
+19:23:44 	min: 0.005s max: 0.063s std dev: 0.01354s window: 50
+19:23:45 average rate: 35.164
+19:23:45 	min: 0.003s max: 0.067s std dev: 0.01706s window: 50
+19:23:46 average rate: 40.034
+19:23:46 	min: 0.000s max: 0.060s std dev: 0.01699s window: 50
+19:23:47 average rate: 42.965
+19:23:47 	min: 0.000s max: 0.052s std dev: 0.01467s window: 50
+19:23:48 average rate: 40.586
+19:23:48 	min: 0.000s max: 0.063s std dev: 0.01448s window: 50
+19:23:49 average rate: 32.914
+19:23:49 	min: 0.001s max: 0.068s std dev: 0.01747s window: 50
+19:23:50 average rate: 37.267
+19:23:50 	min: 0.002s max: 0.068s std dev: 0.01686s window: 50
+19:23:51 average rate: 44.762
+19:23:51 	min: 0.000s max: 0.075s std dev: 0.01756s window: 50
+19:23:52 average rate: 36.445
+19:23:52 	min: 0.000s max: 0.092s std dev: 0.02170s window: 50
+19:23:53 average rate: 44.862
+19:23:53 	min: 0.000s max: 0.052s std dev: 0.01292s window: 50
+19:23:54 average rate: 39.793
+19:23:54 	min: 0.000s max: 0.052s std dev: 0.01363s window: 50
+19:23:55 average rate: 38.098
+19:23:55 	min: 0.000s max: 0.062s std dev: 0.01436s window: 50
+19:23:56 average rate: 38.316
+19:23:56 	min: 0.004s max: 0.069s std dev: 0.01515s window: 50
+19:23:57 average rate: 39.174
+19:23:57 	min: 0.000s max: 0.106s std dev: 0.01852s window: 50
+19:23:58 average rate: 36.113
+19:23:58 	min: 0.000s max: 0.072s std dev: 0.01715s window: 50
+19:23:59 average rate: 41.322
+19:23:59 	min: 0.000s max: 0.055s std dev: 0.01548s window: 50
+19:24:00 average rate: 39.948
+19:24:00 	min: 0.000s max: 0.062s std dev: 0.01724s window: 50
+19:24:01 average rate: 39.423
+19:24:01 	min: 0.001s max: 0.061s std dev: 0.01298s window: 50
+19:24:02 average rate: 39.754
+19:24:02 	min: 0.001s max: 0.047s std dev: 0.01203s window: 50
+19:24:03 average rate: 38.901
+19:24:03 	min: 0.001s max: 0.071s std dev: 0.01528s window: 50
+19:24:04 average rate: 38.922
+19:24:04 	min: 0.000s max: 0.071s std dev: 0.01543s window: 50
+19:24:05 average rate: 38.250
+19:24:05 	min: 0.001s max: 0.088s std dev: 0.01652s window: 50
+19:24:06 average rate: 38.776
+19:24:06 	min: 0.001s max: 0.059s std dev: 0.01328s window: 50
+19:24:07 average rate: 39.593
+19:24:07 	min: 0.001s max: 0.061s std dev: 0.01469s window: 50
+19:24:08 average rate: 39.841
+19:24:08 	min: 0.000s max: 0.064s std dev: 0.01443s window: 50
+19:24:09 average rate: 39.844
+19:24:09 	min: 0.000s max: 0.061s std dev: 0.01455s window: 50
+19:24:10 average rate: 39.210
+19:24:10 	min: 0.001s max: 0.057s std dev: 0.01310s window: 50
+19:24:11 average rate: 39.083
+19:24:11 	min: 0.003s max: 0.062s std dev: 0.01476s window: 50
+19:24:12 average rate: 38.908
+19:24:12 	min: 0.000s max: 0.085s std dev: 0.01750s window: 50
+19:24:13 average rate: 40.042
+19:24:13 	min: 0.001s max: 0.064s std dev: 0.01457s window: 50
+19:24:14 average rate: 39.060
+19:24:14 	min: 0.000s max: 0.051s std dev: 0.01267s window: 50
+19:24:15 average rate: 37.654
+19:24:15 	min: 0.000s max: 0.095s std dev: 0.01704s window: 50
+19:24:16 average rate: 38.990
+19:24:16 	min: 0.001s max: 0.080s std dev: 0.01637s window: 50
+19:24:17 average rate: 37.901
+19:24:17 	min: 0.000s max: 0.060s std dev: 0.01633s window: 50
+19:24:18 average rate: 42.015
+19:24:18 	min: 0.000s max: 0.060s std dev: 0.01521s window: 50
+19:24:19 average rate: 40.319
+19:24:19 	min: 0.000s max: 0.067s std dev: 0.01626s window: 50
+19:24:20 average rate: 39.122
+19:24:20 	min: 0.000s max: 0.048s std dev: 0.01294s window: 50
+19:24:21 average rate: 38.257
+19:24:21 	min: 0.000s max: 0.062s std dev: 0.01598s window: 50
+19:24:22 average rate: 38.124
+19:24:22 	min: 0.002s max: 0.062s std dev: 0.01325s window: 50
+19:24:23 average rate: 39.401
+19:24:23 	min: 0.000s max: 0.063s std dev: 0.01459s window: 50
+19:24:24 average rate: 33.466
+19:24:24 	min: 0.000s max: 0.069s std dev: 0.01642s window: 50
+19:24:25 average rate: 36.416
+19:24:25 	min: 0.000s max: 0.059s std dev: 0.01549s window: 50
+19:24:26 average rate: 39.482
+19:24:26 	min: 0.001s max: 0.059s std dev: 0.01571s window: 50
+19:24:27 average rate: 39.884
+19:24:27 	min: 0.001s max: 0.059s std dev: 0.01458s window: 50
+19:24:28 average rate: 42.977
+19:24:28 	min: 0.002s max: 0.057s std dev: 0.01224s window: 50
+19:24:29 average rate: 39.363
+19:24:29 	min: 0.005s max: 0.049s std dev: 0.01010s window: 50
+19:24:30 average rate: 36.884
+19:24:30 	min: 0.000s max: 0.063s std dev: 0.01419s window: 50
+19:24:31 average rate: 39.269
+19:24:31 	min: 0.000s max: 0.063s std dev: 0.01535s window: 50
+19:24:32 average rate: 37.540
+19:24:32 	min: 0.000s max: 0.059s std dev: 0.01357s window: 50
+19:24:33 average rate: 40.388
+19:24:33 	min: 0.000s max: 0.056s std dev: 0.01449s window: 50
+19:24:34 average rate: 37.597
+19:24:34 	min: 0.001s max: 0.059s std dev: 0.01392s window: 50
+19:24:35 average rate: 37.109
+19:24:35 	min: 0.000s max: 0.059s std dev: 0.01421s window: 50
+19:24:36 average rate: 38.963
+19:24:36 	min: 0.000s max: 0.076s std dev: 0.01740s window: 50
+19:24:37 average rate: 42.658
+19:24:37 	min: 0.000s max: 0.049s std dev: 0.01275s window: 50
+19:24:38 average rate: 35.628
+19:24:38 	min: 0.000s max: 0.098s std dev: 0.01858s window: 50
+19:24:39 average rate: 45.333
+19:24:39 	min: 0.000s max: 0.062s std dev: 0.01410s window: 50
+19:24:40 average rate: 39.560
+19:24:40 	min: 0.000s max: 0.063s std dev: 0.01526s window: 50
+19:24:41 average rate: 35.894
+19:24:41 	min: 0.000s max: 0.074s std dev: 0.01731s window: 50
+19:24:42 failed to initialize wait set: the given context is not valid, either rcl_init() was not called or rcl_shutdown() was called., at ./src/rcl/wait.c:110

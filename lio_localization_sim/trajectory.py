@@ -61,6 +61,9 @@ class Trajectory:
            (壁への食い込み・運動力学違反は起こさない。円柱衝突回避は経路が
            通らない場所にのみ円柱を置くランナー側で担保)。
         """
+        if pattern == 4:
+            self._init_start_to_bingo(field_width, field_height)
+            return
         if pattern >= 2000:
             self._init_stage3(field_width, field_height, pattern)
             return
@@ -106,6 +109,86 @@ class Trajectory:
         self.ball_start = (-self.ax_amp, 0.0)
         self.ball_velocity = (2.0, 0.3)  # m/s
         self.ball_radius = 0.11
+
+    # ----- Robocon 2026: 左スタートゾーン -> ビンゴ手前 -----
+    def _init_start_to_bingo(self, field_width: float, field_height: float):
+        """公式フィールド座標上の実戦経路を、停止点間のC2軌道で結ぶ。
+
+        スタートゾーン奥から出発し、スラローム側のオレンジ2球の前で完全停止、
+        2枚のバッフルを交互に避け、ビンゴ表面から50mmで完全停止する。
+        機体方位は固定し、オムニ移動として並進方向と方位を独立にする。
+        """
+        self.random_mode = False
+        self.start_to_bingo_mode = True
+        self.spin_bursts = []
+        self.ball_active_window = (-1.0, -1.0)
+        self.ball_start = (0.0, 0.0)
+        self.ball_velocity = (0.0, 0.0)
+        self.ball_radius = 0.11
+
+        # (x, y, segment duration). Field origin is the floor centre;
+        # +x points from the starts toward bingo, +y is the left-team side.
+        # Values mirror config/robocon2026_field.json missions.start_to_bingo_left.
+        # Repeated pickup point provides a 0.4s zero-velocity capture dwell.
+        self._route_points = [
+            (-2.419, 1.354),
+            (-1.799, 0.394337567),
+            (-1.799, 0.394337567),
+            (-0.450, 0.500),
+            (-0.300, 1.060),
+            (0.350, 1.060),
+            (2.316, 0.494337567),
+        ]
+
+        def minimum_duration(a, b):
+            distance = math.hypot(b[0] - a[0], b[1] - a[1])
+            by_speed = 1.875 * distance / self.MAX_VEL
+            by_acceleration = math.sqrt(5.774 * distance / self.MAX_ACC)
+            return 1.08 * max(by_speed, by_acceleration)
+
+        self._route_durations = [minimum_duration(a, b)
+                                 for a, b in zip(self._route_points[:-1],
+                                                 self._route_points[1:])]
+        self._route_durations[1] = 0.4
+        self.route_duration = sum(self._route_durations)
+
+    @staticmethod
+    def _minimum_jerk(u: float):
+        """C2 minimum-jerk blend and first/second derivatives in normalized time."""
+        u = min(max(u, 0.0), 1.0)
+        p = 10.0 * u**3 - 15.0 * u**4 + 6.0 * u**5
+        dp = 30.0 * u**2 - 60.0 * u**3 + 30.0 * u**4
+        ddp = 60.0 * u - 180.0 * u**2 + 120.0 * u**3
+        return p, dp, ddp
+
+    def _state_start_to_bingo(self, t: float, held: bool) -> 'State':
+        if held:
+            x, y = self._route_points[0]
+            return State(t=t, x=x, y=y, yaw=0.0, vx=0.0, vy=0.0, omega=0.0,
+                         ax_body=0.0, ay_body=0.0, az_body=self.GRAVITY)
+
+        elapsed = 0.0
+        for i, duration in enumerate(self._route_durations):
+            if t <= elapsed + duration:
+                local_t = t - elapsed
+                u = local_t / duration
+                p, dp, ddp = self._minimum_jerk(u)
+                x0, y0 = self._route_points[i]
+                x1, y1 = self._route_points[i + 1]
+                dx, dy = x1 - x0, y1 - y0
+                x = x0 + dx * p
+                y = y0 + dy * p
+                vx = dx * dp / duration
+                vy = dy * dp / duration
+                ax = dx * ddp / (duration * duration)
+                ay = dy * ddp / (duration * duration)
+                return State(t=t, x=x, y=y, yaw=0.0, vx=vx, vy=vy, omega=0.0,
+                             ax_body=ax, ay_body=ay, az_body=self.GRAVITY)
+            elapsed += duration
+
+        x, y = self._route_points[-1]
+        return State(t=t, x=x, y=y, yaw=0.0, vx=0.0, vy=0.0, omega=0.0,
+                     ax_body=0.0, ay_body=0.0, az_body=self.GRAVITY)
 
     # ----- ランダム経路モード(第二段階耐久試験) -----
     RANDOM_MARGIN = 0.5   # 壁マージン: ROBOT_RADIUS(0.289) + クリアランス
@@ -351,6 +434,8 @@ class Trajectory:
     def state(self, t: float) -> State:
         held = t < self.STARTUP_HOLD_SEC
         t = max(t - self.STARTUP_HOLD_SEC, 0.0)
+        if getattr(self, 'start_to_bingo_mode', False):
+            return self._state_start_to_bingo(t, held)
         if self.random_mode:
             return self._state_random(t, held)
         wx, wy = self.wx, self.wy

@@ -1,0 +1,13 @@
+[INFO] [1784815750.090563403] [icp_seed_mode_diag]: icp_seed_mode_diag: recording 55.0s, 22 segments, corr=0.2m
+[INFO] [1784815840.224040736] [icp_seed_mode_diag]: recorded 2240 scans; running three seeding modes
+[INFO] [1784816026.824746295] [icp_seed_mode_diag]: ====================================================================================================
+[INFO] [1784816026.829346969] [icp_seed_mode_diag]: seed perturbation applied to "offset": dx=+6.79mm dy=-13.33mm (|14.96|mm)
+[INFO] [1784816026.830521969] [icp_seed_mode_diag]: production results matched by stamp: 2202 of 2240 scans (2202 received)
+[INFO] [1784816026.831142900] [icp_seed_mode_diag]: plain = least squares, 20 iters. _prod = huber 0.025 / 10 iters / clamped, as deployed. "production" is the running matcher on these same scans.
+[INFO] [1784816026.842137177] [icp_seed_mode_diag]: production n=1807  dx=  +6.65+- 2.06mm dy= -13.24+- 2.32mm |bias|= 14.81mm RMSE= 15.13mm dyaw=+0.2978deg
+[INFO] [1784816026.844077657] [icp_seed_mode_diag]: truth     n=1840  dx=  +9.19+- 1.42mm dy= -29.16+- 1.29mm |bias|= 30.57mm RMSE= 30.63mm dyaw=+0.7563deg
+[INFO] [1784816026.845449999] [icp_seed_mode_diag]: offset    n=1840  dx=  +9.20+- 1.42mm dy= -29.16+- 1.29mm |bias|= 30.58mm RMSE= 30.64mm dyaw=+0.7558deg
+[INFO] [1784816026.846555719] [icp_seed_mode_diag]: chained   n=1840  dx=-2104.31+- 0.95mm dy=+2359.59+- 0.95mm |bias|=3161.62mm RMSE=3161.62mm dyaw=+21.6419deg
+[INFO] [1784816026.848063378] [icp_seed_mode_diag]: truth_prod n=1840  dx=  +6.67+- 1.50mm dy= -13.08+- 1.68mm |bias|= 14.68mm RMSE= 14.85mm dyaw=+0.2941deg
+[INFO] [1784816026.850055691] [icp_seed_mode_diag]: offset_prod n=1840  dx=  +6.72+- 1.49mm dy= -13.17+- 1.66mm |bias|= 14.78mm RMSE= 14.95mm dyaw=+0.2946deg
+[INFO] [1784816026.850610010] [icp_seed_mode_diag]: ====================================================================================================

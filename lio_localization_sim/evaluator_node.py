@@ -74,10 +74,14 @@ class EvaluatorNode(Node):
             PoseArray, '/detected_balls', self.ball_callback, 10)
 
         self.report_timer = self.create_timer(5.0, self.periodic_report)
-        self.finish_timer = self.create_timer(self.duration_sec, self.finish)
+        # 計測窓はノード起動ではなく最初の真値到着から数える。Unity Editorを手で
+        # (あるいはMCP経由で)Playにするまでの数十秒がそのまま窓を食い潰し、
+        # 「一度も/odom_fastが評価されないまま時間切れ」になっていた。
+        self.finish_timer = None
 
         self.get_logger().info(
-            f'evaluator_node started: will run for {self.duration_sec}s then report')
+            f'evaluator_node started: will run for {self.duration_sec}s '
+            f'starting from the first /ground_truth_pose')
 
     def _stamp_to_t(self, stamp) -> float:
         # 到着時刻(通信・処理遅延を含む)ではなく、送信側が付けたメッセージの
@@ -86,6 +90,10 @@ class EvaluatorNode(Node):
         return (stamp.sec + stamp.nanosec * 1e-9) - self.sim_start_time_sec
 
     def gt_callback(self, msg: Odometry):
+        if self.finish_timer is None:
+            self.finish_timer = self.create_timer(self.duration_sec, self.finish)
+            self.get_logger().info(
+                f'first ground truth received: measuring for {self.duration_sec}s')
         t = self._stamp_to_t(msg.header.stamp)
         yaw = yaw_from_quat(msg.pose.pose.orientation)
         self.gt_samples.append(Sample(t, msg.pose.pose.position.x, msg.pose.pose.position.y, yaw))

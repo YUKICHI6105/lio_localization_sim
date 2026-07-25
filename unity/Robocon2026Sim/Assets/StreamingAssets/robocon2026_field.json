@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "name": "chiba_university_robocon_2026",
+  "units": "metres",
+  "coordinate_system": {
+    "handedness": "right",
+    "origin": "field_centre_floor",
+    "x": "start_to_bingo",
+    "y": "left",
+    "z": "up",
+    "unity_mapping": {"unity_x": "-y", "unity_y": "z", "unity_z": "x"}
+  },
+  "field": {"length": 5.638, "width": 3.376, "floor_z": 0.0},
+  "rules": {
+    "match_duration_s": 300,
+    "note_diameter": 0.150,
+    "note_mass": 0.200,
+    "notes_per_team": 6,
+    "max_notes_in_slalom": 2
+  },
+  "robot": {
+    "chassis": {
+      "shape": "equilateral_triangle",
+      "side": 0.500,
+      "height": 0.120,
+      "corner_radius": 0.050
+    },
+    "omni_wheels": {
+      "count": 3,
+      "diameter_options": [0.060, 0.100],
+      "simulation_diameter": 0.100,
+      "width": 0.050
+    },
+    "target_limits": {
+      "max_speed": 5.000,
+      "max_acceleration": 4.905,
+      "max_yaw_rate": 6.283185307
+    }
+  },
+  "missions": {
+    "start_to_bingo_left": {
+      "interpretation": "The field-deep pair means the two orange notes nearest the slalom.",
+      "surface_clearance": 0.050,
+      "yaw": 0.0,
+      "start": [-2.419, 1.354],
+      "pickup": [-1.799, 0.394337567],
+      "slalom_waypoints": [[-0.450, 0.500], [-0.300, 1.060], [0.350, 1.060]],
+      "finish": [2.316, 0.494337567],
+      "pickup_note_indices": [4, 5],
+      "pickup_dwell_s": 0.400,
+      "required_zero_speed_points": ["start", "pickup", "finish"]
+    }
+  },
+  "zones": [
+    {"id": "start_left", "x_min": -2.819, "x_max": -2.019, "y_min": 1.069, "y_max": 1.669, "colour": "#15d12e", "confidence": "overhead_drawing_dimensions"},
+    {"id": "start_right", "x_min": -2.819, "x_max": -2.019, "y_min": -1.669, "y_max": -1.069, "colour": "#15d12e", "confidence": "overhead_drawing_dimensions"},
+    {"id": "notes_left", "x_min": -2.819, "x_max": -1.579, "y_min": 0.0165, "y_max": 0.2665, "colour": "#0852f2", "confidence": "overhead_drawing_dimensions"},
+    {"id": "notes_right", "x_min": -2.819, "x_max": -1.579, "y_min": -0.2665, "y_max": -0.0165, "colour": "#0852f2", "confidence": "overhead_drawing_dimensions"},
+    {"id": "slalom", "x_min": -1.579, "x_max": 0.919, "y_min": -1.6715, "y_max": 1.6715, "colour": "#bf0a0a", "confidence": "overhead_drawing_dimensions"},
+    {"id": "goal", "x_min": 0.919, "x_max": 2.819, "y_min": -1.6715, "y_max": 1.6715, "colour": "#f2e60a", "confidence": "overhead_drawing_dimensions"}
+  ],
+  "walls": {
+    "thickness": 0.033,
+    "height": 0.300,
+    "height_rule_value": 0.100,
+    "height_note": "TEMPORARY: raised above the 0.14 m LiDAR scan plane so walls are visible while the robot LiDAR mount height is still being designed. The competition rule height is height_rule_value (0.100 m); restore it and lower the LiDAR mount once the real mount is fixed.",
+    "thickness_conflict": "The terminology section says 0.033 m; section 3.2 says 0.038 m.",
+    "segments": [
+      {"id": "start_end", "x1": -2.8025, "y1": -1.688, "x2": -2.8025, "y2": 1.688, "confidence": "overhead_drawing_dimensions"},
+      {"id": "bingo_end", "x1": 2.8025, "y1": -1.688, "x2": 2.8025, "y2": 1.688, "confidence": "overhead_drawing_dimensions"},
+      {"id": "left_side", "x1": -2.8025, "y1": 1.6715, "x2": 2.8025, "y2": 1.6715, "confidence": "overhead_drawing_dimensions"},
+      {"id": "right_side", "x1": -2.8025, "y1": -1.6715, "x2": 2.8025, "y2": -1.6715, "confidence": "overhead_drawing_dimensions"},
+      {"id": "centre_to_bingo", "x1": -2.8025, "y1": 0.0, "x2": 1.846, "y2": 0.0, "confidence": "overhead_drawing_alignment"},
+      {"id": "baffle_left_1", "x1": -0.779, "y1": 0.869, "x2": -0.779, "y2": 1.669, "confidence": "overhead_drawing_dimensions"},
+      {"id": "baffle_right_1", "x1": -0.779, "y1": -1.669, "x2": -0.779, "y2": -0.869, "confidence": "overhead_drawing_dimensions"},
+      {"id": "baffle_left_2", "x1": 0.021, "y1": 0.019, "x2": 0.021, "y2": 0.819, "confidence": "overhead_drawing_dimensions"},
+      {"id": "baffle_right_2", "x1": 0.021, "y1": -0.819, "x2": 0.021, "y2": -0.019, "confidence": "overhead_drawing_dimensions"}
+    ]
+  },
+  "bingo": {
+    "centre": {"x": 2.316, "y": 0.0},
+    "grid_plane": "x-z",
+    "team_approach_axes": ["+y", "-y"],
+    "columns": 3,
+    "rows": 3,
+    "clear_cell": 0.260,
+    "vertical_frame": 0.040,
+    "shelf_thickness": 0.020,
+    "bottom_clearance": 0.040,
+    "width": 0.940,
+    "depth_each_side": 0.300,
+    "total_depth": 0.600,
+    "height": 0.900,
+    "far_edge_x": 2.786,
+    "confidence": "overhead_and_elevation_drawings"
+  },
+  "notes": {
+    "blue": [[-2.699, -0.125], [-2.499, -0.125], [-2.299, -0.125], [-2.099, -0.125], [-1.899, -0.125], [-1.699, -0.125]],
+    "orange": [[-2.699, 0.125], [-2.499, 0.125], [-2.299, 0.125], [-2.099, 0.125], [-1.899, 0.125], [-1.699, 0.125]],
+    "confidence": "rule_equal_spacing_plus_overhead_notes_zone"
+  }
+}

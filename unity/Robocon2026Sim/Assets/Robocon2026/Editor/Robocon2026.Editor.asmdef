@@ -1,0 +1,10 @@
+{
+  "name": "Robocon2026.Editor",
+  "rootNamespace": "Robocon2026.Simulation.Editor",
+  "references": [
+    "Robocon2026.Runtime",
+    "Unity.RenderPipelines.Universal.Runtime"
+  ],
+  "includePlatforms": ["Editor"],
+  "autoReferenced": true
+}
