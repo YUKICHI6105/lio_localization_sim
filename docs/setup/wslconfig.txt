@@ -1,0 +1,26 @@
+# WSL2 resource limits for this 15.7 GB machine.
+#
+# Without this file WSL sizes its VM at 50% of host RAM (~7.9 GB) and, more importantly, never
+# hands reclaimed memory back to Windows -- page cache alone was holding ~1.7 GB hostage.  That
+# left too little for the Unity Editor (~4 GB) and contributed to an out-of-memory crash during
+# graphics initialisation.
+#
+# Takes effect after the next `wsl --shutdown` or reboot.
+[wsl2]
+# Cap the VM so Unity always has headroom.  Measured steady-state usage inside WSL is ~2 GB
+# (VS Code server plus its extensions), so 4 GB leaves room for colcon builds and ROS runs.
+memory=4GB
+
+# Return freed memory to Windows instead of holding it in the VM (WSL 2.0+).  "gradual" is the
+# conservative setting; it reclaims slowly and does not stall the guest.
+autoMemoryReclaim=gradual
+
+# Keep a swap file so a large build cannot hard-OOM against the smaller memory cap.
+swap=4GB
+
+# Release cached disk pages promptly rather than growing the VM working set.
+pageReporting=true
+
+[experimental]
+# Compact the VHD on shutdown so the disk image does not grow without bound either.
+sparseVhd=true
