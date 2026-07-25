@@ -1,0 +1,5 @@
+- [Stop immediately on sudo](feedback_sudo_stop.md) — never work around sudo-requiring steps; ask the user to run them
+- [Stop after 3 failed debug attempts](feedback_debug_retry_limit.md) — ask the user instead of continuing to dig alone; added to global CLAUDE.md
+- [Sonnet subagents for cost, weigh reload overhead](feedback_subagent_cost_policy.md) — delegate non-Fable-grade tasks to Sonnet; do small tasks inline
+- [Run once, verify, then repeat](feedback_test_run_protocol.md) — one test run first; on error stop and fix before more runs
+- [lio_localization status 2026-07-21](project_lio_localization_status.md) — yaw-lock根本原因(③のIMU積分時間管理3欠陥)解決、RMSE 1.6-2.0mm/max 13-25mm、feature/icp-covarianceブランチ; test-ops lessons
