@@ -8,8 +8,8 @@ from pathlib import Path
 
 
 project = Path(__file__).resolve().parents[1]
-workspace = Path(__file__).resolve().parents[3]
-source = workspace / 'src/lio_localization_sim/config/robocon2026_field.json'
+package_root = Path(__file__).resolve().parents[3]
+source = package_root / 'config/robocon2026_field.json'
 destination = project / 'Assets/StreamingAssets/robocon2026_field.json'
 
 data = json.loads(source.read_text(encoding='utf-8'))

@@ -1,5 +1,0 @@
-- Respond in Japanese. Report clearly in Japanese, including progress logs and error details.
-- For commands with long output, redirect the output to a log file. Then, use a subagent to search the log file (e.g., using grep) and report only the errors.
-- Use models at or below the level of Sonnet for sub-agents. If a higher-tier model is required for a specific task, seek the user's permission to use it.
-- Bashコマンドの先頭に `cd <パス> && ...` を付けない。作業ディレクトリは基本的に対象プロジェクトのルートに固定されているため、`cd`は省略して直接コマンドを実行する（`cd`との連結は許可リストの一致を妨げ、本来自動許可されるはずのコマンドまで毎回確認を求められる原因になるため）。
-- エラーやバグの原因特定を試み、3回やり直しても原因が分からない場合は、それ以上自己判断で調査・修正を続けず、状況（試したこと・分かったこと）を整理してユーザーに報告し、指示を仰ぐこと。

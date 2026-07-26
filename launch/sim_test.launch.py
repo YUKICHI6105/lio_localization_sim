@@ -18,6 +18,7 @@ def launch_setup(context, *args, **kwargs):
 
     field_config = LaunchConfiguration('field_config').perform(context)
     duration_sec = LaunchConfiguration('duration_sec').perform(context)
+    output_dir = LaunchConfiguration('output_dir').perform(context)
     field_width = float(LaunchConfiguration('field_width').perform(context))
     field_height = float(LaunchConfiguration('field_height').perform(context))
     trajectory_pattern = int(LaunchConfiguration('trajectory_pattern').perform(context))
@@ -65,6 +66,7 @@ def launch_setup(context, *args, **kwargs):
         parameters=[field_config, {
             'field_width': field_width, 'field_height': field_height,
             'duration_sec': float(duration_sec),
+            'output_dir': output_dir,
             'sim_start_time_sec': sim_start_time_sec,
             'trajectory_pattern': trajectory_pattern}],
         output='screen')
@@ -109,7 +111,11 @@ def launch_setup(context, *args, **kwargs):
             get_package_share_directory('lio_localization_sim'), 'rviz', 'sim_view.rviz')
         extra.append(Node(
             package='rviz2', executable='rviz2', name='rviz2',
-            arguments=['-d', rviz_cfg], output='screen'))
+            arguments=['-d', rviz_cfg], output='screen',
+            # WSLg offers both Wayland and XWayland.  RViz's OGRE GLX backend
+            # needs the latter; auto-selecting Wayland produces an invalid
+            # GLX parent-window handle.
+            additional_env={'QT_QPA_PLATFORM': 'xcb'}))
 
     # evaluatorがレポートを書いて終了したらlaunch全体を終了させる
     # (これが無いとシムノード・実ノードが走り続け、次の検証実行と
@@ -139,6 +145,9 @@ def generate_launch_description():
         DeclareLaunchArgument(
             'duration_sec', default_value='180.0',
             description='評価を実行する秒数(main.md想定の3分間走行)'),
+        DeclareLaunchArgument(
+            'output_dir', default_value='/tmp',
+            description='評価レポート・CSV・グラフの出力先'),
         DeclareLaunchArgument(
             'field_width', default_value='10.0',
             description='field.yamlと一致させること(真の初期姿勢計算に使用)'),

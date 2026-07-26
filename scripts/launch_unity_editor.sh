@@ -12,9 +12,9 @@
 # Usage: launch_unity_editor.sh
 set -u
 
-UNITY="/mnt/c/Program Files/Unity/Hub/Editor/6000.5.4f1/Editor/Unity.exe"
-WIN_PROJECT='C:\Users\kouza.FUKU-PC\UnityProjects\Robocon2026Sim'
-WSL_PROJECT=/mnt/c/Users/kouza.FUKU-PC/UnityProjects/Robocon2026Sim
+UNITY="${UNITY_EXECUTABLE:-/mnt/c/Program Files/Unity/Hub/Editor/6000.5.5f1/Editor/Unity.exe}"
+WIN_PROJECT='C:\Users\kouza\UnityProjects\Robocon2026Sim'
+WSL_PROJECT=/mnt/c/Users/kouza/UnityProjects/Robocon2026Sim
 LOG=/tmp/unity_editor_launch.log
 
 [ -x "$UNITY" ] || { echo "ERROR: Unity not found at $UNITY" >&2; exit 1; }

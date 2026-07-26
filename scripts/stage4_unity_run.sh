@@ -20,10 +20,10 @@ WS=/home/yukichi6105/ros2_ws
 # refuses to open one project twice, and requiring the user to close their Editor would defeat
 # the point of autonomous verification.  Only Assets/Packages/ProjectSettings are synced (264
 # KB); the clone keeps its own regenerable Library cache.
-MASTER=/mnt/c/Users/kouza.FUKU-PC/UnityProjects/Robocon2026Sim
-PROJECT=/mnt/c/Users/kouza.FUKU-PC/UnityProjects/Robocon2026Sim_Batch
-WIN_PROJECT='C:\Users\kouza.FUKU-PC\UnityProjects\Robocon2026Sim_Batch'
-UNITY="/mnt/c/Program Files/Unity/Hub/Editor/6000.5.4f1/Editor/Unity.exe"
+MASTER=/mnt/c/Users/kouza/UnityProjects/Robocon2026Sim
+PROJECT=/mnt/c/Users/kouza/UnityProjects/Robocon2026Sim_Batch
+WIN_PROJECT='C:\Users\kouza\UnityProjects\Robocon2026Sim_Batch'
+UNITY="${UNITY_EXECUTABLE:-/mnt/c/Program Files/Unity/Hub/Editor/6000.5.5f1/Editor/Unity.exe}"
 OUT="$WS/src/lio_localization_sim/docs/stage4_runs/$TAG"
 
 mkdir -p "$OUT" "$PROJECT"

@@ -9,7 +9,7 @@ from pathlib import Path
 source = Path(__file__).resolve().parents[1]
 destination = Path(os.environ.get(
     'ROBOCON_UNITY_WINDOWS_PROJECT',
-    '/mnt/c/Users/kouza.FUKU-PC/UnityProjects/Robocon2026Sim')).resolve()
+    '/mnt/c/Users/kouza/UnityProjects/Robocon2026Sim')).resolve()
 marker = destination / '.robocon2026-managed'
 
 if destination == source or source in destination.parents:

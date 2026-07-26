@@ -20,7 +20,7 @@ import subprocess
 import sys
 import time
 
-RELAY = "/mnt/c/Users/kouza.FUKU-PC/.unity/relay/relay_win.exe"
+RELAY = "/mnt/c/Users/kouza/.unity/relay/relay_win.exe"
 # The relay has to start bun, attach to the Editor's named pipe and enumerate tools before it
 # can serve a call; measured cold start is a few seconds, so allow generous headroom.
 CONNECT_WAIT = 6.0

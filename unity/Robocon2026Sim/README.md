@@ -9,7 +9,7 @@ The authoritative geometry remains
 1. Run `python3 tools/sync_unity_field.py` from this directory.
 2. Run `python3 tools/deploy_to_windows.py`. Windows Unity does not support a
    project stored directly on WSL's case-sensitive filesystem, so this creates
-   `C:\\Users\\kouza.FUKU-PC\\UnityProjects\\Robocon2026Sim`.
+   `C:\\Users\\kouza\\UnityProjects\\Robocon2026Sim`.
 3. In Unity Hub, add that Windows directory and open it with Unity 6.5.
 4. Wait until Package Manager finishes resolving URP, Newtonsoft JSON and the
    official ROS-TCP-Connector.
