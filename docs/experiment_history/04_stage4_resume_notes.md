@@ -46,6 +46,9 @@ WSL再起動でセッションが切れるため、途中状態を残す。フ�
 
 - 公式Unity MCP(`com.unity.ai.assistant` 同梱)を Claude Code に登録済み:
   `claude mcp add unity-mcp --scope local -- /mnt/c/Users/kouza.FUKU-PC/.unity/relay/relay_win.exe --mcp`
+  (2026-07-27時点の追記: このマシンのWindowsプロファイル名は`kouza.FUKU-PC`ではなく
+  `kouza`だった。正しいパスは
+  `/mnt/c/Users/kouza/.unity/relay/relay_win.exe`。同日、この正しいパスで再登録済み)
 - 使えるツール7個。特に **`Unity_RunCommand`(EditorでC#をコンパイル・実行)** があるので
   Play Mode制御も診断も可能。他に `Unity_GetConsoleLogs`, `Unity_Camera_Capture` 等
 - `src/lio_localization_sim/scripts/unity_mcp.py` … セッション再起動を待たずシェルからMCPを叩くヘルパー
@@ -64,7 +67,7 @@ Unity をバッチモード(`-runTests -testPlatform PlayMode`)でヘッドレ�
 
 `.wslconfig` が無く、WSLがホストRAMの50%(7.9GB)まで膨張し解放しない状態だった
 (実測 vmmemWSL 2.5〜3.9GB、うち実使用2.0GB・ページキャッシュ1.7GB)。
-`C:\Users\kouza.FUKU-PC\.wslconfig` を新規作成:
+`C:\Users\kouza\.wslconfig` を新規作成:
 
 ```ini
 [wsl2]
@@ -405,7 +408,7 @@ bash src/lio_localization_sim/scripts/launch_unity_editor.sh
 
 ```bash
 nohup "/mnt/c/Program Files/Unity/Hub/Editor/6000.5.4f1/Editor/Unity.exe" \
-  -projectPath 'C:\Users\kouza.FUKU-PC\UnityProjects\Robocon2026Sim' \
+  -projectPath 'C:\Users\kouza\UnityProjects\Robocon2026Sim' \
   > /tmp/unity_editor_launch.log 2>&1 &
 ```
 

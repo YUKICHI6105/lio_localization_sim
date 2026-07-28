@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using RosMessageTypes.BuiltinInterfaces;
 using RosMessageTypes.Geometry;
@@ -48,6 +49,12 @@ namespace Robocon2026.Simulation
         private const float LidarBlindCentreRadians = -90f * Mathf.Deg2Rad;
         private const float LidarRangeMin = 0.05f;
         private const float LidarRangeMax = 30f;
+        // /clock drives ROS simulation time, not the physical IMU. Publishing it at every
+        // 1 kHz physics step made every ROS node process 1,000 redundant clock updates/s and
+        // competed with the actual 1 kHz IMU over the Unity TCP bridge. A 250 Hz clock still
+        // resolves the 4 ms timing needed by watchdogs/evaluation while preserving every
+        // 1 ms IMU sample and stamp.
+        private const float ClockPeriod = 0.004f;
         private const float LidarPeriod = 0.025f;
         private const float GroundTruthPeriod = 0.010f;
 
@@ -57,9 +64,22 @@ namespace Robocon2026.Simulation
         private ROSConnection ros = null!;
         private Rigidbody body = null!;
         private Vector3 previousWorldVelocity;
+        private double nextClockTime;
         private double nextScanTime;
         private double nextGroundTruthTime;
+        private double previousImuSampleTime;
         private bool initializedVelocity;
+
+        // Real IMU bias is not a fixed offset: it drifts slowly over the run (temperature,
+        // mechanical settling, 1/f noise). A constant offset only exercises the estimator's
+        // *initial* bias guess, never its ability to track drift via
+        // bias_acc/gyro_random_walk_sigma -- so a constant-bias simulation cannot validate
+        // that mechanism against anything resembling real hardware. These fields hold the
+        // evolving bias state, seeded at Start() from the same constants PublishImu used to
+        // add directly, and nudged by a small random walk each sample (see PublishImu).
+        private double accelBiasX;
+        private double accelBiasY;
+        private double gyroBiasZ;
 
         // Epoch for every timestamp this publisher sends (/clock and all message headers),
         // recorded once at Start(). Time.timeAsDouble is normally 0 at the start of a fresh
@@ -81,9 +101,18 @@ namespace Robocon2026.Simulation
             foreach (var selfCollider in GetComponentsInChildren<Collider>())
                 robotSelfColliders.Add(selfCollider);
             ros = ROSConnection.GetOrCreateInstance();
-            ros.RosIPAddress = "127.0.0.1";
+            // ROSConnection is a persistent singleton in the Editor.  After a Play/Stop
+            // cycle its previous connection thread has been cancelled by OnDestroy(), but the
+            // singleton itself survives; merely setting ConnectOnStart again does not restart
+            // that thread.  Own the connection explicitly for each publisher session so the
+            // next Play always registers a fresh socket with the waiting ROS endpoint.
+            ros.Disconnect();
+            var configuredRosIp = Environment.GetEnvironmentVariable("ROBOCON_ROS_IP");
+            ros.RosIPAddress = string.IsNullOrWhiteSpace(configuredRosIp)
+                ? "127.0.0.1"
+                : configuredRosIp;
             ros.RosPort = 10000;
-            ros.ConnectOnStart = true;
+            ros.ConnectOnStart = false;
             ros.ShowHud = true;
 
             // Queue sizes sized to ~1s of buffering at each topic's publish rate. The
@@ -97,19 +126,33 @@ namespace Robocon2026.Simulation
             // on WSL's virtualised loopback overflowed them within a couple of hundred
             // milliseconds ("Queue full! Messages are getting dropped!"). Losing IMU that way
             // trips the 2 s dead-reckoning watchdog and kills the whole run.
-            ros.RegisterPublisher<ClockMsg>(ClockTopic, 2000);
+            ros.RegisterPublisher<ClockMsg>(ClockTopic, 500);
             ros.RegisterPublisher<LaserScanMsg>(ScanTopic, 80);
             ros.RegisterPublisher<OdometryMsg>(GroundTruthTopic, 200);
             // Register IMU last. Registering the larger message types can briefly block the
             // endpoint; publishing IMU before that makes the ROS watchdog see a false outage.
             ros.RegisterPublisher<ImuMsg>(ImuTopic, 2000);
             ros.Subscribe<OdometryMsg>(OdomFastTopic, OnOdomFastReceived);
+            // GetOrCreateInstance can instantiate ROSConnection in this same Unity frame. Its
+            // own Start() has not necessarily initialised yet, so wait one frame rather than
+            // racing the connector's Play-mode lifecycle with an early connection thread.
+            StartCoroutine(ConnectAfterRosConnectionStarts());
 
             previousWorldVelocity = body.linearVelocity;
+            nextClockTime = 0.0;
             nextScanTime = 0.0;
             nextGroundTruthTime = 0.0;
+            previousImuSampleTime = 0.0;
+            // Seed the evolving bias at the same values PublishImu used to add as fixed
+            // constants, so the starting behaviour is unchanged; only the drift over time is new.
+            // (2026-07-28: bias/random-walk/sensor-noise isolation tests confirmed the
+            // deceleration-linked spikes are independent of all three; reverted to adopted values.)
+            accelBiasX = 0.05;
+            accelBiasY = -0.03;
+            gyroBiasZ = 0.005;
             Debug.Log("[Unity ROS Sensors] Unity physics publishers ready: " +
-                "/clock 1kHz, /imu/data 1kHz, /scan 40Hz, /ground_truth_pose 100Hz.");
+                $"/imu/data 1kHz, /clock 250Hz, /scan 40Hz, /ground_truth_pose 100Hz; " +
+                $"ROS={ros.RosIPAddress}:{ros.RosPort}.");
         }
 
         private void OnDestroy()
@@ -126,14 +169,56 @@ namespace Robocon2026.Simulation
             if (ros != null) ros.Disconnect();
         }
 
+        private IEnumerator ConnectAfterRosConnectionStarts()
+        {
+            yield return null;
+
+            // A single one-shot Connect() here was observed to lose a race against the AI
+            // Assistant/MCP package's own relay reconnect and asset-pipeline refresh churn
+            // that happens in the same frame window when Play is entered via MCP automation
+            // (EditorApplication.isPlaying = true) rather than a manual Editor click: the
+            // outgoing per-topic queues (RegisterPublisher above) filled from FixedUpdate
+            // with nothing ever consuming them, producing "Queue full!" from frame one and
+            // zero ROS-side TCP accepts for the whole session. Retry with an explicit
+            // HasConnectionThread check instead of trusting a single attempt. Disconnect()
+            // first: Connect() unconditionally spawns a new connection thread with no guard
+            // against a still-pending previous attempt, so retrying without disconnecting
+            // would orphan it (the same class of bug OnDestroy() below guards against).
+            const int maxAttempts = 10;
+            const float retryIntervalSec = 1.0f;
+            for (var attempt = 1; attempt <= maxAttempts; attempt++)
+            {
+                ros.Disconnect();
+                ros.Connect();
+                yield return new WaitForSecondsRealtime(retryIntervalSec);
+                if (ros.HasConnectionThread)
+                {
+                    Debug.Log($"[Unity ROS Sensors] ROS connection thread confirmed alive " +
+                        $"(attempt {attempt}/{maxAttempts}).");
+                    yield break;
+                }
+                Debug.LogWarning($"[Unity ROS Sensors] ROS connection attempt {attempt}/{maxAttempts} " +
+                    "has no connection thread yet; retrying.");
+            }
+            Debug.LogError("[Unity ROS Sensors] Failed to establish a ROS connection thread after " +
+                $"{maxAttempts} attempts. Sensor data will not reach ROS this session.");
+        }
+
         private void FixedUpdate()
         {
             // Relative to sessionStartTime (see its declaration) rather than
             // Time.timeAsDouble directly, so /clock always starts at 0 for this session.
             var simulationTime = Time.timeAsDouble - sessionStartTime;
             var stamp = ToRosTime(simulationTime);
-            ros.Publish(ClockTopic, new ClockMsg(stamp));
-            PublishImu(stamp);
+
+            // Match the planned IMU update frequency.  Any communication loss must be fixed
+            // in the transport/receiver path rather than hidden by lowering this sensor rate.
+            if (simulationTime + 1e-9 >= nextClockTime)
+            {
+                ros.Publish(ClockTopic, new ClockMsg(stamp));
+                nextClockTime += ClockPeriod;
+            }
+            PublishImu(stamp, simulationTime);
 
             if (simulationTime + 1e-9 >= nextGroundTruthTime)
             {
@@ -149,14 +234,20 @@ namespace Robocon2026.Simulation
             }
         }
 
-        private void PublishImu(TimeMsg stamp)
+        private void PublishImu(TimeMsg stamp, double simulationTime)
         {
-            var dt = Time.fixedDeltaTime;
+            // The acceleration sample spans the interval since the last published IMU value,
+            // not an assumed fixed interval.  The nominal interval is 1 ms, but this keeps the
+            // sample physically correct if an Editor frame delays an individual publication.
+            var dt = initializedVelocity
+                ? (float)Math.Max(simulationTime - previousImuSampleTime, 1e-6)
+                : Time.fixedDeltaTime;
             var accelerationWorld = initializedVelocity
                 ? (body.linearVelocity - previousWorldVelocity) / dt
                 : Vector3.zero;
             initializedVelocity = true;
             previousWorldVelocity = body.linearVelocity;
+            previousImuSampleTime = simulationTime;
 
             // An accelerometer measures specific force: a_world - gravity.
             var specificForceLocalUnity = transform.InverseTransformDirection(
@@ -167,14 +258,35 @@ namespace Robocon2026.Simulation
 
             // Provisional real-sensor model from main.md.  Replace these constants with
             // the selected IMU data-sheet values once its exact model number is fixed.
-            const double accelNoiseSigma = 0.01;
-            const double gyroNoiseSigma = 0.001;
-            accelerationRos.x += 0.05 + Gaussian(accelNoiseSigma);
-            accelerationRos.y += -0.03 + Gaussian(accelNoiseSigma);
+            // TEMP DIAG (2026-07-28, revert after use): Gaussian noise fully disabled so the
+            // raw published accel/gyro values around a deceleration-linked error spike can be
+            // inspected without random per-sample jitter obscuring the underlying signal.
+            const double accelNoiseSigma = 0.0;
+            const double gyroNoiseSigma = 0.0;
+            // A real IMU's bias is not a fixed offset: it wanders slowly over time (continuous-
+            // time random walk), which is exactly what the estimator's bias_acc/gyro_random_walk_
+            // sigma parameters (backend_optimizer_node) model and are meant to track. A constant
+            // bias here only ever exercises the estimator's *initial* bias guess and can never
+            // validate that tracking mechanism against anything resembling real hardware. Nudge
+            // the running bias state each sample by a Gaussian step scaled by sqrt(dt) -- the
+            // standard continuous-to-discrete conversion for a random walk -- so its statistics
+            // match what a continuous-time density of biasRandomWalkSigma implies, regardless of
+            // the actual sample interval. Keep this equal to the ROS-side default so the
+            // estimator's assumed drift rate matches what is actually injected.
+            // 2026-07-28: bias/random-walk isolation tests confirmed the deceleration-linked
+            // error spikes are bias-independent (same magnitude with random walk on, fixed
+            // bias, and zero bias). Reverted to the adopted value.
+            const double biasRandomWalkSigma = 0.0001;
+            var biasWalkStep = biasRandomWalkSigma * Math.Sqrt(dt);
+            accelBiasX += Gaussian(biasWalkStep);
+            accelBiasY += Gaussian(biasWalkStep);
+            gyroBiasZ += Gaussian(biasWalkStep);
+            accelerationRos.x += accelBiasX + Gaussian(accelNoiseSigma);
+            accelerationRos.y += accelBiasY + Gaussian(accelNoiseSigma);
             accelerationRos.z += Gaussian(accelNoiseSigma);
             angularVelocityRos.x += Gaussian(gyroNoiseSigma);
             angularVelocityRos.y += Gaussian(gyroNoiseSigma);
-            angularVelocityRos.z += 0.005 + Gaussian(gyroNoiseSigma);
+            angularVelocityRos.z += gyroBiasZ + Gaussian(gyroNoiseSigma);
 
             var msg = new ImuMsg
             {

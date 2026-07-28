@@ -158,6 +158,6 @@ LiDAR補正が継続せず後半にIMUドリフトした。実機相当化後は
 
 Windows側Unityプロジェクト:
 
-`C:\Users\kouza.FUKU-PC\UnityProjects\Robocon2026Sim`
+`C:\Users\kouza\UnityProjects\Robocon2026Sim`
 
 UnityセンサーモデルのC#変更はWindows側へ同期済み。

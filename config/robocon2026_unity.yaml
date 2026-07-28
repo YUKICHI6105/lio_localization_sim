@@ -13,23 +13,49 @@
     imu_lost_timeout_sec: 2.0
     imu_watchdog_arm_delay_sec: 10.0
     # Physical sensor model used by Unity and both GTSAM preintegrators.
-    accelerometer_sigma: 0.01
+    # GTSAM expects continuous-time noise density, whereas Unity's 0.01 is
+    # per-sample sigma at 1 kHz (equivalent density ~=0.000316). Keep margin.
+    accelerometer_sigma: 0.001
     gyroscope_sigma: 0.001
     integration_sigma: 0.00001
+    # Unity now injects a genuine continuous-time random walk on top of the calibrated
+    # starting bias (see UnityRosSensorPublisher.PublishImu, biasRandomWalkSigma), so this
+    # must match what is actually injected rather than assume a fixed bias.
+    # (2026-07-28: bias/random-walk/sensor-noise isolation tests confirmed the
+    # deceleration-linked spikes are independent of all three; reverted to adopted values.)
     bias_acc_random_walk_sigma: 0.0001
     bias_gyro_random_walk_sigma: 0.0001
     # Values obtained by the startup stationary calibration for this simulated
     # IMU instance.  Real hardware must populate these from its own calibration.
-    initial_bias_accel_x: 0.0
-    initial_bias_accel_y: 0.0
+    initial_bias_accel_x: 0.05
+    initial_bias_accel_y: -0.03
     initial_bias_accel_z: 0.0
     initial_bias_gyro_x: 0.0
     initial_bias_gyro_y: 0.0
-    initial_bias_gyro_z: 0.0
+    initial_bias_gyro_z: 0.005
     lpf_tau: 0.005
+    # A wall-map absolute factor arrives at every 40 Hz scan. Keeping 1.5 s of
+    # states made individual iSAM2 updates miss the next scan under WSL/Unity
+    # load; 0.5 s retains 20 constrained states while reducing correction latency.
+    smoother_lag_sec: 0.5
     # During calibration, retain the continuous IMU solution if a scan is rejected;
     # do not reset to an older, possibly biased scan anchor.
     dropout_error_sec: 120.0
+    # 2026-07-28: tightening relinearize_threshold to 0.001 (from the adopted 0.01)
+    # gave no RMSE/max improvement (6.81mm/13.45mm, same range as every other
+    # variant tried) while adding more slow-smoother-update warnings (11 vs 1-2).
+    # Reverted. Smoother relinearization lag is not the cause either.
+    relinearize_threshold: 0.01
+    # ZUPT (2026-07-28, backend defaults to zupt_enabled=false): tried
+    # thresholds 0.1/0.3/0.5 m/s. 0.5 caused a 27.92mm max spike (forced
+    # v=0 while still moving); 0.1/0.3 gave only marginal RMSE gains and
+    # never fixed the max-error FAIL.
+    # imu_dynamics_* (accel-threshold wall-sigma tightening) also tested and
+    # disabled: threshold=2.0 m/s^2 fires on ordinary cruise decel (4-7 m/s^2
+    # measured even outside spike windows), diluting any selective effect;
+    # no RMSE/max improvement observed. Both mechanisms off pending a
+    # different diagnostic (along/cross-track signed error decomposition).
+    imu_dynamics_enabled: false
 
     # Inner faces of the 33 mm perimeter wall in Unity.
     field_width: 5.572
@@ -70,5 +96,6 @@
     planar_max_yaw_shift: 0.080
     wall_cov_range_sigma: 0.030
     wall_cov_inflation: 1.0
+    wall_use_icp_covariance: true
     wall_prior_base_xy_sigma: 0.030
     wall_prior_base_yaw_sigma: 0.30
