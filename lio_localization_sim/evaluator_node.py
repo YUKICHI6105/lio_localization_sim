@@ -1,7 +1,7 @@
 """main.md 6-A-1: 精度評価ノード。
 
 /ground_truth_pose と /odom_fast を突き合わせて誤差を記録し、要件A
-（定常誤差±10mm、ドリフト±20mm/3分）に対する合否と、スピンバースト・
+（定常RMSE・最大位置誤差ともに10mm以下）に対する合否と、スピンバースト・
 ボール横切り期間中の誤差を個別に報告する。最後にグラフをPNGで保存する。
 """
 
@@ -15,6 +15,10 @@ from nav_msgs.msg import Odometry
 from geometry_msgs.msg import PoseArray
 
 from lio_localization_sim.trajectory import Trajectory
+
+
+STEADY_RMSE_LIMIT_MM = 10.0
+MAX_POSITION_ERROR_LIMIT_MM = 10.0
 
 
 def yaw_from_quat(q):
@@ -216,8 +220,8 @@ class EvaluatorNode(Node):
         mean_nonball, rmse_nonball, max_nonball = stats(non_ball_pos_mm)
         mean_yaw, rmse_yaw, max_yaw = stats(yaw_deg)
 
-        steady_ok = rmse_all <= 10.0
-        drift_ok = max_all <= 20.0
+        steady_ok = rmse_all <= STEADY_RMSE_LIMIT_MM
+        max_error_ok = max_all <= MAX_POSITION_ERROR_LIMIT_MM
         ball_ok = (math.isnan(mean_ball) or math.isnan(mean_nonball) or
                    mean_ball <= mean_nonball * 3.0 + 5.0)
 
@@ -228,11 +232,13 @@ class EvaluatorNode(Node):
         report.append(f'総サンプル数: {len(self.errors)}  (定常区間 t>={self.settle_sec}s: {len(steady)})')
         report.append(f'真値未着のまま評価できなかったサンプル: {len(self.pending_odom)}')
         report.append('')
-        report.append('--- 全体（要件A: 定常±10mm, 最大±20mm） ---')
+        report.append('--- 全体（要件A: 定常RMSE<=10mm, 最大位置誤差<=10mm） ---')
         report.append(f'  位置誤差: mean={mean_all:.2f}mm  RMSE={rmse_all:.2f}mm  max={max_all:.2f}mm')
         report.append(f'  ヨー誤差: mean={mean_yaw:.3f}deg  RMSE={rmse_yaw:.3f}deg  max={max_yaw:.3f}deg')
-        report.append(f'  判定: 定常誤差(RMSE<=10mm) {"PASS" if steady_ok else "FAIL"} / '
-                       f'最大ドリフト(<=20mm) {"PASS" if drift_ok else "FAIL"}')
+        report.append(f'  判定: 定常誤差(RMSE<={STEADY_RMSE_LIMIT_MM:.0f}mm) '
+                       f'{"PASS" if steady_ok else "FAIL"} / '
+                       f'最大位置誤差(<={MAX_POSITION_ERROR_LIMIT_MM:.0f}mm) '
+                       f'{"PASS" if max_error_ok else "FAIL"}')
         report.append('')
         report.append('--- 高G旋回スピンバースト中 ---')
         report.append(f'  位置誤差: mean={mean_spin:.2f}mm  RMSE={rmse_spin:.2f}mm  max={max_spin:.2f}mm')
@@ -285,8 +291,9 @@ class EvaluatorNode(Node):
         ts = [e[0] for e in self.errors]
         errs = [e[1] * 1000.0 for e in self.errors]
         axes[1].plot(ts, errs, linewidth=0.8, color='tab:red')
-        axes[1].axhline(10.0, color='green', linestyle='--', label='10mm target')
-        axes[1].axhline(20.0, color='orange', linestyle='--', label='20mm target')
+        axes[1].axhline(
+            MAX_POSITION_ERROR_LIMIT_MM, color='green', linestyle='--',
+            label='10mm maximum-error requirement')
         for (t0, dur) in self.traj.spin_bursts:
             axes[1].axvspan(
                 t0 + Trajectory.STARTUP_HOLD_SEC,

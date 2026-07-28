@@ -26,11 +26,21 @@ import math
 
 import rclpy
 from rclpy.node import Node
-from rclpy.qos import qos_profile_sensor_data
+from rclpy.qos import HistoryPolicy, QoSProfile, ReliabilityPolicy, qos_profile_sensor_data
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import Imu, LaserScan
 
 from lio_localization.msg import ScanMatchResult, StateEstimate
+
+
+# This tool measures the IMU transport itself.  The standard sensor-data profile is
+# BEST_EFFORT with depth 5, which makes a Python diagnostic drop a 1 kHz stream under
+# scheduler jitter and falsely report a sender-side transport loss.  Mirror the production
+# consumers' reliable, deep subscription instead.
+IMU_DIAG_QOS = QoSProfile(
+    history=HistoryPolicy.KEEP_LAST,
+    depth=5000,
+    reliability=ReliabilityPolicy.RELIABLE)
 
 
 def yaw_from_quat(q):
@@ -133,7 +143,7 @@ class FusionStageDiag(Node):
         self.create_subscription(ScanMatchResult, '/scan_match_result', self.on_match, 20)
         self.create_subscription(StateEstimate, '/state_estimate', self.on_state, 20)
         self.create_subscription(Odometry, '/odom_fast', self.on_odom, 50)
-        self.create_subscription(Imu, '/imu/data', self.on_imu, qos_profile_sensor_data)
+        self.create_subscription(Imu, '/imu/data', self.on_imu, IMU_DIAG_QOS)
         self.create_subscription(LaserScan, '/scan', self.on_scan, qos_profile_sensor_data)
 
         self.create_timer(self.report_every_sec, self.report)
@@ -393,7 +403,7 @@ class FusionStageDiag(Node):
                 log(f'  {key:>8}: n={len(v):<6} mean={1000 * sum(v) / len(v):6.2f}mm '
                     f'p95={1000 * p95:6.2f}mm max={1000 * max(v):6.2f}mm')
         log('--- stamp regularity ---')
-        log(self._dt_text('imu  stamp dt', self.imu_dt, 1.0 / 250.0))
+        log(self._dt_text('imu  stamp dt', self.imu_dt, 1.0 / 1000.0))
         log(self._dt_text('scan stamp dt', self.scan_dt, 1.0 / 40.0))
         if self.scan_vs_imu:
             v = self.scan_vs_imu

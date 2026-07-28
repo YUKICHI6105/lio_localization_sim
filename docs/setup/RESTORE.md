@@ -86,6 +86,6 @@ never publishes.
 bash src/lio_localization_sim/scripts/stage4_sweep_run.sh off 0.15 0.003 1
 ```
 
-`docs/stage4_resume_notes.md` covers the operational pitfalls found the hard way: stale
+`docs/experiment_history/04_stage4_resume_notes.md` covers the operational pitfalls found the hard way: stale
 endpoints holding port 10000, publisher queue sizing against the 1 kHz IMU, and why a run must
 never be judged from an open-loop session.

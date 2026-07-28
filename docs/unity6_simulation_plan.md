@@ -24,7 +24,7 @@ Unity 6.5を常時3D表示・GPUセンサー・操作確認の中心とし、ROS
 ## ファイル配置
 
 - 編集正本: `/home/yukichi6105/ros2_ws/src/lio_localization_sim/unity/Robocon2026Sim`
-- Windows実行用: `C:\Users\kouza.FUKU-PC\UnityProjects\Robocon2026Sim`
+- Windows実行用: `C:\Users\kouza\UnityProjects\Robocon2026Sim`
 
 Windows版UnityはWSLの大文字小文字を区別するファイルシステムをプロジェクトとして開けない。
 したがって次の2コマンドでJSONとWindows側プロジェクトを同期する。
@@ -53,7 +53,7 @@ Unity HubからWindows実行用ディレクトリを開き、生成済みの
 
 - JSON寸法とColliderの差: 1 mm以下
 - 無負荷直進・横移動・旋回の速度誤差: 5%以下
-- 走行軌跡の実機との差: 50 mm以下から開始し、最終20 mm以下
+- 走行軌跡の実機との差: 50 mm以下から開始し、最終10 mm以下
 - 球投入100回の成功率: 95%以上
 - 同じ初期条件での試験結果を記録し、Unity／実機双方の分布で比較する
 

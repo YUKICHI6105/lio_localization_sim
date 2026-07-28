@@ -139,7 +139,7 @@ rep_txt, speed, ros = read('sim_eval_report.txt'), read('speed.log'), read('ros.
 f = {'mode': mode, 'hold': hold, 'sigma': sig, 'rep': rep, 'status': status}
 m = re.search(r'位置誤差:\s*mean=([\d.]+)mm\s+RMSE=([\d.]+)mm\s+max=([\d.]+)mm', rep_txt)
 f['eval_mean'], f['eval_rmse'], f['eval_max'] = m.groups() if m else ('', '', '')
-f['verdict'] = 'PASS' if ('最大ドリフト(<=20mm) PASS' in rep_txt) else 'FAIL'
+f['verdict'] = 'PASS' if ('最大位置誤差(<=10mm) PASS' in rep_txt) else 'FAIL'
 
 # Last report block wins: it covers the whole settled session.
 w = re.findall(r'\((\d+) windows', speed)
