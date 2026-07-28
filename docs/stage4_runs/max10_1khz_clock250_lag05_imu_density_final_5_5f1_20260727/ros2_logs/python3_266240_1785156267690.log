@@ -1,0 +1,26 @@
+[INFO] [1785156267.761639719] [unity_endpoint]: Starting server on 0.0.0.0:10000
+[INFO] [1785156267.862514612] [unity_endpoint]: Connection from 127.0.0.1
+[ERROR] [1785156267.863362969] [unity_endpoint]: Exception: No more data available
+[INFO] [1785156267.863731474] [unity_endpoint]: Disconnected from 127.0.0.1
+[INFO] [1785156267.968472252] [unity_endpoint]: Connection from 127.0.0.1
+[ERROR] [1785156267.969500250] [unity_endpoint]: Exception: No more data available
+[INFO] [1785156267.969845944] [unity_endpoint]: Disconnected from 127.0.0.1
+[INFO] [1785156300.172235347] [unity_endpoint]: Connection from 172.25.0.1
+[WARN] [1785156300.213501911] [rcl.logging_rosout]: Publisher already registered for node name: 'unity_endpoint'. If this is due to multiple nodes with the same name then all logs for the logger named 'unity_endpoint' will go out over the existing publisher. As soon as any node with that name is destructed it will unregister the publisher, preventing any further logs for that name from being published on the rosout topic.
+[INFO] [1785156300.486091974] [unity_endpoint]: RegisterSubscriber(/odom_fast, <class 'nav_msgs.msg._odometry.Odometry'>) OK
+[WARN] [1785156300.502395771] [rcl.logging_rosout]: Publisher already registered for node name: 'unity_endpoint'. If this is due to multiple nodes with the same name then all logs for the logger named 'unity_endpoint' will go out over the existing publisher. As soon as any node with that name is destructed it will unregister the publisher, preventing any further logs for that name from being published on the rosout topic.
+[INFO] [1785156300.531036897] [unity_endpoint]: RegisterSubscriber(/tf, <class 'tf2_msgs.msg._tf_message.TFMessage'>) OK
+[WARN] [1785156300.531597597] [rcl.logging_rosout]: Publisher already registered for node name: 'unity_endpoint'. If this is due to multiple nodes with the same name then all logs for the logger named 'unity_endpoint' will go out over the existing publisher. As soon as any node with that name is destructed it will unregister the publisher, preventing any further logs for that name from being published on the rosout topic.
+[INFO] [1785156300.573083966] [unity_endpoint]: RegisterPublisher(/clock, <class 'rosgraph_msgs.msg._clock.Clock'>) OK
+[WARN] [1785156300.757466748] [rcl.logging_rosout]: Publisher already registered for node name: 'unity_endpoint'. If this is due to multiple nodes with the same name then all logs for the logger named 'unity_endpoint' will go out over the existing publisher. As soon as any node with that name is destructed it will unregister the publisher, preventing any further logs for that name from being published on the rosout topic.
+[INFO] [1785156300.785898994] [unity_endpoint]: RegisterPublisher(/scan, <class 'sensor_msgs.msg._laser_scan.LaserScan'>) OK
+[WARN] [1785156300.792025364] [rcl.logging_rosout]: Publisher already registered for node name: 'unity_endpoint'. If this is due to multiple nodes with the same name then all logs for the logger named 'unity_endpoint' will go out over the existing publisher. As soon as any node with that name is destructed it will unregister the publisher, preventing any further logs for that name from being published on the rosout topic.
+[INFO] [1785156300.820620413] [unity_endpoint]: RegisterPublisher(/ground_truth_pose, <class 'nav_msgs.msg._odometry.Odometry'>) OK
+[WARN] [1785156300.821375290] [rcl.logging_rosout]: Publisher already registered for node name: 'unity_endpoint'. If this is due to multiple nodes with the same name then all logs for the logger named 'unity_endpoint' will go out over the existing publisher. As soon as any node with that name is destructed it will unregister the publisher, preventing any further logs for that name from being published on the rosout topic.
+[INFO] [1785156300.848777580] [unity_endpoint]: RegisterPublisher(/imu/data, <class 'sensor_msgs.msg._imu.Imu'>) OK
+[WARN] [1785156300.853657715] [rcl.logging_rosout]: Publisher already registered for node name: 'unity_endpoint'. If this is due to multiple nodes with the same name then all logs for the logger named 'unity_endpoint' will go out over the existing publisher. As soon as any node with that name is destructed it will unregister the publisher, preventing any further logs for that name from being published on the rosout topic.
+[INFO] [1785156300.886860722] [unity_endpoint]: RegisterPublisher(/clock, <class 'rosgraph_msgs.msg._clock.Clock'>) OK
+[INFO] [1785156300.924474253] [unity_endpoint]: RegisterPublisher(/scan, <class 'sensor_msgs.msg._laser_scan.LaserScan'>) OK
+[INFO] [1785156300.976832099] [unity_endpoint]: RegisterPublisher(/ground_truth_pose, <class 'nav_msgs.msg._odometry.Odometry'>) OK
+[INFO] [1785156301.022576502] [unity_endpoint]: RegisterPublisher(/imu/data, <class 'sensor_msgs.msg._imu.Imu'>) OK
+[INFO] [1785156365.659781128] [unity_endpoint]: Disconnected from 172.25.0.1

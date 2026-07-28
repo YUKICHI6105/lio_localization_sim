@@ -1,0 +1,128 @@
+[INFO] [launch]: All log files can be found below /home/yukichi6105/ros2_ws/src/lio_localization_sim/docs/stage4_runs/max10_1khz_clock250_5_5f1_20260727/ros2_logs/2026-07-27-20-51-59-442052-fuku-pc-244135
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [default_server_endpoint-1]: process started with pid [244150]
+[default_server_endpoint-1] /opt/ros/lyrical/lib/python3.14/site-packages/rclpy/executors.py:1073: UserWarning: MultiThreadedExecutor is used with a single thread.
+[default_server_endpoint-1] Use the SingleThreadedExecutor instead.
+[default_server_endpoint-1]   warnings.warn(
+[default_server_endpoint-1] [INFO] [1785153119.892138625] [unity_endpoint]: Starting server on 0.0.0.0:10000
+[default_server_endpoint-1] [INFO] [1785153120.240107806] [unity_endpoint]: Connection from 127.0.0.1
+[default_server_endpoint-1] [ERROR] [1785153120.240949082] [unity_endpoint]: Exception: No more data available
+[default_server_endpoint-1] [INFO] [1785153120.241390051] [unity_endpoint]: Disconnected from 127.0.0.1
+[default_server_endpoint-1] [INFO] [1785153120.344451588] [unity_endpoint]: Connection from 127.0.0.1
+[default_server_endpoint-1] [ERROR] [1785153120.345400873] [unity_endpoint]: Exception: No more data available
+[default_server_endpoint-1] [INFO] [1785153120.345937016] [unity_endpoint]: Disconnected from 127.0.0.1
+[INFO] [imu_preintegration_node-2]: process started with pid [244214]
+[INFO] [backend_optimizer_node-3]: process started with pid [244215]
+[INFO] [laser_scan_matching_node-4]: process started with pid [244216]
+[INFO] [ball_tracking_node-5]: process started with pid [244217]
+[INFO] [evaluator_node-6]: process started with pid [244218]
+[ball_tracking_node-5] [INFO] [1785153124.571385972] [ball_tracking_node]: ball_tracking_node started
+[imu_preintegration_node-2] [INFO] [1785153124.582277774] [imu_preintegration_node]: imu_preintegration_node started (waiting for first /state_estimate)
+[laser_scan_matching_node-4] [INFO] [1785153124.584766131] [laser_scan_matching_node]: laser_scan_matching_node started (0 cylinders, 9 internal walls, field 5.572x3.310m, initial seed=(-2.419, 1.354, 0.000))
+[backend_optimizer_node-3] [INFO] [1785153124.592817901] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[backend_optimizer_node-3] [INFO] [1785153124.593025419] [backend_optimizer_node]: backend_optimizer_node started (0 cylinders registered)
+[evaluator_node-6] [INFO] [1785153125.055664309] [unity_evaluator_node]: evaluator_node started: will run for 60.0s starting from the first /ground_truth_pose
+[default_server_endpoint-1] [INFO] [1785153210.244005814] [unity_endpoint]: Connection from 172.25.0.1
+[default_server_endpoint-1] [WARN] [1785153210.301682735] [rcl.logging_rosout]: Publisher already registered for node name: 'unity_endpoint'. If this is due to multiple nodes with the same name then all logs for the logger named 'unity_endpoint' will go out over the existing publisher. As soon as any node with that name is destructed it will unregister the publisher, preventing any further logs for that name from being published on the rosout topic.
+[default_server_endpoint-1] [INFO] [1785153210.614749684] [unity_endpoint]: RegisterSubscriber(/odom_fast, <class 'nav_msgs.msg._odometry.Odometry'>) OK
+[default_server_endpoint-1] [WARN] [1785153210.626980778] [rcl.logging_rosout]: Publisher already registered for node name: 'unity_endpoint'. If this is due to multiple nodes with the same name then all logs for the logger named 'unity_endpoint' will go out over the existing publisher. As soon as any node with that name is destructed it will unregister the publisher, preventing any further logs for that name from being published on the rosout topic.
+[default_server_endpoint-1] [INFO] [1785153210.655434825] [unity_endpoint]: RegisterSubscriber(/tf, <class 'tf2_msgs.msg._tf_message.TFMessage'>) OK
+[default_server_endpoint-1] [WARN] [1785153210.656148200] [rcl.logging_rosout]: Publisher already registered for node name: 'unity_endpoint'. If this is due to multiple nodes with the same name then all logs for the logger named 'unity_endpoint' will go out over the existing publisher. As soon as any node with that name is destructed it will unregister the publisher, preventing any further logs for that name from being published on the rosout topic.
+[default_server_endpoint-1] [INFO] [1785153210.679239769] [unity_endpoint]: RegisterPublisher(/clock, <class 'rosgraph_msgs.msg._clock.Clock'>) OK
+[default_server_endpoint-1] [WARN] [1785153210.868379178] [rcl.logging_rosout]: Publisher already registered for node name: 'unity_endpoint'. If this is due to multiple nodes with the same name then all logs for the logger named 'unity_endpoint' will go out over the existing publisher. As soon as any node with that name is destructed it will unregister the publisher, preventing any further logs for that name from being published on the rosout topic.
+[default_server_endpoint-1] [INFO] [1785153210.892619260] [unity_endpoint]: RegisterPublisher(/scan, <class 'sensor_msgs.msg._laser_scan.LaserScan'>) OK
+[default_server_endpoint-1] [WARN] [1785153210.893316965] [rcl.logging_rosout]: Publisher already registered for node name: 'unity_endpoint'. If this is due to multiple nodes with the same name then all logs for the logger named 'unity_endpoint' will go out over the existing publisher. As soon as any node with that name is destructed it will unregister the publisher, preventing any further logs for that name from being published on the rosout topic.
+[default_server_endpoint-1] [INFO] [1785153210.925893716] [unity_endpoint]: RegisterPublisher(/ground_truth_pose, <class 'nav_msgs.msg._odometry.Odometry'>) OK
+[default_server_endpoint-1] [WARN] [1785153210.926424301] [rcl.logging_rosout]: Publisher already registered for node name: 'unity_endpoint'. If this is due to multiple nodes with the same name then all logs for the logger named 'unity_endpoint' will go out over the existing publisher. As soon as any node with that name is destructed it will unregister the publisher, preventing any further logs for that name from being published on the rosout topic.
+[default_server_endpoint-1] [INFO] [1785153210.950082398] [unity_endpoint]: RegisterPublisher(/imu/data, <class 'sensor_msgs.msg._imu.Imu'>) OK
+[default_server_endpoint-1] [WARN] [1785153210.952814360] [rcl.logging_rosout]: Publisher already registered for node name: 'unity_endpoint'. If this is due to multiple nodes with the same name then all logs for the logger named 'unity_endpoint' will go out over the existing publisher. As soon as any node with that name is destructed it will unregister the publisher, preventing any further logs for that name from being published on the rosout topic.
+[evaluator_node-6] [INFO] [1785153210.955227887] [unity_evaluator_node]: first ground truth received: measuring for 60.0s
+[default_server_endpoint-1] [INFO] [1785153210.987079905] [unity_endpoint]: RegisterPublisher(/clock, <class 'rosgraph_msgs.msg._clock.Clock'>) OK
+[default_server_endpoint-1] [INFO] [1785153211.017352770] [unity_endpoint]: RegisterPublisher(/scan, <class 'sensor_msgs.msg._laser_scan.LaserScan'>) OK
+[default_server_endpoint-1] [INFO] [1785153211.049684579] [unity_endpoint]: RegisterPublisher(/ground_truth_pose, <class 'nav_msgs.msg._odometry.Odometry'>) OK
+[default_server_endpoint-1] [INFO] [1785153211.076619018] [unity_endpoint]: RegisterPublisher(/imu/data, <class 'sensor_msgs.msg._imu.Imu'>) OK
+[laser_scan_matching_node-4] [WARN] [1785153211.613494577] [laser_scan_matching_node]: IMU coverage wait exceeded 0.050s, processing scan with extrapolated tail
+[backend_optimizer_node-3] [INFO] [1785153211.691829611] [backend_optimizer_node]: collision unavoidable (point of no return): forcing hard scan trust for 150ms
+[evaluator_node-6] [INFO] [1785153215.309265850] [unity_evaluator_node]: t=4.9s  直近5秒: pos_err mean=8.66mm max=24.24mm  samples=4026  detected_balls=0
+[laser_scan_matching_node-4] [INFO] [1785153215.321278318] [laser_scan_matching_node]: note rejection: 83/541 returns unexplained, 3 clusters -> 3 accepted, 50 points dropped (last extent=0.0919m; gate <=0.350m, min 4 points)
+[laser_scan_matching_node-4] [WARN] [1785153216.986352731] [laser_scan_matching_node]: IMU coverage wait exceeded 0.050s, processing scan with extrapolated tail
+[backend_optimizer_node-3] [WARN] [1785153219.054650649] [backend_optimizer_node]: slow smoother update: 31.2ms (index 290)
+[evaluator_node-6] [INFO] [1785153220.448763000] [unity_evaluator_node]: t=10.0s  直近5秒: pos_err mean=8.28mm max=13.72mm  samples=8406  detected_balls=0
+[laser_scan_matching_node-4] [INFO] [1785153220.468758295] [laser_scan_matching_node]: note rejection: 41/541 returns unexplained, 2 clusters -> 1 accepted, 4 points dropped (last extent=1.1874m; gate <=0.350m, min 4 points)
+[backend_optimizer_node-3] [INFO] [1785153221.372886942] [backend_optimizer_node]: collision unavoidable (point of no return): forcing hard scan trust for 150ms
+[laser_scan_matching_node-4] [WARN] [1785153222.505909835] [laser_scan_matching_node]: IMU coverage wait exceeded 0.050s, processing scan with extrapolated tail
+[backend_optimizer_node-3] [WARN] [1785153222.640519393] [backend_optimizer_node]: slow smoother update: 25.8ms (index 417)
+[backend_optimizer_node-3] [WARN] [1785153222.920718320] [backend_optimizer_node]: slow smoother update: 25.4ms (index 426)
+[evaluator_node-6] [INFO] [1785153225.813270336] [unity_evaluator_node]: t=15.0s  直近5秒: pos_err mean=2.71mm max=8.92mm  samples=12705  detected_balls=0
+[laser_scan_matching_node-4] [INFO] [1785153225.854186470] [laser_scan_matching_node]: note rejection: 24/541 returns unexplained, 0 clusters -> 0 accepted, 0 points dropped (last extent=-1.0000m; gate <=0.350m, min 4 points)
+[backend_optimizer_node-3] [WARN] [1785153226.400233297] [backend_optimizer_node]: slow smoother update: 23.1ms (index 546)
+[backend_optimizer_node-3] [WARN] [1785153229.628597473] [backend_optimizer_node]: slow smoother update: 27.6ms (index 662)
+[evaluator_node-6] [INFO] [1785153231.013869909] [unity_evaluator_node]: t=20.0s  直近5秒: pos_err mean=2.32mm max=3.77mm  samples=17562  detected_balls=0
+[laser_scan_matching_node-4] [INFO] [1785153231.043311618] [laser_scan_matching_node]: note rejection: 14/541 returns unexplained, 0 clusters -> 0 accepted, 0 points dropped (last extent=-1.0000m; gate <=0.350m, min 4 points)
+[laser_scan_matching_node-4] [WARN] [1785153232.338434327] [laser_scan_matching_node]: IMU coverage wait exceeded 0.050s, processing scan with extrapolated tail
+[evaluator_node-6] [INFO] [1785153236.069542895] [unity_evaluator_node]: t=25.0s  直近5秒: pos_err mean=2.02mm max=3.65mm  samples=22518  detected_balls=0
+[laser_scan_matching_node-4] [INFO] [1785153236.148445410] [laser_scan_matching_node]: note rejection: 23/541 returns unexplained, 0 clusters -> 0 accepted, 0 points dropped (last extent=-1.0000m; gate <=0.350m, min 4 points)
+[backend_optimizer_node-3] [WARN] [1785153238.566914001] [backend_optimizer_node]: slow smoother update: 28.6ms (index 997)
+[backend_optimizer_node-3] [WARN] [1785153240.554198230] [backend_optimizer_node]: slow smoother update: 21.9ms (index 1072)
+[evaluator_node-6] [INFO] [1785153241.207516718] [unity_evaluator_node]: t=30.0s  直近5秒: pos_err mean=2.28mm max=4.18mm  samples=27492  detected_balls=0
+[laser_scan_matching_node-4] [INFO] [1785153241.291616338] [laser_scan_matching_node]: note rejection: 23/541 returns unexplained, 0 clusters -> 0 accepted, 0 points dropped (last extent=-1.0000m; gate <=0.350m, min 4 points)
+[backend_optimizer_node-3] [WARN] [1785153241.461704811] [backend_optimizer_node]: slow smoother update: 26.9ms (index 1105)
+[backend_optimizer_node-3] [WARN] [1785153241.769275413] [backend_optimizer_node]: slow smoother update: 44.1ms (index 1113)
+[backend_optimizer_node-3] [WARN] [1785153245.900656526] [backend_optimizer_node]: slow smoother update: 52.9ms (index 1267)
+[evaluator_node-6] [INFO] [1785153246.368750692] [unity_evaluator_node]: t=34.9s  直近5秒: pos_err mean=2.08mm max=3.69mm  samples=32232  detected_balls=0
+[laser_scan_matching_node-4] [INFO] [1785153246.480016023] [laser_scan_matching_node]: note rejection: 33/541 returns unexplained, 0 clusters -> 0 accepted, 0 points dropped (last extent=-1.0000m; gate <=0.350m, min 4 points)
+[laser_scan_matching_node-4] [WARN] [1785153251.029606048] [laser_scan_matching_node]: IMU coverage wait exceeded 0.050s, processing scan with extrapolated tail
+[backend_optimizer_node-3] [WARN] [1785153251.444649790] [backend_optimizer_node]: slow smoother update: 28.7ms (index 1466)
+[evaluator_node-6] [INFO] [1785153251.530345491] [unity_evaluator_node]: t=40.0s  直近5秒: pos_err mean=2.17mm max=4.56mm  samples=36981  detected_balls=0
+[laser_scan_matching_node-4] [INFO] [1785153251.664032358] [laser_scan_matching_node]: note rejection: 34/541 returns unexplained, 0 clusters -> 0 accepted, 0 points dropped (last extent=-1.0000m; gate <=0.350m, min 4 points)
+[laser_scan_matching_node-4] [WARN] [1785153252.297538837] [laser_scan_matching_node]: IMU coverage wait exceeded 0.050s, processing scan with extrapolated tail
+[backend_optimizer_node-3] [WARN] [1785153253.381817732] [backend_optimizer_node]: slow smoother update: 21.6ms (index 1536)
+[evaluator_node-6] [INFO] [1785153256.652160415] [unity_evaluator_node]: t=45.0s  直近5秒: pos_err mean=2.36mm max=4.12mm  samples=41590  detected_balls=0
+[laser_scan_matching_node-4] [INFO] [1785153256.798009170] [laser_scan_matching_node]: note rejection: 19/541 returns unexplained, 0 clusters -> 0 accepted, 0 points dropped (last extent=-1.0000m; gate <=0.350m, min 4 points)
+[backend_optimizer_node-3] [WARN] [1785153259.607946799] [backend_optimizer_node]: slow smoother update: 20.2ms (index 1757)
+[evaluator_node-6] [INFO] [1785153261.795954677] [unity_evaluator_node]: t=50.0s  直近5秒: pos_err mean=2.08mm max=3.53mm  samples=46214  detected_balls=0
+[laser_scan_matching_node-4] [INFO] [1785153261.936098853] [laser_scan_matching_node]: note rejection: 20/541 returns unexplained, 0 clusters -> 0 accepted, 0 points dropped (last extent=-1.0000m; gate <=0.350m, min 4 points)
+[laser_scan_matching_node-4] [WARN] [1785153264.873986346] [laser_scan_matching_node]: IMU coverage wait exceeded 0.050s, processing scan with extrapolated tail
+[laser_scan_matching_node-4] [WARN] [1785153265.918021479] [laser_scan_matching_node]: IMU coverage wait exceeded 0.050s, processing scan with extrapolated tail
+[backend_optimizer_node-3] [WARN] [1785153266.439410307] [backend_optimizer_node]: slow smoother update: 22.2ms (index 2014)
+[evaluator_node-6] [INFO] [1785153266.969467093] [unity_evaluator_node]: t=55.0s  直近5秒: pos_err mean=2.31mm max=3.41mm  samples=51135  detected_balls=0
+[laser_scan_matching_node-4] [INFO] [1785153267.170796607] [laser_scan_matching_node]: note rejection: 24/541 returns unexplained, 0 clusters -> 0 accepted, 0 points dropped (last extent=-1.0000m; gate <=0.350m, min 4 points)
+[evaluator_node-6] [INFO] [1785153272.063096129] [unity_evaluator_node]: t=60.0s  直近5秒: pos_err mean=2.26mm max=3.56mm  samples=55867  detected_balls=0
+[evaluator_node-6] [INFO] [1785153272.065857125] [unity_evaluator_node]: === 評価終了、集計します ===
+[laser_scan_matching_node-4] [INFO] [1785153272.333210093] [laser_scan_matching_node]: note rejection: 22/541 returns unexplained, 0 clusters -> 0 accepted, 0 points dropped (last extent=-1.0000m; gate <=0.350m, min 4 points)
+[evaluator_node-6] [INFO] [1785153272.549610606] [unity_evaluator_node]: 
+[evaluator_node-6] ============================================================
+[evaluator_node-6] main.md 6-A-1 シミュレーション評価レポート
+[evaluator_node-6] ============================================================
+[evaluator_node-6] 総サンプル数: 55869  (定常区間 t>=3.0s: 53797)
+[evaluator_node-6] 真値未着のまま評価できなかったサンプル: 0
+[evaluator_node-6] 
+[evaluator_node-6] --- 全体（要件A: 定常RMSE<=10mm, 最大位置誤差<=10mm） ---
+[evaluator_node-6]   位置誤差: mean=2.88mm  RMSE=3.51mm  max=13.72mm
+[evaluator_node-6]   ヨー誤差: mean=0.056deg  RMSE=0.099deg  max=0.461deg
+[evaluator_node-6]   判定: 定常誤差(RMSE<=10mm) PASS / 最大位置誤差(<=10mm) FAIL
+[evaluator_node-6] 
+[evaluator_node-6] --- 高G旋回スピンバースト中 ---
+[evaluator_node-6]   位置誤差: mean=nanmm  RMSE=nanmm  max=nanmm
+[evaluator_node-6] 
+[evaluator_node-6] --- ボール横切り中 vs 非横切り中 ---
+[evaluator_node-6]   横切り中   : mean=nanmm  RMSE=nanmm  max=nanmm
+[evaluator_node-6]   非横切り中 : mean=2.88mm  RMSE=3.51mm  max=13.72mm
+[evaluator_node-6]   判定: ボール横切りによる自己位置無影響 PASS
+[evaluator_node-6]   (参考) 横切り中の検出ボール数(最新): 0
+[evaluator_node-6] ============================================================
+[evaluator_node-6] [INFO] [1785153272.550735182] [unity_evaluator_node]: レポートを保存しました: /tmp/sim_eval_report.txt
+[backend_optimizer_node-3] [WARN] [1785153273.131701741] [backend_optimizer_node]: slow smoother update: 23.1ms (index 2251)
+[evaluator_node-6] [INFO] [1785153274.662884640] [unity_evaluator_node]: グラフを保存しました: /tmp/sim_eval_plot.png
+[INFO] [evaluator_node-6]: process has finished cleanly [pid 244218]
+[INFO] [ball_tracking_node-5]: sending signal 'SIGINT' to process[ball_tracking_node-5]
+[INFO] [laser_scan_matching_node-4]: sending signal 'SIGINT' to process[laser_scan_matching_node-4]
+[INFO] [backend_optimizer_node-3]: sending signal 'SIGINT' to process[backend_optimizer_node-3]
+[INFO] [imu_preintegration_node-2]: sending signal 'SIGINT' to process[imu_preintegration_node-2]
+[INFO] [default_server_endpoint-1]: sending signal 'SIGINT' to process[default_server_endpoint-1]
+[ball_tracking_node-5] [INFO] [1785153275.307130682] [rclcpp]: signal_handler(signum=2)
+[laser_scan_matching_node-4] [INFO] [1785153275.308386480] [rclcpp]: signal_handler(signum=2)
+[imu_preintegration_node-2] [INFO] [1785153275.312161175] [rclcpp]: signal_handler(signum=2)
+[backend_optimizer_node-3] [INFO] [1785153275.312320312] [rclcpp]: signal_handler(signum=2)
+[INFO] [imu_preintegration_node-2]: process has finished cleanly [pid 244214]
+[INFO] [backend_optimizer_node-3]: process has finished cleanly [pid 244215]

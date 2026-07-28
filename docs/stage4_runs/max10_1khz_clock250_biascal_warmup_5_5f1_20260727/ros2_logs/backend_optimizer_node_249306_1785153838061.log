@@ -1,0 +1,20 @@
+[INFO] [1785153838.101208889] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[INFO] [1785153838.101371261] [backend_optimizer_node]: backend_optimizer_node started (0 cylinders registered)
+[WARN] [1785153871.951773251] [backend_optimizer_node]: slow smoother update: 40.9ms (index 20)
+[WARN] [1785153881.670279108] [backend_optimizer_node]: slow smoother update: 21.5ms (index 380)
+[INFO] [1785153881.670855995] [backend_optimizer_node]: collision unavoidable (point of no return): forcing hard scan trust for 150ms
+[INFO] [1785153884.602015705] [backend_optimizer_node]: collision unavoidable (point of no return): forcing hard scan trust for 150ms
+[WARN] [1785153886.209934111] [backend_optimizer_node]: slow smoother update: 43.7ms (index 538)
+[WARN] [1785153886.911591456] [backend_optimizer_node]: slow smoother update: 53.0ms (index 562)
+[INFO] [1785153888.158626220] [backend_optimizer_node]: collision unavoidable (point of no return): forcing hard scan trust for 150ms
+[WARN] [1785153893.157228455] [backend_optimizer_node]: slow smoother update: 25.2ms (index 784)
+[WARN] [1785153893.554467312] [backend_optimizer_node]: slow smoother update: 24.5ms (index 795)
+[WARN] [1785153901.877921876] [backend_optimizer_node]: slow smoother update: 23.7ms (index 1104)
+[WARN] [1785153908.086701918] [backend_optimizer_node]: slow smoother update: 30.9ms (index 1325)
+[WARN] [1785153908.177856489] [backend_optimizer_node]: slow smoother update: 20.1ms (index 1328)
+[WARN] [1785153915.081318314] [backend_optimizer_node]: slow smoother update: 23.9ms (index 1571)
+[WARN] [1785153919.213674985] [backend_optimizer_node]: slow smoother update: 33.3ms (index 1719)
+[WARN] [1785153919.272757956] [backend_optimizer_node]: slow smoother update: 26.8ms (index 1721)
+[WARN] [1785153929.684183387] [backend_optimizer_node]: slow smoother update: 31.2ms (index 2106)
+[WARN] [1785153931.272952034] [backend_optimizer_node]: slow smoother update: 32.9ms (index 2166)
+[WARN] [1785153931.665755572] [backend_optimizer_node]: slow smoother update: 20.5ms (index 2183)

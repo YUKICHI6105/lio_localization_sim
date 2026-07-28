@@ -1,0 +1,25 @@
+[INFO] [1785230298.878015918] [laser_scan_matching_node]: laser_scan_matching_node started (0 cylinders, 9 internal walls, field 5.572x3.310m, initial seed=(-2.419, 1.354, 0.000))
+[WARN] [1785230328.641675025] [laser_scan_matching_node]: IMU coverage wait exceeded 0.050s, processing scan with extrapolated tail
+[WARN] [1785230330.493379649] [laser_scan_matching_node]: IMU coverage wait exceeded 0.050s, processing scan with extrapolated tail
+[INFO] [1785230332.400292336] [laser_scan_matching_node]: note rejection: 27/541 returns unexplained, 0 clusters -> 0 accepted, 0 points dropped (last extent=-1.0000m; gate <=0.350m, min 4 points)
+[WARN] [1785230333.675499438] [laser_scan_matching_node]: IMU coverage wait exceeded 0.050s, processing scan with extrapolated tail
+[WARN] [1785230335.788014809] [laser_scan_matching_node]: IMU coverage wait exceeded 0.050s, processing scan with extrapolated tail
+[WARN] [1785230337.340431741] [laser_scan_matching_node]: IMU coverage wait exceeded 0.050s, processing scan with extrapolated tail
+[INFO] [1785230337.868379540] [laser_scan_matching_node]: note rejection: 29/541 returns unexplained, 0 clusters -> 0 accepted, 0 points dropped (last extent=-1.0000m; gate <=0.350m, min 4 points)
+[WARN] [1785230338.850495124] [laser_scan_matching_node]: IMU coverage wait exceeded 0.050s, processing scan with extrapolated tail
+[INFO] [1785230343.426660946] [laser_scan_matching_node]: note rejection: 32/541 returns unexplained, 3 clusters -> 3 accepted, 13 points dropped (last extent=0.0728m; gate <=0.350m, min 4 points)
+[INFO] [1785230349.162388715] [laser_scan_matching_node]: note rejection: 52/541 returns unexplained, 1 clusters -> 0 accepted, 0 points dropped (last extent=1.0377m; gate <=0.350m, min 4 points)
+[INFO] [1785230354.454623158] [laser_scan_matching_node]: note rejection: 28/541 returns unexplained, 0 clusters -> 0 accepted, 0 points dropped (last extent=-1.0000m; gate <=0.350m, min 4 points)
+[WARN] [1785230356.616744178] [laser_scan_matching_node]: IMU coverage wait exceeded 0.050s, processing scan with extrapolated tail
+[INFO] [1785230360.018201417] [laser_scan_matching_node]: note rejection: 74/541 returns unexplained, 3 clusters -> 2 accepted, 29 points dropped (last extent=0.0903m; gate <=0.350m, min 4 points)
+[INFO] [1785230365.381965110] [laser_scan_matching_node]: note rejection: 31/541 returns unexplained, 0 clusters -> 0 accepted, 0 points dropped (last extent=-1.0000m; gate <=0.350m, min 4 points)
+[WARN] [1785230366.474512227] [laser_scan_matching_node]: IMU coverage wait exceeded 0.050s, processing scan with extrapolated tail
+[INFO] [1785230371.320459068] [laser_scan_matching_node]: note rejection: 61/541 returns unexplained, 2 clusters -> 1 accepted, 11 points dropped (last extent=0.0778m; gate <=0.350m, min 4 points)
+[WARN] [1785230373.570705922] [laser_scan_matching_node]: IMU coverage wait exceeded 0.050s, processing scan with extrapolated tail
+[INFO] [1785230376.762443035] [laser_scan_matching_node]: note rejection: 76/541 returns unexplained, 3 clusters -> 3 accepted, 48 points dropped (last extent=0.0962m; gate <=0.350m, min 4 points)
+[WARN] [1785230378.614339232] [laser_scan_matching_node]: IMU coverage wait exceeded 0.050s, processing scan with extrapolated tail
+[INFO] [1785230382.120586651] [laser_scan_matching_node]: note rejection: 45/541 returns unexplained, 3 clusters -> 2 accepted, 10 points dropped (last extent=0.0719m; gate <=0.350m, min 4 points)
+[WARN] [1785230385.504728755] [laser_scan_matching_node]: IMU coverage wait exceeded 0.050s, processing scan with extrapolated tail
+[INFO] [1785230387.608633159] [laser_scan_matching_node]: note rejection: 42/541 returns unexplained, 3 clusters -> 3 accepted, 14 points dropped (last extent=0.0706m; gate <=0.350m, min 4 points)
+[INFO] [1785230393.198135253] [laser_scan_matching_node]: note rejection: 30/541 returns unexplained, 0 clusters -> 0 accepted, 0 points dropped (last extent=-1.0000m; gate <=0.350m, min 4 points)
+[INFO] [1785230396.552731970] [rclcpp]: signal_handler(signum=2)

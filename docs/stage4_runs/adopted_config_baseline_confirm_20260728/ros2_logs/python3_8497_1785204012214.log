@@ -1,0 +1,38 @@
+[INFO] [1785204012.385142704] [unity_evaluator_node]: evaluator_node started: will run for 60.0s starting from the first /ground_truth_pose
+[INFO] [1785204047.512493431] [unity_evaluator_node]: first ground truth received: measuring for 60.0s
+[INFO] [1785204052.217767250] [unity_evaluator_node]: t=5.0s  直近5秒: pos_err mean=3.70mm max=7.72mm  samples=4424  detected_balls=0
+[INFO] [1785204057.366812951] [unity_evaluator_node]: t=10.0s  直近5秒: pos_err mean=4.10mm max=5.21mm  samples=9578  detected_balls=0
+[INFO] [1785204062.529249285] [unity_evaluator_node]: t=15.0s  直近5秒: pos_err mean=6.47mm max=10.98mm  samples=14768  detected_balls=0
+[INFO] [1785204067.694145700] [unity_evaluator_node]: t=20.0s  直近5秒: pos_err mean=5.47mm max=10.51mm  samples=19964  detected_balls=0
+[INFO] [1785204072.913810765] [unity_evaluator_node]: t=25.0s  直近5秒: pos_err mean=2.22mm max=2.89mm  samples=25149  detected_balls=0
+[INFO] [1785204078.725067674] [unity_evaluator_node]: t=30.0s  直近5秒: pos_err mean=2.27mm max=3.45mm  samples=30198  detected_balls=0
+[INFO] [1785204084.144123245] [unity_evaluator_node]: t=35.0s  直近5秒: pos_err mean=2.16mm max=3.17mm  samples=35363  detected_balls=0
+[INFO] [1785204089.315084321] [unity_evaluator_node]: t=40.0s  直近5秒: pos_err mean=2.26mm max=3.24mm  samples=40525  detected_balls=0
+[INFO] [1785204094.444097534] [unity_evaluator_node]: t=45.0s  直近5秒: pos_err mean=2.33mm max=3.39mm  samples=45715  detected_balls=0
+[INFO] [1785204099.639375954] [unity_evaluator_node]: t=50.0s  直近5秒: pos_err mean=2.19mm max=3.23mm  samples=50782  detected_balls=0
+[INFO] [1785204104.915845580] [unity_evaluator_node]: t=55.0s  直近5秒: pos_err mean=2.30mm max=3.00mm  samples=55908  detected_balls=0
+[INFO] [1785204110.195559495] [unity_evaluator_node]: t=60.0s  直近5秒: pos_err mean=2.31mm max=3.14mm  samples=61091  detected_balls=0
+[INFO] [1785204110.196622486] [unity_evaluator_node]: === 評価終了、集計します ===
+[INFO] [1785204110.700839953] [unity_evaluator_node]: 
+============================================================
+main.md 6-A-1 シミュレーション評価レポート
+============================================================
+総サンプル数: 61091  (定常区間 t>=3.0s: 58678)
+真値未着のまま評価できなかったサンプル: 0
+
+--- 全体（要件A: 定常RMSE<=10mm, 最大位置誤差<=10mm） ---
+  位置誤差: mean=3.12mm  RMSE=3.65mm  max=10.98mm
+  ヨー誤差: mean=0.071deg  RMSE=0.101deg  max=0.387deg
+  判定: 定常誤差(RMSE<=10mm) PASS / 最大位置誤差(<=10mm) FAIL
+
+--- 高G旋回スピンバースト中 ---
+  位置誤差: mean=nanmm  RMSE=nanmm  max=nanmm
+
+--- ボール横切り中 vs 非横切り中 ---
+  横切り中   : mean=nanmm  RMSE=nanmm  max=nanmm
+  非横切り中 : mean=3.12mm  RMSE=3.65mm  max=10.98mm
+  判定: ボール横切りによる自己位置無影響 PASS
+  (参考) 横切り中の検出ボール数(最新): 0
+============================================================
+[INFO] [1785204110.703108828] [unity_evaluator_node]: レポートを保存しました: /tmp/sim_eval_report.txt
+[INFO] [1785204113.125053589] [unity_evaluator_node]: グラフを保存しました: /tmp/sim_eval_plot.png

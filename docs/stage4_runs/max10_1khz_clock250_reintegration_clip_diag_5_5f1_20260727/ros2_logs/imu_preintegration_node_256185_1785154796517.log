@@ -1,0 +1,3 @@
+[INFO] [1785154796.621372863] [imu_preintegration_node]: imu_preintegration_node started (waiting for first /state_estimate)
+[INFO] [1785154894.718961582] [rclcpp]: signal_handler(signum=2)
+[INFO] [1785154895.157190392] [imu_preintegration_node]: diag odom dump: ok (66449 records)

@@ -1,0 +1,9 @@
+[INFO] [1785204011.712379472] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[INFO] [1785204011.712969798] [backend_optimizer_node]: backend_optimizer_node started (0 cylinders registered)
+[INFO] [1785204065.070236164] [backend_optimizer_node]: collision unavoidable (point of no return): forcing hard scan trust for 150ms
+[WARN] [1785204086.518882014] [backend_optimizer_node]: slow smoother update: 22.9ms (index 1446)
+[WARN] [1785204089.543379412] [backend_optimizer_node]: slow smoother update: 25.4ms (index 1563)
+[WARN] [1785204099.319565639] [backend_optimizer_node]: slow smoother update: 26.4ms (index 1935)
+[WARN] [1785204099.449007892] [backend_optimizer_node]: slow smoother update: 20.5ms (index 1938)
+[WARN] [1785204113.882673528] [backend_optimizer_node]: slow smoother update: 23.0ms (index 2473)
+[INFO] [1785204113.883583799] [rclcpp]: signal_handler(signum=2)

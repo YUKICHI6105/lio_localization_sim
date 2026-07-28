@@ -1,0 +1,24 @@
+[INFO] [1785239833.836688152] [laser_scan_matching_node]: laser_scan_matching_node started (0 cylinders, 9 internal walls, field 5.572x3.310m, initial seed=(-2.419, 1.354, 0.000))
+[WARN] [1785239877.228576821] [laser_scan_matching_node]: IMU coverage wait exceeded 0.050s, processing scan with extrapolated tail
+[WARN] [1785239881.241927433] [laser_scan_matching_node]: IMU coverage wait exceeded 0.050s, processing scan with extrapolated tail
+[INFO] [1785239881.323793118] [laser_scan_matching_node]: note rejection: 25/541 returns unexplained, 0 clusters -> 0 accepted, 0 points dropped (last extent=-1.0000m; gate <=0.350m, min 4 points)
+[WARN] [1785239882.567610210] [laser_scan_matching_node]: IMU coverage wait exceeded 0.050s, processing scan with extrapolated tail
+[WARN] [1785239883.906371912] [laser_scan_matching_node]: IMU coverage wait exceeded 0.050s, processing scan with extrapolated tail
+[INFO] [1785239886.846363641] [laser_scan_matching_node]: note rejection: 29/541 returns unexplained, 0 clusters -> 0 accepted, 0 points dropped (last extent=-1.0000m; gate <=0.350m, min 4 points)
+[WARN] [1785239887.036551940] [laser_scan_matching_node]: IMU coverage wait exceeded 0.050s, processing scan with extrapolated tail
+[WARN] [1785239891.568326416] [laser_scan_matching_node]: IMU coverage wait exceeded 0.050s, processing scan with extrapolated tail
+[INFO] [1785239892.408925775] [laser_scan_matching_node]: note rejection: 50/541 returns unexplained, 2 clusters -> 1 accepted, 7 points dropped (last extent=0.2186m; gate <=0.350m, min 4 points)
+[INFO] [1785239897.739315262] [laser_scan_matching_node]: note rejection: 51/541 returns unexplained, 4 clusters -> 4 accepted, 18 points dropped (last extent=0.0773m; gate <=0.350m, min 4 points)
+[WARN] [1785239900.003516191] [laser_scan_matching_node]: IMU coverage wait exceeded 0.050s, processing scan with extrapolated tail
+[INFO] [1785239903.265713795] [laser_scan_matching_node]: note rejection: 35/541 returns unexplained, 0 clusters -> 0 accepted, 0 points dropped (last extent=-1.0000m; gate <=0.350m, min 4 points)
+[INFO] [1785239908.507115089] [laser_scan_matching_node]: note rejection: 35/541 returns unexplained, 2 clusters -> 2 accepted, 11 points dropped (last extent=0.2573m; gate <=0.350m, min 4 points)
+[INFO] [1785239914.395016866] [laser_scan_matching_node]: note rejection: 35/541 returns unexplained, 3 clusters -> 3 accepted, 14 points dropped (last extent=0.0928m; gate <=0.350m, min 4 points)
+[INFO] [1785239919.947185948] [laser_scan_matching_node]: note rejection: 22/541 returns unexplained, 0 clusters -> 0 accepted, 0 points dropped (last extent=-1.0000m; gate <=0.350m, min 4 points)
+[INFO] [1785239925.330948595] [laser_scan_matching_node]: note rejection: 46/541 returns unexplained, 1 clusters -> 0 accepted, 0 points dropped (last extent=1.0602m; gate <=0.350m, min 4 points)
+[INFO] [1785239931.324278587] [laser_scan_matching_node]: note rejection: 32/541 returns unexplained, 0 clusters -> 0 accepted, 0 points dropped (last extent=-1.0000m; gate <=0.350m, min 4 points)
+[WARN] [1785239932.635831057] [laser_scan_matching_node]: IMU coverage wait exceeded 0.050s, processing scan with extrapolated tail
+[INFO] [1785239936.800027380] [laser_scan_matching_node]: note rejection: 32/541 returns unexplained, 0 clusters -> 0 accepted, 0 points dropped (last extent=-1.0000m; gate <=0.350m, min 4 points)
+[WARN] [1785239940.615783677] [laser_scan_matching_node]: IMU coverage wait exceeded 0.050s, processing scan with extrapolated tail
+[INFO] [1785239942.171782574] [laser_scan_matching_node]: note rejection: 80/541 returns unexplained, 3 clusters -> 3 accepted, 51 points dropped (last extent=0.1073m; gate <=0.350m, min 4 points)
+[WARN] [1785239942.699074590] [laser_scan_matching_node]: IMU coverage wait exceeded 0.050s, processing scan with extrapolated tail
+[INFO] [1785239946.306973813] [rclcpp]: signal_handler(signum=2)

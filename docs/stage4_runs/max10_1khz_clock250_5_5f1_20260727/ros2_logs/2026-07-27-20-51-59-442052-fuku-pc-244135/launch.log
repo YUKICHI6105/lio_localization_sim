@@ -1,0 +1,16 @@
+1785153119.4433556 [INFO] [launch]: All log files can be found below /home/yukichi6105/ros2_ws/src/lio_localization_sim/docs/stage4_runs/max10_1khz_clock250_5_5f1_20260727/ros2_logs/2026-07-27-20-51-59-442052-fuku-pc-244135
+1785153119.4434962 [INFO] [launch]: Default logging verbosity is set to INFO
+1785153119.5053658 [INFO] [default_server_endpoint-1]: process started with pid [244150]
+1785153124.5231159 [INFO] [imu_preintegration_node-2]: process started with pid [244214]
+1785153124.5233040 [INFO] [backend_optimizer_node-3]: process started with pid [244215]
+1785153124.5233810 [INFO] [laser_scan_matching_node-4]: process started with pid [244216]
+1785153124.5234351 [INFO] [ball_tracking_node-5]: process started with pid [244217]
+1785153124.5234792 [INFO] [evaluator_node-6]: process started with pid [244218]
+1785153275.2998443 [INFO] [evaluator_node-6]: process has finished cleanly [pid 244218]
+1785153275.3059034 [INFO] [ball_tracking_node-5]: sending signal 'SIGINT' to process[ball_tracking_node-5]
+1785153275.3079295 [INFO] [laser_scan_matching_node-4]: sending signal 'SIGINT' to process[laser_scan_matching_node-4]
+1785153275.3095574 [INFO] [backend_optimizer_node-3]: sending signal 'SIGINT' to process[backend_optimizer_node-3]
+1785153275.3111999 [INFO] [imu_preintegration_node-2]: sending signal 'SIGINT' to process[imu_preintegration_node-2]
+1785153275.3171387 [INFO] [default_server_endpoint-1]: sending signal 'SIGINT' to process[default_server_endpoint-1]
+1785153275.4817138 [INFO] [imu_preintegration_node-2]: process has finished cleanly [pid 244214]
+1785153275.4820890 [INFO] [backend_optimizer_node-3]: process has finished cleanly [pid 244215]

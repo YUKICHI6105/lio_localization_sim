@@ -1,0 +1,12 @@
+[INFO] [1785153397.241141180] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[INFO] [1785153397.241346270] [backend_optimizer_node]: backend_optimizer_node started (0 cylinders registered)
+[WARN] [1785153426.833549072] [backend_optimizer_node]: slow smoother update: 43.4ms (index 3)
+[INFO] [1785153427.402583407] [backend_optimizer_node]: collision unavoidable (point of no return): forcing hard scan trust for 150ms
+[WARN] [1785153450.408294110] [backend_optimizer_node]: slow smoother update: 36.8ms (index 834)
+[WARN] [1785153450.621176467] [backend_optimizer_node]: slow smoother update: 109.5ms (index 840)
+[WARN] [1785153461.777561425] [backend_optimizer_node]: slow smoother update: 47.2ms (index 1228)
+[WARN] [1785153462.010197683] [backend_optimizer_node]: slow smoother update: 30.9ms (index 1234)
+[WARN] [1785153474.417177493] [backend_optimizer_node]: slow smoother update: 26.6ms (index 1648)
+[WARN] [1785153478.992502422] [backend_optimizer_node]: slow smoother update: 191.4ms (index 1798)
+[WARN] [1785153479.033972257] [backend_optimizer_node]: slow smoother update: 37.9ms (index 1800)
+[WARN] [1785153479.837746781] [backend_optimizer_node]: slow smoother update: 21.6ms (index 1830)

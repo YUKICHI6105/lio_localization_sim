@@ -1,0 +1,14 @@
+[INFO] [1785152201.923286240] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[INFO] [1785152201.937919399] [backend_optimizer_node]: backend_optimizer_node started (0 cylinders registered)
+[WARN] [1785152201.938205407] [backend_optimizer_node]: skipping scan: only 0.0000s of IMU integrated since last node (need >= 0.0050s)
+[WARN] [1785152202.608046715] [backend_optimizer_node]: LiDAR wall correction unavailable for 0.77s (> 0.75s): drifting on IMU dead-reckoning
+[WARN] [1785152206.427468770] [backend_optimizer_node]: slow smoother update: 82.9ms (index 121)
+[WARN] [1785152207.004273562] [backend_optimizer_node]: slow smoother update: 22.9ms (index 134)
+[WARN] [1785152207.881290460] [backend_optimizer_node]: slow smoother update: 22.1ms (index 157)
+[WARN] [1785152210.145948039] [backend_optimizer_node]: wall correction downweighted by DCS: d_xy=0.089m (> 0.047m, dt=0.025s, scale=1.91x) — reduced confidence, not rejected
+[WARN] [1785152211.028508359] [backend_optimizer_node]: LiDAR wall correction unavailable for 0.78s (> 0.75s): drifting on IMU dead-reckoning
+[WARN] [1785152211.344042918] [backend_optimizer_node]: slow smoother update: 24.5ms (index 254)
+[WARN] [1785152213.256069793] [backend_optimizer_node]: slow smoother update: 20.4ms (index 305)
+[WARN] [1785152214.548702195] [backend_optimizer_node]: wall correction downweighted by DCS: d_xy=0.116m (> 0.047m, dt=0.025s, scale=2.50x) — reduced confidence, not rejected
+[WARN] [1785152215.517775591] [backend_optimizer_node]: LiDAR wall correction unavailable for 0.80s (> 0.75s): drifting on IMU dead-reckoning
+[ERROR] [1785152229.288069139] [backend_optimizer_node]: IMU signal LOST (no IMU for 2.00s > 2.00s). Self-localization is the dead-reckoning backbone and cannot continue without it: entering FAIL-SAFE HALT (freezing estimate, no further graph updates).

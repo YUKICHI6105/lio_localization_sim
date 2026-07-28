@@ -1,0 +1,6 @@
+[INFO] [1785226634.653822836] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[INFO] [1785226634.654062343] [backend_optimizer_node]: backend_optimizer_node started (0 cylinders registered)
+[WARN] [1785226655.713687644] [backend_optimizer_node]: slow smoother update: 23.2ms (index 15)
+[WARN] [1785226657.696106156] [backend_optimizer_node]: slow smoother update: 34.9ms (index 84)
+[WARN] [1785226681.938349486] [backend_optimizer_node]: slow smoother update: 47.6ms (index 990)
+[INFO] [1785226718.608344297] [rclcpp]: signal_handler(signum=2)

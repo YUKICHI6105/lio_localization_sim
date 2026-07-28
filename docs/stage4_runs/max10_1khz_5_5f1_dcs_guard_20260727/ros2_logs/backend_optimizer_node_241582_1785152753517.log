@@ -1,0 +1,27 @@
+[INFO] [1785152753.570635704] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[INFO] [1785152753.571512416] [backend_optimizer_node]: backend_optimizer_node started (0 cylinders registered)
+[INFO] [1785152783.796703728] [backend_optimizer_node]: collision unavoidable (point of no return): forcing hard scan trust for 150ms
+[WARN] [1785152784.162227353] [backend_optimizer_node]: slow smoother update: 25.1ms (index 58)
+[INFO] [1785152785.600683571] [backend_optimizer_node]: collision unavoidable (point of no return): forcing hard scan trust for 150ms
+[INFO] [1785152785.922317892] [backend_optimizer_node]: collision unavoidable (point of no return): forcing hard scan trust for 150ms
+[WARN] [1785152786.001758133] [backend_optimizer_node]: wall correction downweighted by DCS: d_xy=0.091m (> 0.059m, dt=0.075s, scale=1.55x) — reduced confidence, not rejected
+[WARN] [1785152786.001882580] [backend_optimizer_node]: hard scan trust suppressed: collision-window wall correction failed physical plausibility (DCS scale 1.55x)
+[WARN] [1785152787.043854151] [backend_optimizer_node]: slow smoother update: 22.7ms (index 147)
+[INFO] [1785152787.990299590] [backend_optimizer_node]: collision unavoidable (point of no return): forcing hard scan trust for 150ms
+[WARN] [1785152788.601396577] [backend_optimizer_node]: wall correction downweighted by DCS: d_xy=0.083m (> 0.047m, dt=0.025s, scale=1.78x) — reduced confidence, not rejected
+[INFO] [1785152788.601689101] [backend_optimizer_node]: collision unavoidable (point of no return): forcing hard scan trust for 150ms
+[WARN] [1785152788.601701810] [backend_optimizer_node]: hard scan trust suppressed: collision-window wall correction failed physical plausibility (DCS scale 1.78x)
+[INFO] [1785152789.341974914] [backend_optimizer_node]: collision unavoidable (point of no return): forcing hard scan trust for 150ms
+[INFO] [1785152789.698951607] [backend_optimizer_node]: collision unavoidable (point of no return): forcing hard scan trust for 150ms
+[INFO] [1785152790.963062402] [backend_optimizer_node]: collision unavoidable (point of no return): forcing hard scan trust for 150ms
+[WARN] [1785152791.167747127] [backend_optimizer_node]: slow smoother update: 20.4ms (index 292)
+[WARN] [1785152792.869045828] [backend_optimizer_node]: slow smoother update: 23.0ms (index 339)
+[INFO] [1785152793.403053161] [backend_optimizer_node]: collision unavoidable (point of no return): forcing hard scan trust for 150ms
+[INFO] [1785152794.695716236] [backend_optimizer_node]: collision unavoidable (point of no return): forcing hard scan trust for 150ms
+[WARN] [1785152794.716027669] [backend_optimizer_node]: slow smoother update: 20.1ms (index 401)
+[WARN] [1785152794.759905527] [backend_optimizer_node]: slow smoother update: 22.7ms (index 402)
+[INFO] [1785152798.834357304] [backend_optimizer_node]: collision unavoidable (point of no return): forcing hard scan trust for 150ms
+[WARN] [1785152798.856478618] [backend_optimizer_node]: slow smoother update: 22.0ms (index 516)
+[INFO] [1785152802.745338625] [backend_optimizer_node]: collision unavoidable (point of no return): forcing hard scan trust for 150ms
+[WARN] [1785152813.818483482] [backend_optimizer_node]: slow smoother update: 24.2ms (index 1038)
+[WARN] [1785152833.790624223] [backend_optimizer_node]: slow smoother update: 32.8ms (index 1716)

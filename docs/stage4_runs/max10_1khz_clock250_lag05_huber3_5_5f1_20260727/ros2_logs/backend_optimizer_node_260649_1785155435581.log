@@ -1,0 +1,5 @@
+[INFO] [1785155436.286510585] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[INFO] [1785155436.286784858] [backend_optimizer_node]: backend_optimizer_node started (0 cylinders registered)
+[WARN] [1785155503.062873090] [backend_optimizer_node]: slow smoother update: 34.7ms (index 1274)
+[WARN] [1785155504.461239956] [backend_optimizer_node]: slow smoother update: 25.5ms (index 1326)
+[INFO] [1785155532.280378890] [rclcpp]: signal_handler(signum=2)

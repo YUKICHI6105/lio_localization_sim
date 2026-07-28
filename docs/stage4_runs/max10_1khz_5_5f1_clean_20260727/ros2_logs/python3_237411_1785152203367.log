@@ -1,0 +1,8 @@
+[INFO] [1785152203.764451582] [unity_evaluator_node]: evaluator_node started: will run for 60.0s starting from the first /ground_truth_pose
+[INFO] [1785152203.766672019] [unity_evaluator_node]: first ground truth received: measuring for 60.0s
+[INFO] [1785152203.770059914] [unity_evaluator_node]: t=252.9s  直近5秒: pos_err mean=4669.81mm max=4669.81mm  samples=1  detected_balls=2
+[INFO] [1785152206.552939967] [unity_evaluator_node]: t=255.0s  直近5秒: pos_err mean=4513.29mm max=4669.81mm  samples=1810  detected_balls=0
+[INFO] [1785152211.869851673] [unity_evaluator_node]: t=260.0s  直近5秒: pos_err mean=3453.17mm max=4285.46mm  samples=5647  detected_balls=0
+[INFO] [1785152216.228944101] [unity_evaluator_node]: t=264.9s  直近5秒: pos_err mean=1634.60mm max=2341.99mm  samples=9553  detected_balls=0
+[INFO] [1785152220.840324846] [unity_evaluator_node]: t=270.0s  直近5秒: pos_err mean=4841.49mm max=7696.41mm  samples=13422  detected_balls=0
+[INFO] [1785152226.135139739] [unity_evaluator_node]: t=275.0s  直近5秒: pos_err mean=11035.78mm max=14958.29mm  samples=17230  detected_balls=0

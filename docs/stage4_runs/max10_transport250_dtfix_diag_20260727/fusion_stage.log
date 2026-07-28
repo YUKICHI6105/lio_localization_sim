@@ -1,0 +1,24 @@
+[INFO] [1785146138.331686195] [fusion_stage_diag]: fusion_stage_diag started (settle=8.0s)
+Traceback (most recent call last):
+  File "/home/yukichi6105/ros2_ws/src/lio_localization_sim/tools/fusion_stage_diag.py", line 423, in <module>
+    main()
+    ~~~~^^
+  File "/home/yukichi6105/ros2_ws/src/lio_localization_sim/tools/fusion_stage_diag.py", line 414, in main
+    rclpy.spin(node)
+    ~~~~~~~~~~^^^^^^
+  File "/opt/ros/lyrical/lib/python3.14/site-packages/rclpy/__init__.py", line 324, in spin
+    executor.spin_once()
+    ~~~~~~~~~~~~~~~~~~^^
+  File "/opt/ros/lyrical/lib/python3.14/site-packages/rclpy/executors.py", line 1020, in spin_once
+    self._spin_once_impl(timeout_sec)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/opt/ros/lyrical/lib/python3.14/site-packages/rclpy/executors.py", line 1000, in _spin_once_impl
+    handler, entity, node = self.wait_for_ready_callbacks(
+                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        timeout_sec, None, wait_condition)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/ros/lyrical/lib/python3.14/site-packages/rclpy/executors.py", line 970, in wait_for_ready_callbacks
+    return next(self._cb_iter)
+  File "/opt/ros/lyrical/lib/python3.14/site-packages/rclpy/executors.py", line 876, in _wait_for_ready_callbacks
+    raise ExternalShutdownException()
+rclpy.executors.ExternalShutdownException
