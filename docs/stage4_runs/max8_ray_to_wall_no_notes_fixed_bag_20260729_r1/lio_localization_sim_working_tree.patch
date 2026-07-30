@@ -1,0 +1,485 @@
+diff --git a/config/robocon2026_unity.yaml b/config/robocon2026_unity.yaml
+index 6566482..72470b6 100644
+--- a/config/robocon2026_unity.yaml
++++ b/config/robocon2026_unity.yaml
+@@ -78,9 +78,12 @@
+     ball_radius_max: 0.085
+     ball_fit_residual_max: 0.020
+     ball_cluster_min_points: 4
++    # ノーツ候補のscan-index連続だけでは遠方の壁ノイズまで同一クラスタになる。
++    # 候補点間が100mmを超えて空間的に飛べば別クラスタへ分け、ノーツ除外を維持する。
++    ball_exclusion_max_adjacent_gap: 0.100
+ 
+-    # Parameter-only ICP tuning pass 1: preserve more scan structure and accept
+-    # locally consistent walls before IMU drift exceeds the correction basin.
++    # ノーツ除外の空間分割後も80mmを超える誤対応は残るため、対応候補を
++    # 80mmへ制限する。同一62秒固定bagで最大10.79mm（80mm未適用では11.18mm）。
+     scan_decimation: 2
+     accept_distance: 0.20
+     max_icp_loops: 10
+@@ -89,13 +92,20 @@
+     wall_min_inlier_ratio: 0.40
+     planar_max_iterations: 10
+     planar_min_inliers: 40
+-    planar_correspondence_distance: 0.20
++    planar_correspondence_distance: 0.08
+     planar_huber_delta: 0.025
+     planar_max_mean_residual: 0.060
+     planar_max_shift: 0.120
+     planar_max_yaw_shift: 0.080
++    # Unity emits per-ray Gaussian range noise.  Match it directly against finite
++    # mapped walls rather than projecting it into a point-to-line residual.
++    planar_use_ray_to_wall: true
++    planar_ray_to_wall_gate: 0.120
+     wall_cov_range_sigma: 0.030
+-    wall_cov_inflation: 1.0
++    # planar pathの局所Hessianは誤対応・フレーム間相関を表現しない。共分散を
++    # 2倍に緩め、短時間のwall観測スパイクがfixed-lag smootherへ残留するのを防ぐ。
++    # gap=100mm/corr=80mmの固定bagで最大位置誤差9.54mmを確認。
++    wall_cov_inflation: 2.0
+     wall_use_icp_covariance: true
+     wall_prior_base_xy_sigma: 0.030
+     wall_prior_base_yaw_sigma: 0.30
+diff --git a/docs/requirements/backend_estimator_architecture_2026-07-28.md b/docs/requirements/backend_estimator_architecture_2026-07-28.md
+index f492d31..8a72311 100644
+--- a/docs/requirements/backend_estimator_architecture_2026-07-28.md
++++ b/docs/requirements/backend_estimator_architecture_2026-07-28.md
+@@ -1,7 +1,46 @@
+-# Backend Optimizer 推定手順(2026-07-28時点)
++# Backend Optimizer 推定手順(2026-07-29更新)
+ 
+ `lio_localization::BackendOptimizerNode` の因子グラフ構造とデータフローの図。
+-2026-07-28の減速時誤差スパイク調査で確認した構造を元に作成。
++2026-07-28の減速時誤差スパイク調査で確認した構造を元に作成し、2026-07-29の
++専用最適化ワーカー、IMU専用executor、lock-free SPSC IMUリングバッファを反映。
++
++## 実行ドメイン
++
++```mermaid
++flowchart TB
++    IMU["/imu/data<br/>1kHz"] --> IMUCB
++    SMR["/scan_match_result<br/>40Hz"] --> SCANCB
++
++    subgraph BACKEND["backend_optimizer_node"]
++        direction TB
++        subgraph IMUE["IMU executor / 1 thread"]
++            IMUCB["imu_callback<br/>受信・時刻検査・リング投入・通知だけ"]
++        end
++        RING[("lock-free SPSC IMUリング<br/>8,192 samples / 約8秒")]
++        subgraph CONTROLE["control executor / 1 thread"]
++            SCANCB["scan_match_callback<br/>結果FIFO投入・通知だけ"]
++            WATCH["IMU watchdog<br/>fail-safe監視"]
++        end
++        PEND["pending scan FIFO<br/>最大40件"]
++        subgraph WORKER["optimizer worker / 1 thread"]
++            DRAIN["IMU coverage確認"]
++            GTSAM["積分・因子生成・iSAM2"]
++        end
++    end
++
++    IMUCB --> RING
++    SCANCB --> PEND
++    RING -.->|condition_variable| DRAIN
++    PEND -.->|condition_variable| DRAIN
++    DRAIN --> GTSAM
++    WATCH -.->|IMU途絶 / overflow| GTSAM
++```
++
++IMU callback groupはnodeへ自動登録せず、IMU executorへ手動で割り当てる。そのため
++scan callbackやwatchdogがreadyでも、IMU callbackの実行枠を奪えない。iSAM2はROS
++executorではなくoptimizer workerだけが所有する。したがって、3スレッドは同じ仕事を
++競合して実行するためではなく、**IMU受信・control callback・最適化を互いにブロックしない
++ための固定した責務分離**である。
+ 
+ ## 全体フロー
+ 
+@@ -12,10 +51,11 @@ flowchart TD
+     PERCEPTION --> SMR["ScanMatchResult<br/>(wall + cylinders)"]
+ 
+     SMR --> PEND["pending_results_<br/>(scan_match_callback)"]
+-    PEND --> DRAIN{"drain_pending_results<br/>スキャン時刻分のIMUは<br/>全部届いた?"}
+-    QUEUE -.->|"IMU到着時にも同期的に呼ばれる"| DRAIN
+-    DRAIN -->|"まだ→待つ"| PEND
+-    DRAIN -->|"揃った→そのコールバックの中で続行"| PROCESS["process_scan_result<br/>(同一コールバック内で実行、他のコールバックは待たされる)"]
++    PEND --> EVENT["condition_variableへ通知<br/>(callbackはここで終了)"]
++    QUEUE -.->|"IMU到着時にも通知"| EVENT
++    EVENT --> DRAIN{"専用optimizer worker<br/>スキャン時刻分のIMUは<br/>全部届いた?"}
++    DRAIN -->|"未着"| WAIT["condition_variableで待機<br/>(次の通知で再判定)"]
++    DRAIN -->|"到着済み"| PROCESS["process_scan_result<br/>(GTSAMは専用workerだけが実行)"]
+ 
+     PROCESS --> INTEGRATE["integrate_imu_up_to<br/>実測dtで積分<br/>+端数はゼロ次ホールドで詰める"]
+     INTEGRATE --> ACCUMULATOR[("accumulator_<br/>backend_optimizer_nodeの<br/>メンバ変数(常駐バッファ)")]
+@@ -36,8 +76,6 @@ flowchart TD
+     RESETACC -.-> ACCUMULATOR
+     ISAM2 -.->|"数値例外"| DIVERGE["reset_graph_after_divergence"]
+     REJECT -.->|"40回連続(~1秒)<br/>※現行Unity設定では円柱0件のため機能しない"| RELOC["円柱で真偽判定→再ローカライズ<br/>(dead code path、後述)"]
+-    IMU -.->|"途絶検知"| WATCHDOG["imu_watchdog<br/>backend更新・/state_estimate配信を停止<br/>(ロボット自体の停止は保証しない)"]
+-
+     style SCAN fill:#2a2410,stroke:#996
+     style PERCEPTION fill:#2a2410,stroke:#996
+     style SMR fill:#2a2410,stroke:#996
+@@ -58,21 +96,33 @@ flowchart TD
+ 
+     style DIVERGE fill:#3a1a1a,stroke:#a33
+     style RELOC fill:#555,stroke:#888,stroke-dasharray: 5 5
+-    style WATCHDOG fill:#3a1a1a,stroke:#a33
+ ```
+ 
+ ### 図の各ブロックの補足説明
+ 
+-**両方のコールバックは、積んだ直後に同期的な処理判定へ進む**
++**両方のコールバックは受信・キュー追加・ワーカー通知だけを行う**
+ 
+ `imu_callback`(IMU到着時)・`scan_match_callback`(スキャン結果到着時)は、それぞれ
+-自分のFIFO(`imu_queue_`, `pending_results_`)に積んだ**直後に、同じコールバックの中で
+-`drain_pending_results()`を同期呼び出しする**。IMUカバレッジ条件が揃っていれば、
+-`process_scan_result`・IMU積分・ISAM2更新まで**そのコールバック実行中に最後まで
+-実行される**。backendは`rclcpp::spin()`(既定のSingleThreadedExecutor、単一スレッド)
+-で動いているため、ISAM2更新に時間がかかっている間は他方のコールバック(IMU受信含む)も
+-待たされる。IMU側のサブスクリプションキューを深く取っている(`SensorDataQoS().keep_last(2000)`)
+-のは、この間に届くIMUメッセージを取りこぼさないための設計。
++自分のFIFO(`imu_queue_`, `pending_results_`)へ追加し、condition variableで専用
++optimizer workerを起こして終了する。workerは先頭スキャンの時刻までIMUが届いたことを
++確認してから`process_scan_result`・IMU積分・ISAM2更新を直列実行する。GTSAMの状態を
++触るのはこのworkerだけである。IMU callback groupは専用`SingleThreadedExecutor`、
++scan callbackとwatchdogは別の`SingleThreadedExecutor`で動くため、ISAM2更新中だけでなく
++control executor内のcallback実行中にもIMU executorは1kHz受信を継続できる。
++
++`imu_queue_`は動的に伸びる`deque`ではなく8,192件の固定長**lock-free SPSCリング**である。
++専用IMU executorだけがproducer、optimizer workerだけがconsumerなので、1kHzの投入・取り出し・
++積分に`work_mutex_`は使わない。通常は2秒ホライズンで古い値を削除する。この削除もproducerでは
++なくwatchdogから通知されたworkerが、保留スキャンも実行中ジョブも無いときだけ行う。従ってworkerが
++必要とする積分区間を並行して消すことはない。8秒相当まで滞留した場合は、IMUを黙って捨てて不連続な
++因子を作る代わりにoverflowをfail-safeとしてラッチする。`pending_results_`は40Hz・最大40件の
++低頻度FIFOで、こちらと`worker_stop_`・`optimizer_busy_`だけを`work_mutex_`で保護する。
++重いISAM2更新中にはmutexを保持しない。IMUサブスクリプションの深いQoS(`SensorDataQoS().keep_last(2000)`)も輸送・
++スケジューリングの短時間ジッタに対する余裕として維持する。
++
++ノード破棄時は停止フラグを設定してworkerを起こし、`join()`完了後にメンバを破棄する。
++また、IMU watchdogが並行してfail-safeをラッチした場合は保留スキャンを破棄し、
++取り出し済みジョブからの`/state_estimate`公開も抑止する。
+ 
+ **IMU積分(`integrate_imu_up_to`)は「時間を揃えるための作業」**
+ 
+diff --git a/docs/setup/RESTORE.md b/docs/setup/RESTORE.md
+index 789e281..21c640f 100644
+--- a/docs/setup/RESTORE.md
++++ b/docs/setup/RESTORE.md
+@@ -86,6 +86,11 @@ never publishes.
+ bash src/lio_localization_sim/scripts/stage4_sweep_run.sh off 0.15 0.003 1
+ ```
+ 
++For an agent driving Play/Stop programmatically via Unity MCP instead of a human clicking
++the button, see [`UNITY_MCP_BENCHMARK_GUIDE.md`](UNITY_MCP_BENCHMARK_GUIDE.md): Play/Stop is
++just reading and writing `EditorApplication.isPlaying` through `Unity_RunCommand` -- no
++keyboard/mouse automation or window-focus tricks are needed or used.
++
+ `docs/experiment_history/04_stage4_resume_notes.md` covers the operational pitfalls found the hard way: stale
+ endpoints holding port 10000, publisher queue sizing against the 1 kHz IMU, and why a run must
+ never be judged from an open-loop session.
+diff --git a/launch/unity_sensor_localization.launch.py b/launch/unity_sensor_localization.launch.py
+index c5b4b19..6c3d3ef 100644
+--- a/launch/unity_sensor_localization.launch.py
++++ b/launch/unity_sensor_localization.launch.py
+@@ -38,9 +38,15 @@ def generate_launch_description():
+             name='laser_scan_matching_node', parameters=[config, initial_pose], output='screen'),
+         Node(
+             package='lio_localization', executable='ball_tracking_node',
+-            name='ball_tracking_node', parameters=common, output='screen'),
++            name='ball_tracking_node', parameters=common, output='screen',
++            # Ball tracking is not on the self-localization safety path. Give
++            # IMU/backend callbacks precedence during a host CPU burst.
++            prefix='nice -n 10'),
+         Node(
+-            package='lio_localization_sim', executable='evaluator_node',
++            # /odom_fast is 1 kHz.  Keep its real-time comparison path in C++ so
++            # Python allocation/GC cannot contend with the localization nodes.
++            # The Python evaluator remains available for offline plotting only.
++            package='lio_localization', executable='realtime_evaluator_node',
+             name='unity_evaluator_node',
+             parameters=[config, {
+                 'use_sim_time': True,
+@@ -55,12 +61,12 @@ def generate_launch_description():
+                 'duration_sec': 60.0,
+                 'settle_sec': 3.0,
+                 'sim_start_time_sec': 0.0,
+-                'trajectory_pattern': 4,
+-                'field_width': 5.638,
+-                'field_height': 3.376,
+                 'output_dir': '/tmp',
+             }],
+-            output='screen'),
++            output='screen',
++            # The evaluator is experiment instrumentation. It must never win
++            # CPU time over the 1 kHz backend IMU callback it is observing.
++            prefix='nice -n 10'),
+     ]
+ 
+     evaluator = localization_nodes[-1]
+diff --git a/package.xml b/package.xml
+index b650296..b720e4b 100644
+--- a/package.xml
++++ b/package.xml
+@@ -12,6 +12,8 @@
+   <depend>nav_msgs</depend>
+   <depend>geometry_msgs</depend>
+   <depend>std_msgs</depend>
++  <exec_depend>rosbag2_py</exec_depend>
++  <exec_depend>rosbag2_storage_mcap</exec_depend>
+   <exec_depend>ros2launch</exec_depend>
+   <exec_depend>launch_ros</exec_depend>
+   <exec_depend>lio_localization</exec_depend>
+diff --git a/scripts/stage4_mcp_run.sh b/scripts/stage4_mcp_run.sh
+index 2eebd34..6a0a72e 100755
+--- a/scripts/stage4_mcp_run.sh
++++ b/scripts/stage4_mcp_run.sh
+@@ -8,10 +8,10 @@
+ # ROS-up-to-Play gap short. The evaluator no longer cares about that gap (its window starts at
+ # the first /ground_truth_pose), but a short gap still keeps the logs readable.
+ #
+-# Usage: stage4_mcp_run.sh <tag> [--probes]
++# Usage: stage4_mcp_run.sh <tag> [--probes] [config_yaml]
+ set -u
+ 
+-TAG="${1:?usage: stage4_mcp_run.sh <tag> [--probes]}"
++TAG="${1:?usage: stage4_mcp_run.sh <tag> [--probes] [config_yaml]}"
+ PROBE_MODE="${2:-}"
+ WS=/home/yukichi6105/ros2_ws
+ OUT="$WS/src/lio_localization_sim/docs/stage4_runs/$TAG"
+@@ -22,6 +22,42 @@ mkdir -p "$ROS_LOG_DIR"
+ rm -f "$OUT"/*.log "$OUT"/*.txt "$OUT"/*.csv "$OUT/READY"
+ rm -f /tmp/sim_eval_report.txt /tmp/sim_eval_plot.png /tmp/diag_raw_errors.csv /tmp/diag_odom.csv
+ 
++# Preserve the exact inputs used by every run. A tag alone was insufficient to reconstruct
++# several 2026-07-28 experiments because the YAML and dirty source state were not archived.
++CFG="${3:-$WS/src/lio_localization_sim/config/robocon2026_unity.yaml}"
++cp "$CFG" "$OUT/robocon2026_unity.yaml"
++snapshot_repo() {
++  local name="$1"
++  local repo="$2"
++  git -C "$repo" rev-parse HEAD > "$OUT/${name}_commit.txt"
++  git -C "$repo" status --short > "$OUT/${name}_status.txt"
++  git -C "$repo" diff --binary HEAD > "$OUT/${name}_working_tree.patch"
++  # git diff HEAD does not include newly-created (untracked) source files.
++  # Archive them as standalone no-index patches so a run using an experimental
++  # C++ node is reproducible even before that node has been committed.
++  git -C "$repo" ls-files --others --exclude-standard > "$OUT/${name}_untracked_files_all.txt"
++  : > "$OUT/${name}_untracked.patch"
++  : > "$OUT/${name}_untracked_files.txt"
++  while IFS= read -r file; do
++    [ -n "$file" ] || continue
++    # Run artifacts and agent scratch state are not source inputs; including
++    # them makes the patch huge and can follow stale ros2_logs symlinks.
++    case "$file" in
++      docs/stage4_runs/*|.claude/*) continue ;;
++    esac
++    printf '%s\n' "$file" >> "$OUT/${name}_untracked_files.txt"
++    git -C "$repo" diff --binary --no-index /dev/null "$file" >> "$OUT/${name}_untracked.patch" 2>/dev/null || true
++  done < "$OUT/${name}_untracked_files_all.txt"
++}
++snapshot_repo lio_localization "$WS/src/lio_localization"
++snapshot_repo lio_localization_sim "$WS/src/lio_localization_sim"
++{
++  printf 'run_tag=%s\n' "$TAG"
++  printf 'started_at=%s\n' "$(date --iso-8601=seconds)"
++  printf 'probe_mode=%s\n' "$PROBE_MODE"
++  printf 'ros_distro=%s\n' "${ROS_DISTRO:-not_sourced_yet}"
++} > "$OUT/run_manifest.txt"
++
+ pkill -f "imu_preintegration_node|backend_optimizer_node|laser_scan_matching_node|evaluator_node|ball_tracking_node|default_server_endpoint|fusion_stage_diag.py"
+ sleep 1
+ 
+@@ -31,11 +67,16 @@ source /opt/ros/lyrical/setup.bash
+ source "$WS/install/setup.bash"
+ set -u
+ 
+-ros2 launch lio_localization_sim unity_sensor_localization.launch.py > "$OUT/ros.log" 2>&1 &
++ros2 launch lio_localization_sim unity_sensor_localization.launch.py \
++  field_config:="$CFG" > "$OUT/ros.log" 2>&1 &
+ ROS_PID=$!
+ 
+ endpoint_open() {
+-  timeout 0.2 bash -c '</dev/tcp/127.0.0.1/10000' 2>/dev/null
++  # Do not probe by opening and immediately closing a TCP connection.  The
++  # ROS-TCP endpoint treats that as a malformed Unity client and emits a
++  # misleading "No more data available" exception.  A listening-socket check
++  # establishes readiness without injecting traffic into the experiment.
++  ss -ltnH 'sport = :10000' | grep -q .
+ }
+ 
+ for _ in $(seq 1 60); do
+@@ -89,6 +130,14 @@ kill $ROS_PID 2>/dev/null
+ pkill -f "ros2 topic hz|ros2 topic echo"
+ pkill -f "imu_preintegration_node|backend_optimizer_node|laser_scan_matching_node|evaluator_node|ball_tracking_node|default_server_endpoint|fusion_stage_diag.py"
+ 
++# Rendering is deliberately post-run: importing matplotlib inside the former
++# Python evaluator contended with the 1 kHz localization data path.
++if [ -f /tmp/diag_raw_errors.csv ]; then
++  python3 "$WS/src/lio_localization_sim/tools/render_eval_plot.py" \
++    /tmp/diag_raw_errors.csv /tmp/sim_eval_plot.png \
++    >> "$OUT/ros.log" 2>&1 || echo "WARNING: offline plot rendering failed" >> "$OUT/ros.log"
++fi
++
+ cp /tmp/sim_eval_report.txt "$OUT/" 2>/dev/null
+ cp /tmp/sim_eval_plot.png "$OUT/" 2>/dev/null
+ cp /tmp/diag_raw_errors.csv "$OUT/" 2>/dev/null
+diff --git a/scripts/unity_mcp.py b/scripts/unity_mcp.py
+index 178404e..66c1b9e 100755
+--- a/scripts/unity_mcp.py
++++ b/scripts/unity_mcp.py
+@@ -13,7 +13,7 @@ Usage:
+ Examples:
+     unity_mcp.py --list
+     unity_mcp.py Unity_GetConsoleLogs '{"count": 50}'
+-    unity_mcp.py Unity_RunCommand '{"script": "Debug.Log(\"hi\");"}'
++    unity_mcp.py Unity_RunCommand '{"code": "Debug.Log(\"hi\");"}'
+ """
+ import json
+ import subprocess
+diff --git a/setup.py b/setup.py
+index 0963cdc..1472a97 100644
+--- a/setup.py
++++ b/setup.py
+@@ -32,6 +32,7 @@ setup(
+             'lidar_sim_node = lio_localization_sim.lidar_sim_node:main',
+             'evaluator_node = lio_localization_sim.evaluator_node:main',
+             'gazebo_driver_node = lio_localization_sim.gazebo_driver_node:main',
++            'unity_csv_to_rosbag2 = lio_localization_sim.unity_csv_to_rosbag2:main',
+         ],
+     },
+ )
+diff --git a/unity/Robocon2026Sim/Assets/Robocon2026/Scripts/RoboconFieldBuilder.cs b/unity/Robocon2026Sim/Assets/Robocon2026/Scripts/RoboconFieldBuilder.cs
+index 6019069..633ae1f 100644
+--- a/unity/Robocon2026Sim/Assets/Robocon2026/Scripts/RoboconFieldBuilder.cs
++++ b/unity/Robocon2026Sim/Assets/Robocon2026/Scripts/RoboconFieldBuilder.cs
+@@ -11,10 +11,13 @@ namespace Robocon2026.Simulation
+     public sealed class RoboconFieldBuilder : MonoBehaviour
+     {
+         public const string DefinitionFileName = "robocon2026_field.json";
++        public const string DisableNotesExperimentFlag =
++            "DisableNotesForLocalizationExperiment.flag";
+ 
+         private readonly Dictionary<string, Material> materials = new();
+         private PhysicsMaterial fieldPhysicsMaterial = null!;
+         private Transform generatedRoot = null!;
++        private bool disableNotesForLocalizationExperiment;
+ 
+         public FieldDefinition Definition { get; private set; } = null!;
+ 
+@@ -23,6 +26,8 @@ namespace Robocon2026.Simulation
+             Definition = LoadDefinition();
+             Definition.Validate();
+             ConfigurePhysics();
++            disableNotesForLocalizationExperiment = File.Exists(Path.GetFullPath(
++                Path.Combine(Application.dataPath, "..", DisableNotesExperimentFlag)));
+ 
+             var oldRoot = transform.Find("GeneratedField");
+             if (oldRoot != null) Destroy(oldRoot.gameObject);
+@@ -46,6 +51,10 @@ namespace Robocon2026.Simulation
+             BuildNotes("Orange", Definition.Notes.Orange, "#FF6412");
+             BuildView();
+ 
++            if (disableNotesForLocalizationExperiment)
++                Debug.LogWarning(
++                    $"[Robocon2026] Localization experiment: all note GameObjects are inactive " +
++                    $"because {DisableNotesExperimentFlag} exists.");
+             Debug.Log($"[Robocon2026] Built '{Definition.Name}' from {DefinitionFileName}.");
+         }
+ 
+@@ -163,6 +172,12 @@ namespace Robocon2026.Simulation
+                 body.angularDamping = 0.05f;
+                 body.solverIterations = 12;
+                 body.solverVelocityIterations = 4;
++
++                // Keep the generated hierarchy intact for editor validation, while removing
++                // rendering, raycast and collision participation for the controlled
++                // localization A/B experiment. The default remains the competition scene.
++                if (disableNotesForLocalizationExperiment)
++                    go.SetActive(false);
+             }
+         }
+ 
+diff --git a/unity/Robocon2026Sim/Assets/Robocon2026/Scripts/UnityRosSensorPublisher.cs b/unity/Robocon2026Sim/Assets/Robocon2026/Scripts/UnityRosSensorPublisher.cs
+index 1955751..4f92de7 100644
+--- a/unity/Robocon2026Sim/Assets/Robocon2026/Scripts/UnityRosSensorPublisher.cs
++++ b/unity/Robocon2026Sim/Assets/Robocon2026/Scripts/UnityRosSensorPublisher.cs
+@@ -39,6 +39,7 @@ namespace Robocon2026.Simulation
+         // authoritative send count against the receive count rather than inferred from a rate.
+         public static long ImuPublishCount;
+         public static long ScanPublishCount;
++        public static long GroundTruthPublishCount;
+         private const int LidarSamples = 1081;
+         private const float LidarFovRadians = 270f * Mathf.Deg2Rad;
+         // A 270 deg sensor has a 90 deg blind sector; where it points is a mounting choice.
+@@ -69,6 +70,7 @@ namespace Robocon2026.Simulation
+         private double nextGroundTruthTime;
+         private double previousImuSampleTime;
+         private bool initializedVelocity;
++        private UnitySensorCsvRecorder csvRecorder;
+ 
+         // Real IMU bias is not a fixed offset: it drifts slowly over the run (temperature,
+         // mechanical settling, 1/f noise). A constant offset only exercises the estimator's
+@@ -97,6 +99,16 @@ namespace Robocon2026.Simulation
+             sessionStartTime = Time.timeAsDouble;
+             ImuPublishCount = 0;
+             ScanPublishCount = 0;
++            GroundTruthPublishCount = 0;
++            try
++            {
++                csvRecorder = new UnitySensorCsvRecorder(Time.fixedDeltaTime);
++                Debug.Log($"[Unity ROS Sensors] Authoritative sensor CSV recording: {csvRecorder.OutputDirectory}");
++            }
++            catch (Exception exception)
++            {
++                Debug.LogError("[Unity ROS Sensors] Failed to start authoritative sensor CSV recording: " + exception);
++            }
+             body = GetComponent<Rigidbody>();
+             foreach (var selfCollider in GetComponentsInChildren<Collider>())
+                 robotSelfColliders.Add(selfCollider);
+@@ -166,6 +178,20 @@ namespace Robocon2026.Simulation
+             // sends silently failing partway through a run). Disconnecting here on the
+             // GameObject's destruction -- which Play Mode Stop does trigger -- closes the
+             // connection every time regardless of why the session is ending.
++            if (csvRecorder != null)
++            {
++                try
++                {
++                    csvRecorder.Dispose();
++                    Debug.Log("[Unity ROS Sensors] Authoritative sensor CSV recording finalized: "
++                        + csvRecorder.OutputDirectory);
++                }
++                catch (Exception exception)
++                {
++                    Debug.LogError("[Unity ROS Sensors] Sensor CSV recording did not finalize cleanly: " + exception);
++                }
++                csvRecorder = null;
++            }
+             if (ros != null) ros.Disconnect();
+         }
+ 
+@@ -298,6 +324,7 @@ namespace Robocon2026.Simulation
+                 linear_acceleration = accelerationRos,
+                 linear_acceleration_covariance = DiagonalCovariance3(accelNoiseSigma * accelNoiseSigma)
+             };
++            csvRecorder?.RecordImu(msg, ImuPublishCount);
+             ros.Publish(ImuTopic, msg);
+             ImuPublishCount++;
+         }
+@@ -332,7 +359,9 @@ namespace Robocon2026.Simulation
+                         localAngularRos),
+                     new double[36])
+             };
++            csvRecorder?.RecordGroundTruth(msg, GroundTruthPublishCount);
+             ros.Publish(GroundTruthTopic, msg);
++            GroundTruthPublishCount++;
+         }
+ 
+         private void PublishScan(TimeMsg stamp)
+@@ -390,6 +419,7 @@ namespace Robocon2026.Simulation
+                 LidarRangeMax,
+                 ranges,
+                 Array.Empty<float>());
++            csvRecorder?.RecordScan(msg, ScanPublishCount);
+             ros.Publish(ScanTopic, msg);
+             ScanPublishCount++;
+         }

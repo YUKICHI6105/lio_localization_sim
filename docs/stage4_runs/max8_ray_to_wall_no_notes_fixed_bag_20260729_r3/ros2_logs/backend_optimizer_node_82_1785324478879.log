@@ -1,0 +1,26 @@
+[INFO] [1785324479.125433657] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[INFO] [1785324479.125787912] [backend_optimizer_node]: backend_optimizer_node started (0 cylinders registered)
+[WARN] [1785324483.154218591] [backend_optimizer_node]: slow smoother update: 34.9ms (index 10)
+[ERROR] [1785324485.136199197] [backend_optimizer_node]: IMU ring buffer overflowed (8192 samples / 8.2s capacity): entering FAIL-SAFE HALT
+[ERROR] [1785324485.439063516] [backend_optimizer_node]: FAIL-SAFE HALT active (IMU lost): ignoring scan corrections, self-localization is frozen and must be restarted.
+[ERROR] [1785324486.002030548] [backend_optimizer_node]: FAIL-SAFE HALT active (IMU lost): ignoring scan corrections, self-localization is frozen and must be restarted.
+[ERROR] [1785324486.506242717] [backend_optimizer_node]: FAIL-SAFE HALT active (IMU lost): ignoring scan corrections, self-localization is frozen and must be restarted.
+[ERROR] [1785324487.044439708] [backend_optimizer_node]: FAIL-SAFE HALT active (IMU lost): ignoring scan corrections, self-localization is frozen and must be restarted.
+[ERROR] [1785324488.660643839] [backend_optimizer_node]: FAIL-SAFE HALT active (IMU lost): ignoring scan corrections, self-localization is frozen and must be restarted.
+[ERROR] [1785324489.161332008] [backend_optimizer_node]: FAIL-SAFE HALT active (IMU lost): ignoring scan corrections, self-localization is frozen and must be restarted.
+[ERROR] [1785324489.691053887] [backend_optimizer_node]: FAIL-SAFE HALT active (IMU lost): ignoring scan corrections, self-localization is frozen and must be restarted.
+[ERROR] [1785324490.191917887] [backend_optimizer_node]: FAIL-SAFE HALT active (IMU lost): ignoring scan corrections, self-localization is frozen and must be restarted.
+[ERROR] [1785324490.764030775] [backend_optimizer_node]: FAIL-SAFE HALT active (IMU lost): ignoring scan corrections, self-localization is frozen and must be restarted.
+[ERROR] [1785324491.297504010] [backend_optimizer_node]: FAIL-SAFE HALT active (IMU lost): ignoring scan corrections, self-localization is frozen and must be restarted.
+[ERROR] [1785324491.804988601] [backend_optimizer_node]: FAIL-SAFE HALT active (IMU lost): ignoring scan corrections, self-localization is frozen and must be restarted.
+[ERROR] [1785324492.305891337] [backend_optimizer_node]: FAIL-SAFE HALT active (IMU lost): ignoring scan corrections, self-localization is frozen and must be restarted.
+[ERROR] [1785324493.328027742] [backend_optimizer_node]: FAIL-SAFE HALT active (IMU lost): ignoring scan corrections, self-localization is frozen and must be restarted.
+[ERROR] [1785324493.895124908] [backend_optimizer_node]: FAIL-SAFE HALT active (IMU lost): ignoring scan corrections, self-localization is frozen and must be restarted.
+[ERROR] [1785324494.412219667] [backend_optimizer_node]: FAIL-SAFE HALT active (IMU lost): ignoring scan corrections, self-localization is frozen and must be restarted.
+[ERROR] [1785324494.907723635] [backend_optimizer_node]: FAIL-SAFE HALT active (IMU lost): ignoring scan corrections, self-localization is frozen and must be restarted.
+[ERROR] [1785324495.425595477] [backend_optimizer_node]: FAIL-SAFE HALT active (IMU lost): ignoring scan corrections, self-localization is frozen and must be restarted.
+[ERROR] [1785324495.939786504] [backend_optimizer_node]: FAIL-SAFE HALT active (IMU lost): ignoring scan corrections, self-localization is frozen and must be restarted.
+[ERROR] [1785324496.487981079] [backend_optimizer_node]: FAIL-SAFE HALT active (IMU lost): ignoring scan corrections, self-localization is frozen and must be restarted.
+[ERROR] [1785324496.991534203] [backend_optimizer_node]: FAIL-SAFE HALT active (IMU lost): ignoring scan corrections, self-localization is frozen and must be restarted.
+[ERROR] [1785324499.317815125] [backend_optimizer_node]: FAIL-SAFE HALT active (IMU lost): ignoring scan corrections, self-localization is frozen and must be restarted.
+[INFO] [1785324500.095927104] [rclcpp]: signal_handler(signum=2)

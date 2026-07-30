@@ -1,0 +1,40 @@
+[INFO] [1785296073.436106725] [evaluator_node]: evaluator_node started: will run for 60.0s starting from the first /ground_truth_pose
+[INFO] [1785296075.285742372] [evaluator_node]: first ground truth received: measuring for 60.0s
+[INFO] [1785296080.018509778] [evaluator_node]: t=5.0s  直近5秒: pos_err mean=4.17mm max=8.56mm  samples=4709  detected_balls=0
+[INFO] [1785296085.015269013] [evaluator_node]: t=10.0s  直近5秒: pos_err mean=3.95mm max=5.23mm  samples=9718  detected_balls=0
+[INFO] [1785296090.014541719] [evaluator_node]: t=15.0s  直近5秒: pos_err mean=7.58mm max=11.98mm  samples=14824  detected_balls=0
+[INFO] [1785296095.022311420] [evaluator_node]: t=20.0s  直近5秒: pos_err mean=4.77mm max=11.32mm  samples=19920  detected_balls=0
+[INFO] [1785296100.024308957] [evaluator_node]: t=25.0s  直近5秒: pos_err mean=7.65mm max=12.17mm  samples=24716  detected_balls=0
+[INFO] [1785296105.019877821] [evaluator_node]: t=30.0s  直近5秒: pos_err mean=6.87mm max=10.94mm  samples=29857  detected_balls=0
+[INFO] [1785296110.022973606] [evaluator_node]: t=35.0s  直近5秒: pos_err mean=4.68mm max=10.23mm  samples=35061  detected_balls=0
+[INFO] [1785296115.021214121] [evaluator_node]: t=40.0s  直近5秒: pos_err mean=7.78mm max=13.17mm  samples=40205  detected_balls=0
+[INFO] [1785296120.024252976] [evaluator_node]: t=45.0s  直近5秒: pos_err mean=6.58mm max=10.82mm  samples=45371  detected_balls=0
+[INFO] [1785296125.039106444] [evaluator_node]: t=50.0s  直近5秒: pos_err mean=5.36mm max=10.69mm  samples=49513  detected_balls=0
+[INFO] [1785296130.031973418] [evaluator_node]: t=55.0s  直近5秒: pos_err mean=8.30mm max=11.74mm  samples=53564  detected_balls=0
+[INFO] [1785296135.030262739] [evaluator_node]: t=60.0s  直近5秒: pos_err mean=6.45mm max=10.54mm  samples=58644  detected_balls=0
+[INFO] [1785296135.279046570] [evaluator_node]: === 評価終了、集計します ===
+[INFO] [1785296135.682122487] [evaluator_node]: 
+============================================================
+main.md 6-A-1 シミュレーション評価レポート
+============================================================
+総サンプル数: 58945  (定常区間 t>=3.0s: 56188)
+真値未着のまま評価できなかったサンプル: 1
+
+--- 全体（要件A: 定常RMSE<=10mm, 最大位置誤差<=10mm） ---
+  位置誤差: mean=6.26mm  RMSE=6.94mm  max=13.17mm
+  ヨー誤差: mean=0.167deg  RMSE=0.203deg  max=0.447deg
+  判定: 定常誤差(RMSE<=10mm) PASS / 最大位置誤差(<=10mm) FAIL
+
+--- 高G旋回スピンバースト中 ---
+  位置誤差: mean=nanmm  RMSE=nanmm  max=nanmm
+
+--- ボール横切り中 vs 非横切り中 ---
+  横切り中   : mean=nanmm  RMSE=nanmm  max=nanmm
+  非横切り中 : mean=6.26mm  RMSE=6.94mm  max=13.17mm
+  判定: ボール横切りによる自己位置無影響 PASS
+  (参考) 横切り中の検出ボール数(最新): 0
+============================================================
+[INFO] [1785296135.683788827] [evaluator_node]: レポートを保存しました: /home/yukichi6105/ros2_ws/src/lio_localization_sim/docs/stage4_runs/imu_receiver_with_evaluator_20260729_r1/sim_eval_report.txt
+[ros2run]: Received signal:  Interrupt
+[INFO] [1785296137.510593489] [evaluator_node]: グラフを保存しました: /home/yukichi6105/ros2_ws/src/lio_localization_sim/docs/stage4_runs/imu_receiver_with_evaluator_20260729_r1/sim_eval_plot.png
+Failed to publish log message to rosout: publisher's context is invalid, at ./src/rcl/publisher.c:427

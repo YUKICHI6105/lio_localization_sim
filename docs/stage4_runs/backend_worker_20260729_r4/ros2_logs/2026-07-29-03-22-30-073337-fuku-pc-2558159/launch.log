@@ -1,0 +1,19 @@
+1785262950.0753839 [INFO] [launch]: All log files can be found below /home/yukichi6105/ros2_ws/src/lio_localization_sim/docs/stage4_runs/backend_worker_20260729_r4/ros2_logs/2026-07-29-03-22-30-073337-fuku-pc-2558159
+1785262950.0755405 [INFO] [launch]: Default logging verbosity is set to INFO
+1785262950.1492391 [INFO] [default_server_endpoint-1]: process started with pid [2558193]
+1785262955.1763747 [INFO] [imu_preintegration_node-2]: process started with pid [2558464]
+1785262955.1766565 [INFO] [backend_optimizer_node-3]: process started with pid [2558465]
+1785262955.1767826 [INFO] [laser_scan_matching_node-4]: process started with pid [2558466]
+1785262955.1770434 [INFO] [ball_tracking_node-5]: process started with pid [2558467]
+1785262955.1771407 [INFO] [evaluator_node-6]: process started with pid [2558468]
+1785263047.5169258 [INFO] [evaluator_node-6]: process has finished cleanly [pid 2558468]
+1785263047.5231562 [INFO] [ball_tracking_node-5]: sending signal 'SIGINT' to process[ball_tracking_node-5]
+1785263047.5248346 [INFO] [laser_scan_matching_node-4]: sending signal 'SIGINT' to process[laser_scan_matching_node-4]
+1785263047.5348155 [INFO] [backend_optimizer_node-3]: sending signal 'SIGINT' to process[backend_optimizer_node-3]
+1785263047.5375416 [INFO] [imu_preintegration_node-2]: sending signal 'SIGINT' to process[imu_preintegration_node-2]
+1785263047.5391824 [INFO] [default_server_endpoint-1]: sending signal 'SIGINT' to process[default_server_endpoint-1]
+1785263047.6831837 [INFO] [ball_tracking_node-5]: process has finished cleanly [pid 2558467]
+1785263047.7024493 [INFO] [laser_scan_matching_node-4]: process has finished cleanly [pid 2558466]
+1785263047.7201953 [INFO] [imu_preintegration_node-2]: process has finished cleanly [pid 2558464]
+1785263047.7463911 [INFO] [backend_optimizer_node-3]: process has finished cleanly [pid 2558465]
+1785263049.6453841 [ERROR] [default_server_endpoint-1]: process has died [pid 2558193, exit code -6, cmd '/home/yukichi6105/ros2_ws/install/ros_tcp_endpoint/lib/ros_tcp_endpoint/default_server_endpoint --ros-args -r __node:=unity_endpoint --params-file /tmp/launch_params_1fbxtjtv'].

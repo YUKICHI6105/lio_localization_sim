@@ -1,0 +1,94 @@
+[INFO] [launch]: All log files can be found below /home/yukichi6105/ros2_ws/src/lio_localization_sim/docs/stage4_runs/bag_replay_88s_cpp_evaluator_20260729_r1/ros2_logs/2026-07-29-12-51-51-268724-fuku-pc-4010894
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [default_server_endpoint-1]: process started with pid [4010927]
+[default_server_endpoint-1] /opt/ros/lyrical/lib/python3.14/site-packages/rclpy/executors.py:1073: UserWarning: MultiThreadedExecutor is used with a single thread.
+[default_server_endpoint-1] Use the SingleThreadedExecutor instead.
+[default_server_endpoint-1]   warnings.warn(
+[default_server_endpoint-1] [INFO] [1785297112.990407793] [unity_endpoint]: Starting server on 0.0.0.0:10000
+[default_server_endpoint-1] [INFO] [1785297113.145483182] [unity_endpoint]: Connection from 127.0.0.1
+[default_server_endpoint-1] [ERROR] [1785297113.147309825] [unity_endpoint]: Exception: No more data available
+[default_server_endpoint-1] [INFO] [1785297113.148009897] [unity_endpoint]: Disconnected from 127.0.0.1
+[default_server_endpoint-1] [INFO] [1785297113.251414795] [unity_endpoint]: Connection from 127.0.0.1
+[default_server_endpoint-1] [ERROR] [1785297113.254159208] [unity_endpoint]: Exception: No more data available
+[default_server_endpoint-1] [INFO] [1785297113.255393485] [unity_endpoint]: Disconnected from 127.0.0.1
+[INFO] [imu_preintegration_node-2]: process started with pid [4011194]
+[INFO] [backend_optimizer_node-3]: process started with pid [4011195]
+[INFO] [laser_scan_matching_node-4]: process started with pid [4011196]
+[INFO] [ball_tracking_node-5]: process started with pid [4011197]
+[INFO] [realtime_evaluator_node-6]: process started with pid [4011198]
+[realtime_evaluator_node-6] [INFO] [1785297116.769522765] [unity_evaluator_node]: C++ realtime evaluator started: measuring 60.0s from first ground truth
+[backend_optimizer_node-3] [INFO] [1785297116.773331282] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[backend_optimizer_node-3] [INFO] [1785297116.775849104] [backend_optimizer_node]: backend_optimizer_node started (0 cylinders registered)
+[imu_preintegration_node-2] [INFO] [1785297116.812491569] [imu_preintegration_node]: imu_preintegration_node started (waiting for first /state_estimate)
+[ball_tracking_node-5] [INFO] [1785297116.872094533] [ball_tracking_node]: ball_tracking_node started
+[laser_scan_matching_node-4] [INFO] [1785297117.239759470] [laser_scan_matching_node]: laser_scan_matching_node started (0 cylinders, 9 internal walls, field 5.572x3.310m, initial seed=(-2.419, 1.354, 0.000))
+[realtime_evaluator_node-6] [INFO] [1785297135.425741064] [unity_evaluator_node]: first ground truth received; measurement window started
+[backend_optimizer_node-3] [WARN] [1785297139.300380086] [backend_optimizer_node]: slow smoother update: 20.8ms (index 154)
+[realtime_evaluator_node-6] [INFO] [1785297140.420923630] [unity_evaluator_node]: t=5.0s  recent 5s: pos_err mean=4.08mm max=8.90mm samples=5159 balls=0
+[laser_scan_matching_node-4] [INFO] [1785297140.430052641] [laser_scan_matching_node]: note rejection: 32/541 returns unexplained, 0 clusters -> 0 accepted, 0 points dropped (last extent=-1.0000m; gate <=0.350m, min 4 points)
+[realtime_evaluator_node-6] [INFO] [1785297145.420774036] [unity_evaluator_node]: t=10.0s  recent 5s: pos_err mean=3.92mm max=5.22mm samples=10370 balls=0
+[laser_scan_matching_node-4] [INFO] [1785297145.429364833] [laser_scan_matching_node]: note rejection: 29/541 returns unexplained, 0 clusters -> 0 accepted, 0 points dropped (last extent=-1.0000m; gate <=0.350m, min 4 points)
+[backend_optimizer_node-3] [WARN] [1785297149.929375163] [backend_optimizer_node]: slow smoother update: 23.0ms (index 574)
+[realtime_evaluator_node-6] [INFO] [1785297150.420858424] [unity_evaluator_node]: t=15.0s  recent 5s: pos_err mean=7.62mm max=11.97mm samples=15533 balls=0
+[laser_scan_matching_node-4] [INFO] [1785297150.429474515] [laser_scan_matching_node]: note rejection: 38/541 returns unexplained, 2 clusters -> 1 accepted, 5 points dropped (last extent=0.0786m; gate <=0.350m, min 4 points)
+[realtime_evaluator_node-6] [INFO] [1785297155.420697854] [unity_evaluator_node]: t=20.0s  recent 5s: pos_err mean=4.75mm max=11.36mm samples=20733 balls=0
+[laser_scan_matching_node-4] [INFO] [1785297155.451111580] [laser_scan_matching_node]: note rejection: 55/541 returns unexplained, 2 clusters -> 1 accepted, 4 points dropped (last extent=0.0914m; gate <=0.350m, min 4 points)
+[realtime_evaluator_node-6] [INFO] [1785297160.420806981] [unity_evaluator_node]: t=25.0s  recent 5s: pos_err mean=7.82mm max=12.15mm samples=25943 balls=0
+[laser_scan_matching_node-4] [INFO] [1785297160.452383663] [laser_scan_matching_node]: note rejection: 28/541 returns unexplained, 0 clusters -> 0 accepted, 0 points dropped (last extent=-1.0000m; gate <=0.350m, min 4 points)
+[realtime_evaluator_node-6] [INFO] [1785297165.421311430] [unity_evaluator_node]: t=30.0s  recent 5s: pos_err mean=6.90mm max=10.91mm samples=31141 balls=0
+[laser_scan_matching_node-4] [INFO] [1785297165.467080777] [laser_scan_matching_node]: note rejection: 42/541 returns unexplained, 4 clusters -> 3 accepted, 13 points dropped (last extent=0.0867m; gate <=0.350m, min 4 points)
+[backend_optimizer_node-3] [WARN] [1785297168.948458580] [backend_optimizer_node]: slow smoother update: 22.0ms (index 1334)
+[backend_optimizer_node-3] [WARN] [1785297169.824528197] [backend_optimizer_node]: slow smoother update: 32.3ms (index 1367)
+[realtime_evaluator_node-6] [INFO] [1785297170.426216483] [unity_evaluator_node]: t=35.0s  recent 5s: pos_err mean=4.65mm max=10.24mm samples=36340 balls=0
+[laser_scan_matching_node-4] [INFO] [1785297170.479972273] [laser_scan_matching_node]: note rejection: 45/541 returns unexplained, 1 clusters -> 0 accepted, 0 points dropped (last extent=1.0864m; gate <=0.350m, min 4 points)
+[realtime_evaluator_node-6] [INFO] [1785297175.421310512] [unity_evaluator_node]: t=40.0s  recent 5s: pos_err mean=7.78mm max=13.09mm samples=41522 balls=0
+[laser_scan_matching_node-4] [INFO] [1785297175.500143943] [laser_scan_matching_node]: note rejection: 28/541 returns unexplained, 0 clusters -> 0 accepted, 0 points dropped (last extent=-1.0000m; gate <=0.350m, min 4 points)
+[laser_scan_matching_node-4] [WARN] [1785297178.980789326] [laser_scan_matching_node]: IMU coverage wait exceeded 0.050s, processing scan with extrapolated tail
+[realtime_evaluator_node-6] [INFO] [1785297180.431525153] [unity_evaluator_node]: t=45.0s  recent 5s: pos_err mean=6.51mm max=10.73mm samples=46724 balls=0
+[laser_scan_matching_node-4] [INFO] [1785297180.518551208] [laser_scan_matching_node]: note rejection: 42/541 returns unexplained, 4 clusters -> 4 accepted, 17 points dropped (last extent=0.0993m; gate <=0.350m, min 4 points)
+[realtime_evaluator_node-6] [INFO] [1785297185.420848372] [unity_evaluator_node]: t=50.0s  recent 5s: pos_err mean=5.06mm max=10.69mm samples=51924 balls=0
+[laser_scan_matching_node-4] [INFO] [1785297185.527237761] [laser_scan_matching_node]: note rejection: 45/541 returns unexplained, 3 clusters -> 3 accepted, 13 points dropped (last extent=0.1619m; gate <=0.350m, min 4 points)
+[backend_optimizer_node-3] [WARN] [1785297189.890173961] [backend_optimizer_node]: slow smoother update: 24.9ms (index 2156)
+[realtime_evaluator_node-6] [INFO] [1785297190.420558660] [unity_evaluator_node]: t=55.0s  recent 5s: pos_err mean=8.16mm max=11.69mm samples=57114 balls=0
+[laser_scan_matching_node-4] [INFO] [1785297190.525961705] [laser_scan_matching_node]: note rejection: 26/541 returns unexplained, 0 clusters -> 0 accepted, 0 points dropped (last extent=-1.0000m; gate <=0.350m, min 4 points)
+[realtime_evaluator_node-6] [INFO] [1785297195.420735454] [unity_evaluator_node]: t=60.0s  recent 5s: pos_err mean=6.51mm max=10.57mm samples=62323 balls=0
+[realtime_evaluator_node-6] [INFO] [1785297195.422834704] [unity_evaluator_node]: 
+[realtime_evaluator_node-6] ============================================================
+[realtime_evaluator_node-6] main.md 6-A-1 シミュレーション評価レポート (C++ realtime evaluator)
+[realtime_evaluator_node-6] ============================================================
+[realtime_evaluator_node-6] 総サンプル数: 62323  (定常区間 t>=3.0s: 59234)
+[realtime_evaluator_node-6] 真値未着のまま評価できなかったサンプル: 0
+[realtime_evaluator_node-6] 
+[realtime_evaluator_node-6] --- 全体（要件A: 定常RMSE<=10mm, 最大位置誤差<=10mm） ---
+[realtime_evaluator_node-6]   位置誤差: mean=6.25mm  RMSE=6.93mm  max=13.09mm
+[realtime_evaluator_node-6]   ヨー誤差: mean=0.167deg  RMSE=0.203deg  max=0.451deg
+[realtime_evaluator_node-6]   判定: 定常誤差(RMSE<=10mm) PASS / 最大位置誤差(<=10mm) FAIL
+[realtime_evaluator_node-6] 
+[realtime_evaluator_node-6] --- 高G旋回スピンバースト中 ---
+[realtime_evaluator_node-6]   位置誤差: mean=nanmm  RMSE=nanmm  max=nanmm
+[realtime_evaluator_node-6] 
+[realtime_evaluator_node-6] --- ボール横切り中 vs 非横切り中 ---
+[realtime_evaluator_node-6]   横切り中   : mean=nanmm  RMSE=nanmm  max=nanmm
+[realtime_evaluator_node-6]   非横切り中 : mean=nanmm  RMSE=nanmm  max=nanmm
+[realtime_evaluator_node-6]   判定: ボール横切りによる自己位置無影響 PASS
+[realtime_evaluator_node-6]   (参考) 横切り中の検出ボール数(最新): 0
+[realtime_evaluator_node-6] ============================================================
+[realtime_evaluator_node-6] 
+[realtime_evaluator_node-6] [INFO] [1785297195.546933157] [unity_evaluator_node]: Saved report and raw error CSV in /tmp
+[laser_scan_matching_node-4] [INFO] [1785297195.558816049] [laser_scan_matching_node]: note rejection: 33/541 returns unexplained, 3 clusters -> 3 accepted, 14 points dropped (last extent=0.0602m; gate <=0.350m, min 4 points)
+[INFO] [realtime_evaluator_node-6]: process has finished cleanly [pid 4011198]
+[INFO] [ball_tracking_node-5]: sending signal 'SIGINT' to process[ball_tracking_node-5]
+[INFO] [laser_scan_matching_node-4]: sending signal 'SIGINT' to process[laser_scan_matching_node-4]
+[INFO] [backend_optimizer_node-3]: sending signal 'SIGINT' to process[backend_optimizer_node-3]
+[INFO] [imu_preintegration_node-2]: sending signal 'SIGINT' to process[imu_preintegration_node-2]
+[INFO] [default_server_endpoint-1]: sending signal 'SIGINT' to process[default_server_endpoint-1]
+[ball_tracking_node-5] [INFO] [1785297195.701041775] [rclcpp]: signal_handler(signum=2)
+[backend_optimizer_node-3] [INFO] [1785297195.705403716] [rclcpp]: signal_handler(signum=2)
+[laser_scan_matching_node-4] [INFO] [1785297195.706566280] [rclcpp]: signal_handler(signum=2)
+[backend_optimizer_node-3] [INFO] [1785297195.708883027] [backend_optimizer_node]: backend concurrency stats: imu_callbacks=60286, during_worker=5651 (9.4%), during_smoother=4182 (6.9%), callback_gap_max=145.981ms, gaps>2ms=3772, gaps>10ms=236; stamp_gap_max=1.000ms, gaps>1ms=0; queue_lock_wait_max=10.526ms, waits>2ms=22; callback_duration_max=10.569ms, durations>2ms=73; worker_jobs=2390 mean/max=2.487/33.357ms; smoother_updates=2389 mean/max=1.751/32.337ms
+[imu_preintegration_node-2] [INFO] [1785297195.709667855] [rclcpp]: signal_handler(signum=2)
+[INFO] [ball_tracking_node-5]: process has finished cleanly [pid 4011197]
+[INFO] [laser_scan_matching_node-4]: process has finished cleanly [pid 4011196]
+[INFO] [backend_optimizer_node-3]: process has finished cleanly [pid 4011195]
+[INFO] [imu_preintegration_node-2]: process has finished cleanly [pid 4011194]
+[INFO] [default_server_endpoint-1]: process has finished cleanly [pid 4010927]

@@ -1,0 +1,2460 @@
+diff --git a/docs/experiment_history/09_backend_worker_evaluation_2026-07-29.md b/docs/experiment_history/09_backend_worker_evaluation_2026-07-29.md
+new file mode 100644
+index 0000000..da7d037
+--- /dev/null
++++ b/docs/experiment_history/09_backend_worker_evaluation_2026-07-29.md
+@@ -0,0 +1,169 @@
++# 実験履歴: Backend専用optimizer worker導入影響評価(2026-07-29)
++
++## 1. 目的
++
++`backend_optimizer_node`は`SingleThreadedExecutor`で動作しており、従来は
++`scan_match_callback`からiSAM2更新までを同期実行していた。このため最適化中は
++1kHz IMU callbackも停止していた。
++
++今回、callbackをキュー追加とcondition variable通知だけに限定し、IMU積分・因子生成・
++iSAM2更新・`/state_estimate`配信を専用optimizer workerへ移した。GTSAM状態は引き続き
++単一スレッドだけが所有する。本試験は、この変更がclosed-loop測位精度へ与える影響を
++確認する初回評価である。
++
++## 2. 再現性の確保
++
++`scripts/stage4_mcp_run.sh`を変更し、各runへ次を自動保存するようにした。
++
++- 実際に使用した`robocon2026_unity.yaml`
++- `lio_localization` / `lio_localization_sim`のコミットID
++- 両リポジトリの`git status`
++- tracked fileの未コミット差分(binary patch)
++- run名、開始時刻、probe有無を記したmanifest
++
++これにより、2026-07-28以前の一部runにあった「run名から設定を推測するしかない」
++状態を解消した。
++
++## 3. 実験条件
++
++- Unity Editor 6000.5.5f1、MCPからPlay/Stop
++- Stage 4フルスタックclosed-loop、60秒評価
++- IMU 1kHz設定、`/clock` 250Hz
++- `smoother_lag_sec=0.5`
++- `bias_acc_random_walk_sigma=0.0001`
++- `bias_gyro_random_walk_sigma=0.0001`
++- `zupt_enabled=false`
++- `imu_dynamics_enabled=false`
++
++比較対象はworker導入前の同系列3run
++(`bias_random_walk_20260728`、`bias_random_walk_rep2_20260728`、
++`bias_random_walk_rep3_20260728`)とした。
++
++## 4. 結果
++
++### 4.1 通常構成による3回反復
++
++| 構成 | run | samples | mean | RMSE | max | slow smoother回数 |
++|---|---|---:|---:|---:|---:|---:|
++| worker前 | bias_random_walk | 58,769 | 6.28mm | 6.91mm | 12.90mm | 2 |
++| worker前 | bias_random_walk_rep2 | 59,987 | 6.06mm | 6.59mm | 13.07mm | 3 |
++| worker前 | bias_random_walk_rep3 | 59,361 | 6.14mm | 6.83mm | 12.99mm | 4 |
++| worker後 | backend_worker_20260729_r2 | 58,933 | 6.19mm | 6.84mm | **22.72mm** | 2 |
++| worker後 | backend_worker_20260729_r3 | 55,090 | 6.12mm | 6.77mm | 13.11mm | 0 |
++| worker後 | backend_worker_20260729_r4 | 55,634 | 6.01mm | 6.63mm | 13.00mm | 7 |
++
++3runの代表値:
++
++| 指標 | worker前 | worker後 |
++|---|---:|---:|
++| meanの平均 | 6.16mm | 6.11mm |
++| RMSEの平均 | 6.78mm | 6.75mm |
++| maxの中央値 | 12.99mm | 13.11mm |
++| slow smoother回数の中央値 | 3 | 2 |
++
++定常的なmean/RMSEおよび典型的なmaxは実質同水準であり、worker化による通常精度の
++明確な回帰は観測されなかった。最大10mm要件は従来どおり未達。
++
++`backend_worker_20260729_r2`だけはt=58.454秒に22.72mmのピークを記録した。同runでは
++GTSAM例外、IMU fail-safe、壁補正拒否、グラフリセットは発生しておらず、
++slow smoother警告も2回でworker導入前の通常範囲だった。後続2runでは再現せず
++13.11mm / 13.00mmへ戻ったため、現時点ではworker化に起因する再現性のある回帰とは
++判定しない。ただし単発外れ値として保留し、今後同位相で再発するか監視する。
++
++### 4.2 診断プローブ付きrun
++
++`backend_worker_20260729_r1`は`--probes`付きで実行し、RMSE 6.54mm、max 55.30mmだった。
++slow smoother警告15回、laser scan matcherのIMU coverage timeout 32回と、通常runより
++明らかに高負荷だった。ピークは衝突相当の高加速度窓内で、窓外maxは15.38mm。
++
++このプロジェクトでは過去にも診断subscriber自身が受信率を低下させ、「IMUを58%落とした」
++ように見せた事例がある。そのため、このrunはworker精度の主比較から除外し、診断負荷を
++含むストレスrunとしてのみ保存する。
++
++## 5. Backend内部カウンタによる直接定量化
++
++外部subscriberを増やさずに並行動作を測るため、backend内部へ次の軽量カウンタを追加した。
++hot pathでは整数加算とatomicフラグ参照だけを行い、ログ出力はノード終了時の1回だけとした。
++
++- IMU callback総数
++- optimizer worker処理中に実行されたIMU callback数
++- `smoother_->update()`と`calculateEstimate()`の実行中に実行されたIMU callback数
++- IMU callback壁時計gapの最大値と2ms / 10ms超過回数
++- worker jobとsmoother updateの回数、平均時間、最大時間
++
++通常構成の`backend_worker_quant_20260729_r1`で得た値:
++
++| 指標 | 結果 |
++|---|---:|
++| IMU callback総数 | 63,466 |
++| worker処理中のIMU callback | 5,572 (総数の8.8%) |
++| iSAM2/estimate処理中のIMU callback | 3,905 (総数の6.2%) |
++| worker job | 2,336回、平均2.653ms、最大48.000ms |
++| smoother update | 2,335回、平均1.713ms、最大35.068ms |
++| callback gap最大 | 188.229ms |
++| callback gap >2ms | 8,206回 |
++| callback gap >10ms | 2,127回 |
++
++丸め済み平均時間から概算すると、workerが実際に動いていた累計時間は約6.20秒、
++smoother処理の累計時間は約4.00秒である。その間のIMU callback実行密度はそれぞれ
++約899 callback/s、約976 callback/sだった。
++
++従来構造ではiSAM2がIMU callbackと同じSingleThreadedExecutor上で同期実行されていたため、
++iSAM2処理中に実行できるIMU callbackは構造上0件である。今回3,905件を直接計測できたことから、
++**専用worker化によって最適化中もIMU callbackが継続することを定量確認した**。
++
++一方、最大188msのcallback gapと10ms超過2,127回は残っている。専用workerは
++「backend自身のiSAM2がexecutorを止める」原因を除いたが、Unity→ROS TCP輸送、
++DDS/executorスケジューリング、ホスト負荷などによるバースト到着や欠落までは解消しない。
++この2つは分けて扱う必要がある。
++
++同runの精度はmean 6.30mm、RMSE 6.95mm、max 13.79mmで、定常RMSEはPASS、
++最大10mm要件はFAIL。内部カウンタ追加後も過去系列と同水準だった。
++
++### 5.1 再試験(最大5回、正常データ取得時点で終了)
++
++再現確認では、次を「問題のないデータ」の条件とした。
++
++- レポートが正常生成され、GTSAM例外・グラフリセット・IMU fail-safeがない
++- iSAM2処理中のIMU callback数が0件より多い
++- 定常RMSE 10mm以下
++- 最大誤差が過去通常帯付近の15mm以下
++
++`backend_worker_quant_20260729_r2`はPlay要求後30秒以上たってもUnityセンサーの
++ROS実接続が成立せず、ground truthが1件も届かなかった。推定器評価ではなく既知の
++Unity–ROS接続失敗としてログを保全し、無効runとした。
++
++次の`backend_worker_quant_20260729_r3`で正常データが得られたため、最大5回まで
++繰り返す予定をここで終了した。
++
++| 指標 | 初回定量run | 正常再試験r3 |
++|---|---:|---:|
++| mean / RMSE / max | 6.30 / 6.95 / 13.79mm | 6.20 / 6.83 / 12.53mm |
++| IMU callback総数 | 63,466 | 64,222 |
++| worker中callback | 5,572 (8.8%) | 5,365 (8.4%) |
++| iSAM2中callback | 3,905 (6.2%) | 3,660 (5.7%) |
++| worker平均 / 最大 | 2.653 / 48.000ms | 2.626 / 42.575ms |
++| smoother平均 / 最大 | 1.713 / 35.068ms | 1.668 / 36.758ms |
++| callback gap最大 | 188.229ms | 177.674ms |
++| gap >2ms / >10ms | 8,206 / 2,127回 | 9,466 / 2,232回 |
++
++正常再試験r3ではworker累計時間が概算約6.37秒、smoother累計時間が約4.04秒であり、
++その間のIMU callback実行密度はそれぞれ約842 callback/s、約905 callback/sだった。
++初回定量runと独立に、iSAM2中もIMU callbackが継続することを再確認した。
++
++## 6. 結論
++
++- worker化後も定常RMSEは3runすべて10mm以下で、通常精度の明確な回帰はない
++- 典型的な最大誤差は約13mmでworker導入前と同水準。最大10mm要件は未達のまま
++- 22.72mmの単発ピークは再現せず、原因は未確定
++- slow smoother回数は中央値では3回から2回だが、0〜7回とばらつきが大きく、
++  worker化による計算時間改善を示す結果ではない
++- evaluator sample数はworker後に平均約4.7%少なかったが、これはUnity/ホスト実行速度も
++  含む値であり、backendのIMU callback受信数そのものではない
++- iSAM2処理中に3,905件(概算976 callback/s)のIMU callbackが実行され、
++  worker分離の目的は定量的に達成した
++- 最大188msのcallback gapは残っており、輸送・ホストスケジューリング層は別途調査が必要
++
++したがって、専用worker実装は**通常精度を維持し、iSAM2によるcallback停止を解消したため
++採用可能**と判断する。22.72mmピークの再発監視と、iSAM2以外を原因とする受信gapの調査は
++残課題とする。
+diff --git a/docs/experiment_history/10_callback_delay_component_isolation_2026-07-29.md b/docs/experiment_history/10_callback_delay_component_isolation_2026-07-29.md
+new file mode 100644
+index 0000000..66faa52
+--- /dev/null
++++ b/docs/experiment_history/10_callback_delay_component_isolation_2026-07-29.md
+@@ -0,0 +1,99 @@
++# 実験履歴: IMU callback遅延の構成要素切り分け (2026-07-29)
++
++## 目的
++
++backendのiSAM2を専用workerへ移し、1 kHz `/odom_fast`評価器をC++化した後にも、
++フル構成bag再生で最大145.981msのIMU callback gapが一度観測された。
++Unity CSVから変換した同一88.42秒MCAPの先頭62秒を使い、フル構成だけに含まれる
++`ball_tracking_node` とROS-TCP endpointが原因かを切り分けた。
++
++全runでIMUのheader stamp gapは最大1.000ms、`>1ms`は0件だった。従って、ここでの
++gapはUnityのセンサ生成時刻ではなく、ROS側でbackend callbackが実行されるまでの壁時計遅延である。
++
++## 結果
++
++| 構成 | run | callback gap最大 | >10ms | IMU callback数 |
++|---|---|---:|---:|---:|
++| 最小LIO + C++評価器 | `imu_receiver_with_cpp_evaluator_20260729_r2` | 20.476ms | 28 | 62,001 |
++| 最小LIO + ball | `imu_receiver_cpp_plus_ball_20260729_r1` | 16.923ms | 24 | 62,001 |
++| 最小LIO + endpoint | `imu_receiver_cpp_plus_endpoint_20260729_r1` | 28.482ms | 11 | 61,202 |
++| 最小LIO + ball + endpoint | `imu_receiver_cpp_plus_ball_endpoint_20260729_r1` | 21.872ms | 25 | 62,001 |
++| フルlaunch（初回） | `bag_replay_88s_cpp_evaluator_20260729_r1` | **145.981ms** | 236 | 60,286 |
++| フルlaunch（再試験） | `bag_replay_88s_cpp_full_retest_20260729_r1` | 32.417ms | 39 | 60,502 |
++| フルlaunch（評価器・ballをnice +10） | `bag_replay_88s_cpp_nice10_20260729_r2` | **22.408ms** | **17** | 60,268 |
++
++全runの評価精度はmean約6.25mm、RMSE約6.94mm、最大約13.1〜13.2mmで同水準だった。
++定常RMSE 10mm要件はPASS、最大位置誤差10mm要件はFAILのままである。
++
++## 判断
++
++- `ball_tracking_node`の有無で悪化はなく、原因ではない。
++- idle状態のROS-TCP endpointも単独・ballとの同時追加のいずれでも145ms級を再現しなかった。
++- フル構成の再試験は32.417msまで低下した。初回145.981msは再現しないため、現時点では
++  恒常的なノード構成の問題ではなく、試験時のホスト／WSLスケジューリング外乱として扱う。
++- いずれもstamp gapはない。Unityの1kHz生成・CSV記録が原因という仮説は否定される。
++
++## 実施した改善
++
++`stage4_mcp_run.sh`のendpoint起動確認は、従来`/dev/tcp`で実接続して直ちに切断していた。
++そのためendpoint自身が「No more data available」という偽の例外を記録していた。現在は`ss`で
++listen socketのみを確認し、実験へ偽クライアントを注入しないよう修正した。
++
++同時に`bag_component_isolation.sh`を追加した。YAML、commit、dirty diff、未追跡ソースを
++runごとに保存して、今後の構成追加試験を再現可能にする。巨大な過去run成果物はソース
++スナップショットから除外する。
++
++フルlaunchでは、計測専用のC++評価器と自己位置推定の安全経路ではない
++`ball_tracking_node`を`nice +10`で起動するよう変更した。backend、IMU前積分、scan matching、
++ROS-TCP endpointは通常優先度のままとした。適用後の有効runは最大22.408ms、10ms超17回で、
++位置誤差mean/RMSE/maxは6.26/6.94/13.17mmと変更前と同水準だった。
++
++最初の`bag_replay_88s_cpp_nice10_20260729_r1`はROS launchのprefixをリスト形式で渡したため
++`nice-n10`という存在しない実行ファイルになり、評価器とball追跡が起動しなかった無効runとして
++ログを保全した。prefixを`"nice -n 10"`へ修正したr2のみを有効結果としている。
++
++### IMU専用executor・固定リングバッファ
++
++backend内の2-thread `MultiThreadedExecutor`を廃止した。IMU callback groupをnodeへ自動登録せず、
++専用`SingleThreadedExecutor`へ手動割当した。scan結果callbackとwatchdogは別のcontrol
++`SingleThreadedExecutor`、GTSAMは従来どおりoptimizer workerが所有する。さらに高頻度
++`imu_queue_`を8,192件（1kHzで約8秒）の固定長リングに置換した。通常2秒の保持域を超える
++過負荷では古いIMUを黙って破棄せず、overflowをfail-safeとしてラッチする。
++
++`bag_replay_88s_dedicated_imu_executor_20260729_r1`では、位置誤差mean/RMSE/maxは
++6.26/6.94/13.17mmで従来同一、IMU stamp gapは最大1.000ms・>1ms 0件だった。callback統計は
++最大gap **12.900ms**、>2ms 201回、>10ms **1回**、queue mutex待ち最大1.539ms、callback処理時間
++最大1.541msである。リングoverflow、IMU fail-safe、GTSAM例外は発生しなかった。
++
++この結果は、スレッド数を一律に減らすのではなく、IMU受信・control callback・最適化を
++固定した責務の3実行ドメインに分けたことで、callback内外の待ちを抑えたことを示す。
++
++### lock-free SPSC IMUリング（mutex待ちの除去）
++
++固定リングの初回測定では、専用IMU executorによりcallback gapは大幅に縮小した一方、
++IMU callbackがworkerと`work_mutex_`を共有していたため、queue mutex待ち最大1.539ms、
++callback処理時間最大1.541msが残った。そこでリングを、IMU executorだけがproducer、
++optimizer workerだけがconsumerとなるlock-free SPSC実装へ変更した。2秒ホライズンの掃除は
++IMU callbackから外し、watchdog通知を受けたworkerだけが、保留スキャンも実行中ジョブも無い
++ときに行うようにした。overflow時は従来どおりfail-safeをラッチし、古いIMUを黙って捨てない。
++
++最終ソースを再リンクして実行した `bag_replay_88s_lockfree_imu_ring_20260729_r3`（同じ88.42秒
++MCAPの先頭62秒、bag再生倍率は1倍、`--clock 250`は`/clock`発行周波数250Hz）では、位置誤差
++mean/RMSE/maxは **6.25/6.94/13.17mm**、IMU stamp gapは最大1.000ms・>1ms 0件で、推定精度と
++入力連続性は維持した。IMUリング投入時間は最大**0.065ms**、>2ms **0回**である。callback全体では
++最大4.063ms、>2ms 2回、callback gap最大28.828ms・>10ms 11回だった。直前の同構成r2でも投入時間
++最大0.192ms・>2ms 0回だった一方で、gap最大は15.807msだった。callback全体の壁時計計測にはOSによる
++deschedule時間も含まれるため、run間で揺れる残余の超過をmutex待ちと解釈してはいけない。少なくとも
++共有mutexが直接作っていた1.539ms待ちは除去済みであり、残余はホストスケジューリング側の問題として
++分離された。ring overflow、IMU fail-safe、GTSAM例外は両runで発生しなかった。
++
++なお `bag_replay_88s_lockfree_imu_ring_20260729_r1` は、更新済みソースに対して古いリンク済み
++実行物が起動していたことをログ文字列（`queue_lock_wait`）で検出したため、無効runとして保全した。
++再リンク後に実行物へ`ring_enqueue`文字列が含まれることを確認してr2を実行し、起動時掃除も
++含む最終ソースをr3で再確認した。
++
++## 次の調査条件
++
++145ms級が再発した場合のみ、そのrunのホスト負荷・同時プロセス・WSL CPU使用率を同じ時刻軸で
++採取する。再発していない状態でscheduler優先度やCPU affinityを固定すると、偶然の外乱を
++恒久設定として持ち込むだけになるため、現段階では採用しない。
+diff --git a/docs/experiment_history/11_maximum_10mm_root_cause_investigation_2026-07-29.md b/docs/experiment_history/11_maximum_10mm_root_cause_investigation_2026-07-29.md
+new file mode 100644
+index 0000000..9d41542
+--- /dev/null
++++ b/docs/experiment_history/11_maximum_10mm_root_cause_investigation_2026-07-29.md
+@@ -0,0 +1,455 @@
++# 実験履歴: 最大位置誤差10mm未達の原因調査 (2026-07-29)
++
++## 結論
++
++固定した同一LiDAR/IMUデータを使って推定段ごとに誤差を分解した結果、当初の最大位置誤差
++13.17mmの第一原因は、平面scan-to-map solverのノーツ除外クラスタリングが空間的に離れた点を
++同一クラスタへ連結し、ノーツ由来点を壁対応として残すことであった。これは空間分割により修正済みである。
++1kHz IMU callbackの遅延、iSAM2の計算時間、LiDAR幾何の縮退は当初原因でもなかった。
++
++修正後に行った、同一軌跡・同一乱数でノーツ collider を物理的に消すA/Bでは、ノーツ無しでも
++最大9.466mmだった。したがって現在の最大8mm未達の主因はノーツ混入ではない。一方で、真値seedからも
++7.72mmずれるscan-to-map誤差がfrontend固有の低周波バイアスなのか、odom seed・backend feedbackを
++含むproduction経路で生じた相関なのかは、真値seedした全40Hz scanの自己相関を測るまで未確定である。
++
++最大誤差時刻37.280秒では次の順に誤差が生成されていた。
++
++| 段 | 時刻 | 位置誤差 | 備考 |
++|---|---:|---:|---|
++| 平面scan matching観測 | 37.276s | 10.444mm | `dx=+6.925, dy=-7.818mm` |
++| fixed-lag smoother出力 | 37.276s | 12.926mm | `dx=+10.555, dy=-7.461mm` |
++| 1kHz IMU伝播出力 | 37.280s | 13.169mm | `dx=+10.867, dy=-7.438mm` |
++
++すなわちフロントエンドで既に10mmを超え、その観測と過去状態・IMUをsmootherが妥協して
++約2.48mm増加し、最後の1kHz伝播が加えた差は約0.24mmだった。smoother自体は全観測中の
++scan matching最大18.218mmを状態最大12.952mmまで抑えており、全体としては悪化要因ではなく
++フィルタとして機能している。
++
++現状YAMLのパラメータを恒久変更するだけでは最大10mmに届かなかった。固定bagの有効試験では
++対応距離を200mmから80mmへ縮める構成が最良だったが、最大10.84mmでFAILである。次に行うべき
++ことは対応距離やsmoother重みの追加総当たりではなく、空間的に不連続な候補点を同一ノーツ
++クラスタへ結合しないよう除外処理を修正し、同一bagで再評価することである。
++
++## 試験データと再現条件
++
++- Unity CSV:
++  `/mnt/c/Users/kouza/UnityProjects/Robocon2026Sim/SensorRecordings/20260729_023109_437_91162bde`
++- 変換済みbag:
++  `/tmp/robocon_unity_88s_20260729.mcap`
++- CSV manifest SHA-256:
++  `de1cf8f6c5e8e5cd48fac006f7894f6077b99dc161672e73816d8c937dcc26e1`
++- データ長: 88.42秒
++- `/imu/data`: 88,421件、1kHz
++- `/scan`: 3,537件、40Hz
++- `/ground_truth_pose`: 8,843件、100Hz
++- 比較区間: evaluatorの起動除外3秒後から固定bag再生先頭62秒
++- bag再生倍率: 1倍
++- `--clock 250`: 再生倍率ではなく`/clock`発行周波数250Hz
++- IMU header stamp最大gap: 1.000ms、1.001ms超0件
++- LiDAR `time_increment`: 約1ns
++
++Unityは1スキャン分の1,081本を同一Physics状態で一括raycastしているため、このデータに
++実スキャナ相当の25ms走査歪みは存在しない。従って今回のbagについては、deskew不足を最大誤差の
++原因とはしない。
++
++各固定bag runはYAML、両リポジトリのcommit、dirty diff、未追跡ソースを
++`docs/stage4_runs/<run>/`へ保存した。今回、`stage4_mcp_run.sh`は第3引数で任意の試験YAMLを
++受け取れるようにし、A/B runへ実際に渡したYAMLを同じrunディレクトリへ保存するようにした。
++
++## 基準run
++
++基準はlock-free SPSC IMUリング適用後の
++`bag_replay_88s_lockfree_imu_ring_20260729_r3`である。
++
++| 指標 | 結果 |
++|---|---:|
++| mean位置誤差 | 6.25mm |
++| RMSE | 6.94mm |
++| 最大位置誤差 | 13.17mm |
++| yaw RMSE | 0.204deg |
++| yaw最大 | 0.451deg |
++| 最大位置誤差要件 | FAIL |
++
++最大位置誤差は37.280秒の13.166573mm、yaw誤差0.357628degだった。この時刻の運動は
++`speed=1.127m/s`、`acceleration=3.529m/s²`、角速度0で、旋回中ではなく直線減速区間だった。
++他の大きなピークも周回中の減速・折返し付近に多いが、加速度5～6m/s²帯の誤差は小さく、
++加速度の大きさ単独では説明できない。
++
++## 推定段ごとの誤差分解
++
++同じ再生中に`/scan_match_result`、`/state_estimate`、`/odom_fast`を別bagへ記録し、
++100Hz ground truthをstampで補間した。先頭3秒を除く結果は次のとおりである。
++
++| stream | mean | RMSE | max | 符号付き平均 `(dx,dy)` |
++|---|---:|---:|---:|---:|
++| scan matching wall | 6.582mm | 7.339mm | 18.218mm | `(+1.824,-2.759)mm` |
++| smoother state | 6.259mm | 6.930mm | 12.952mm | `(+1.770,-2.732)mm` |
++| propagated odom | 6.286mm | 6.968mm | 13.169mm | `(+1.762,-2.735)mm` |
++
++37.0～37.6秒ではwall観測の偏りが複数scanに連続した。単発の白色雑音外れ値ではなく、
++同じ未登録物体から同じ向きに生じる相関した対応誤りである。例えば37.201秒は14.866mm、
++37.251秒は13.205mm、37.276秒は10.444mm、37.351秒は13.140mmだった。
++
++このためbackendのDCS/Huberだけで完全に除くことは難しい。各wall観測は多数の「インライア」を
++持つ局所的に整合した解であり、単一factorの残差ゲートを超える異常値には見えないためである。
++
++## 37.280秒の対応点分解
++
++production C++と同じ有限線分、point-to-line残差、Huber重み、2点間引き、最大10反復、
++ノーツ除外をPythonで再構成し、初期姿勢をground truthそのものに置いた。この条件でも
++37.276秒scanは真値から`(+6.91,-7.95)mm`、合計10.54mm、yaw `+0.2963deg`へ移動した。
++productionのwall観測10.444mmと一致するため、backendのseed誤差を使わずにフロントエンドの
++目的関数だけでピークを再現できた。
++
++最終対応は530点、実際のx/y拘束点数は225/305、情報行列の固有値は
++`(195.05, 252.90, 470.81)`だった。最小固有値が消失しておらず、両軸の対応も十分にあるため、
++このピークは廊下状環境などの縮退ではない。
++
++200mm対応ゲートと80mm対応ゲートを比較すると、200mmだけが受理する26点のうち25点が
++中央壁線分へ割り当てられていた。
++
++| 対応集合 | 点数 | 中央壁からの平均距離 | Huber後の同方向寄与 |
++|---|---:|---:|---:|
++| 80mm以内の中央壁点 | 70 | 9.7mm | y勾配 `+0.2307` |
++| 80～200mmの中央壁点 | 25 | 119.6mm | y勾配 `+0.6250` |
++
++Huber lossは1点の影響を25mm相当へ制限するが、25点が同じ向きの誤対応になると影響が加算される。
++従ってHuberを使っていることと、まとまった誤対応に頑健であることは同義ではない。
++
++### ノーツ除外が25点を残す直接原因
++
++現行実装は「どのmap面からも50mm超離れたscan indexの連続区間」を一つのクラスタとし、
++クラスタ全体の最大径が350mm以下ならノーツとして除外する。しかし連続index間の実空間距離は
++クラスタ分割条件に使っていない。
++
++37.276秒では次の候補区間が得られた。
++
++| scan内候補 | 点数 | クラスタ全体径 | 最大隣接点間隔 | 現行判断 |
++|---|---:|---:|---:|---|
++| rays 473:500 | 27 | 878.1mm | 211.9mm | 大きすぎるため保持 |
++| rays 501:512 | 11 | 137.2mm | 137.2mm | ノーツとして除外 |
++
++前者は空間的に不連続な点をscan indexが連続したという理由だけで一群にしている。全体径が
++878.1mmへ膨らみ、実装が意図していた「小物体だけを落とし、未登録壁は残す」判定の逆を起こす。
++その中に残った中央壁から平均119.6mmの25点が最大誤差を生成する。
++
++隣接候補点間の実空間距離でクラスタを分割するオフライン変更を、既知の推定誤差ピーク10時刻に
++適用した。対応距離は現状の200mmのままである。
++
++| 空間分割閾値 | 10時刻の平均 | p90 | 最大 | 37.280秒 |
++|---:|---:|---:|---:|---:|
++| 現行（分割なし） | 7.41mm | 8.59mm | 10.54mm | 10.54mm |
++| 75mm | 5.56mm | 7.90mm | 8.07mm | 7.19mm |
++| 100mm | 5.38mm | 7.90mm | **8.05mm** | 7.19mm |
++| 125mm | 5.40mm | 7.92mm | 8.29mm | 7.19mm |
++| 150mm | 5.72mm | 7.92mm | 8.29mm | 7.23mm |
++| 200mm | 6.41mm | 8.24mm | 8.37mm | 7.55mm |
++
++この因果仮説はproduction C++へ実装し、後述の同一62秒bag再生でも検証した。
++
++## 固定bagパラメータA/B
++
++構造変更前に、同一bag上で単純な閾値・重み調整の効果と限界も確認した。
++
++| run | 主変更 | mean | RMSE | max | 判定 |
++|---|---|---:|---:|---:|---|
++| baseline r3 | corr=200mm, Huber=25mm | 6.25mm | 6.94mm | 13.17mm | FAIL |
++| `max10_corr100_fixed_bag_20260729_r1` | corr=100mm | 5.33mm | 5.80mm | 10.93mm | FAIL |
++| `max10_corr080_fixed_bag_20260729_r1` | corr=80mm | **5.18mm** | **5.66mm** | **10.84mm** | FAIL |
++| `max10_corr080_cov065_fixed_bag_20260729_r1` | corr=80mm、wallを強く重み付け | 5.20mm | 5.69mm | 11.22mm | FAIL |
++| `max10_corr100_huber015_fixed_bag_20260729_r1` | corr=100mm、Huber=15mm | 5.42mm | 5.91mm | 11.18mm | FAIL |
++
++対応距離短縮は誤対応を減らして明確に改善したが、最良でも0.84mm超過した。wall共分散を
++小さくしてbackendで強く信じさせると悪化した。wall観測自身が相関バイアスを含む以上、
++情報行列が良条件という理由だけで強く重み付けしてはいけない。
++
++Huber 15mmも100mm対応との組合せでは悪化した。従ってHuber値は変更せず、次節の
++ノーツクラスタ修正、80mm対応距離、wall共分散の保守的な緩和を採用した。
++
++## 実装と最終固定bag検証
++
++### 採用した実装
++
++`laser_scan_matching_node`へ`ball_exclusion_max_adjacent_gap`を追加した。mapから50mm超離れた
++候補点列について、scan indexが連続していても、前の候補点との実空間距離が100mmを超えた時点で
++クラスタを確定する。このため、遠方壁点とノーツ点が連続rayとして一群へ誤結合しない。
++
++加えて、前節のA/B結果と段別記録を根拠に以下を現行YAMLへ採用した。
++
++| パラメータ | 変更 | 理由 |
++|---|---:|---|
++| `ball_exclusion_max_adjacent_gap` | 新設 `100mm` | 空間的に不連続な候補点をノーツクラスタへ誤結合しない。 |
++| `planar_correspondence_distance` | `200mm → 80mm` | 100mm超の残余誤対応を壁対応から除く。 |
++| `wall_cov_inflation` | `1.0 → 2.0` | planar pathの局所共分散が対応誤り・フレーム間相関を表せないため、wall観測を過信しない。 |
++
++### 実装後の段別確認
++
++ノーツ空間分割と80mm対応を有効にして段別MCAPを記録した。37.280秒ではwall観測が6.598mmまで
++改善していた一方、直前37.201秒のwall観測が15.212mmへ跳ねた履歴をsmootherが保持し、stateは
++10.463mm、1kHz odomは10.786mmとなった。従って残る超過は「ノーツ除外が再び失敗した」のではなく、
++短時間のwall観測スパイクを局所Hessian由来の過小な共分散で強く信じたことによる。
++
++wall観測の実RMSEは5.991mmだったのに対し、planar pathが配信していた共分散の標準偏差は
++約3.16mm固定だった。これを2倍へ緩める構成を、他の変更を固定して1回だけ再試験した。
++
++| run | 有効な変更 | mean | RMSE | max | 判定 |
++|---|---|---:|---:|---:|---|
++| `max10_note_spatial_gap100_fixed_bag_20260729_r2` | 空間分割100mm | 5.54mm | 6.04mm | 11.18mm | FAIL |
++| `max10_note_gap100_corr080_fixed_bag_20260729_r2` | + 対応80mm | 5.15mm | 5.63mm | 10.79mm | FAIL |
++| `max10_note_gap100_corr080_cov2_fixed_bag_20260729_r1` | + wall共分散2倍 | **5.09mm** | **5.55mm** | **9.54mm** | **PASS** |
++
++最後のrunは同一62秒bag、1倍再生、先頭3秒除外、59,281定常サンプルで測定した。最大は
++15.150秒の9.541267mm、yaw最大は0.227degである。run manifestにはlaser/backendの上書き値も保存し、
++現行YAMLの採用値と一致することを確認した。
++
++`max10_note_spatial_gap100_fixed_bag_20260729_r1`は実行環境の時間制限で60秒前に停止したため、
++評価対象から除外した。`max10_note_gap100_corr080_fixed_bag_20260729_r1`は試験スクリプトの
++ROS parameter引数不足でscan matching nodeが起動しなかった無効runであり、引数処理を修正したr2を
++有効結果とした。段別記録runのMCAPはrecorder終了待ち後に`ros2 bag reindex`でmetadataを復元し、
++61.938秒・75,523メッセージとして読出しを確認している。
++
++## 8mmマージン追加試験
++
++10mm達成後、同じ`σ=30mm`固定bagを変えずに最大8mmを狙った。まず共分散だけをさらに緩め、
++次にfrontendのロバスト損失を再検討した。
++
++| run | 追加変更 | mean | RMSE | max | 8mm判定 |
++|---|---|---:|---:|---:|---|
++| `max10_note_gap100_corr080_cov2_fixed_bag_20260729_r1` | 採用済み基準 | 5.09mm | 5.55mm | 9.541mm | FAIL |
++| `max8_note_gap100_corr080_cov4_fixed_bag_20260729_r1` | wall共分散4倍 | 4.99mm | 5.37mm | 9.267mm | FAIL |
++| `max8_note_gap100_corr080_ls_cov4_fixed_bag_20260729_r1` | + planar最小二乗相当 | **4.67mm** | **5.01mm** | **8.456mm** | FAIL |
++
++最後のrunは59,271定常サンプルで、最大は38.076秒の8.456212mmだった。8mm超過は
++37.879～38.205秒など複数サンプルに連続しており、評価器の単発照合誤差ではない。
++最高記録は従来から1.085mm改善したが、目標には0.456mm届かなかった。
++
++最小二乗を試した根拠は、空間ノーツ除外と80mm対応ゲートを適用した後の残差が、Unityが
++意図的に生成したGaussian雑音を主体とするためである。全経路を10Hzでtruth seedから再計算した
++frontend診断では、現行Huberの`mean/RMSE/max=5.40/5.94/15.44mm`に対し、
++最小二乗相当は`5.16/5.71/13.89mm`へ改善した。オンラインでも平均・RMSE・最大はすべて
++改善したが8mmには達しなかったため、現行YAMLの`planar_huber_delta=0.025`と
++`wall_cov_inflation=2.0`は変更せず、試験上書きだけを未採用とした。
++
++段別記録から、wall観測誤差は`RMSE=5.991mm、max=15.212mm`で、主要ピーク直前0.5秒の
++符号付き平均も約7～8mmに達した。したがってbackendの重みを弱めるだけでは、IMUドリフトとの
++交換条件でピーク時刻が移るだけで8mmへ収束しない。41 scan（約1秒）のoracle運動補償平均なら
++wall最大は7.714mmまで下がる一方、実装可能なodom差分ベースの同等フィルタは最大14mm前後へ
++悪化した。真値を使わない単純な時間平均を採用してはならない。
++
++同一の8mm判定が3構成連続で未達となったため、workspaceの3回失敗停止規則に従い追加試行を
++停止した。再開には、次のどちらを要件とするか明示的な判断が必要である。
++
++1. `σ=30mm` stress bagでも最大8mmを必須とする: scan間相関を明示的に扱う観測モデル、
++   実対応法線・残差scale・correspondence stabilityに基づくplanar共分散を実装してから再試験する。
++2. UTM-30LX実機相当で最大8mmを評価する: Unityの短期ランダム成分を仕様上の繰返し精度
++   `σ<=10mm`へ直し、`σ=30mm`bagは10mm stress regressionとして分離して複数seedで試験する。
++
++### ユーザー判断による50mm対応ゲート追加試験
++
++3回停止後、ノーツ点が50～80mm帯に残っている可能性を調べるため、ユーザー指示で試験を再開した。
++ノーツ候補判定距離は元から50mmであるため、変更したのは壁対応の採用距離
++`planar_correspondence_distance=80→50mm`だけである。
++
++| run | mean | RMSE | max |
++|---|---:|---:|---:|
++| 80mm・現行採用構成 | 5.09mm | 5.55mm | 9.541mm |
++| `max8_note_gap100_corr050_cov2_fixed_bag_20260729_r1` | 5.40mm | 5.93mm | 10.447mm |
++
++全指標が悪化したため、50～80mm帯は主に有効なGaussian壁点であり、この帯に残ったノーツ点が
++現在の主因という仮説は支持されない。50mm以内で偶然map面に近接するノーツ点は両構成で受理される
++ため、ノーツ混入を完全には否定できない。これを決着させるには、閾値をさらに狭めるのではなく、
++同一経路・seedでUnity上のノーツcolliderだけを無効化した物理A/Bが必要である。50mm変更は不採用。
++
++### ノーツ物理有無の同一軌跡・固定seed A/B
++
++Unityプロジェクト直下に`DisableNotesForLocalizationExperiment.flag`が存在するときだけ、
++生成済みノーツGameObjectを非アクティブ化する実験スイッチを`RoboconFieldBuilder`へ追加した。
++通常時はflagが無いため従来どおりであり、試験終了後はflagを`.flag.disabled`へ退避して
++ノーツ有り状態へ戻した。
++
++最初のclosed-loop live比較は、TCP/Editor負荷による推定差がUnity側の制御へ戻り、ノーツ有無の
++走行軌跡が最大5.15m分岐したため因果判定から除外した。代わりにROSを接続せず
++`HasOdomEstimate=false`の真値フィードバックで次の2本を収録し、各CSVをMCAPへ変換した。
++
++- ノーツ有り: `20260729_093936_195_539d93d1`
++- ノーツ無し: `20260729_094209_282_55016362`
++
++Unityセンサ乱数はソース上`System.Random(20260723)`固定である。両bagの先頭62秒を照合した結果、
++真値軌跡差はmean/RMSE/maxすべて`0.000mm`、scan時刻も2,480 scanで対応した。50mm超変化したrayは
++1 scan平均31.68本、p95 105本、最大116本であり、経路・乱数ではなくノーツによるray遮蔽だけを
++ほぼ完全に分離できた。
++
++この2入力を同じ現行ROS構成で固定bag再生した。
++
++| 入力 | run | mean | RMSE | max | 位置誤差振幅の標準偏差 | 8mm超サンプル |
++|---|---|---:|---:|---:|---:|---:|
++| ノーツ有り | `max8_openloop_notes_present_fixed_bag_20260729_r1` | 5.090mm | 5.556mm | 9.541mm | 2.227mm | 6,770 / 59,271 (11.422%) |
++| ノーツ無し | `max8_openloop_no_notes_fixed_bag_20260729_r1` | 5.083mm | 5.538mm | 9.466mm | 2.197mm | 5,178 / 59,271 (8.736%) |
++
++ノーツを物理的に消すと8mm超の滞在割合は2.686ポイント減ったため、残存ノーツ点または壁の遮蔽は
++上側tailを小さく悪化させている。しかしmeanは0.007mm、RMSEは0.018mm、最大は0.076mmしか
++改善せず、ノーツ無しでも最大9.466mmである。従って**現在の最大8mm未達の主因はノーツ点混入では
++ない**。ノーツ有り側が既存固定bagの最大9.541mmを再現したことも、このA/Bの整合性を支持する。
++
++過去の「3～4mm」は主に位置RMSE（例: 3.06～3.51mm）で、標準偏差そのものではなく、旧実装・
++異なる負荷/経路条件のrunを含む。今回の厳密A/Bで計算した位置誤差振幅の標準偏差は約2.2mmであり、
++ノーツ有無ではほぼ変化しなかった。
++
++### ノーツ無し残余誤差の段別・相関調査
++
++ノーツ無し固定bagを`--record-stages`で再生し、62.000秒・75,612メッセージの段別MCAPを取得した。
++recorderはSIGINT後にbounded graceful shutdownを行うよう試験スクリプトを修正したため、今回のMCAPは
++再index不要でmetadataを含み、再現可能な入力として保存されている。
++
++| 段 | mean | RMSE | max | 最大時刻 |
++|---|---:|---:|---:|---:|
++| wall観測 | 5.429mm | 5.954mm | 13.816mm | 60.301秒 |
++| smoother state | 5.126mm | 5.571mm | 9.369mm | 38.026秒 |
++| 1kHz odom | 5.143mm | 5.596mm | 9.464mm | 38.055秒 |
++
++評価ピーク38.056秒ではwall観測は直近で`(+7.703,+0.472)mm`、stateは
++`(+8.853,-2.927)mm`、odomは`(+8.887,-2.955)mm`だった。1kHz伝播によるstate→odom差は
++約0.07mmであり主因ではない。直前0.5秒のwall符号付き平均は`(+6.97,-2.48)mm`で、
++個別の単発外れ値ではなく同方向の観測がfixed-lag窓を通して残っている。
++
++このscanをground truth姿勢からproductionと同じplanar solverで解き直しても、
++`(+7.70,+0.47)mm`（7.72mm）へ移動した。実際のwall出力7.717mmと一致するため、
++残余の偏りはbackendのseedフィードバックではなく、ノーツを除いたscan-to-map目的関数そのものにある。
++
++wall観測の符号付き誤差の自己相関はx方向で、1 scan後0.840、0.1秒後0.834、0.5秒後0.670、
++1.0秒後0.449だった。したがって40Hzの複数wall priorを独立観測として掛ける現行モデルは、
++局所Hessianの`diag(1e-5)`だけでは表せない時間相関を無視している。`wall_cov_inflation=2.0`は
++1フレームの幅を緩める暫定策であり、相関した20観測を20個の独立情報として数える問題は残る。
++
++次の改善対象はノーツゲートではない。まず真値seedした全40Hz scanの符号付き誤差自己相関で、
++frontend固有の相関とodom seed/backend feedbackを分離する。その後、frontend相関が確認できた場合に
++観測の有効サンプル数に基づくkeyframe化、またはscan matchingの低周波バイアスを状態として持つ
++factor graphを比較する。単純な時間平均はodomとのフィードバックで悪化することを既に確認している。
++
++### 収束・品質ゲートを厳格化できるか
++
++「収束判定を厳しくする」と「悪い観測を採用しない」は別である。前者の反復停止閾値
++`delta.norm() < 1e-5`は、既に偏った局所最小値へ収束した後の停止条件であり、下げてもその解を
++正解へ動かさない。後者の平均残差・inlier数ゲートは、誤差と相関するなら有効である。
++
++ノーツ無し固定bagの全経路を8Hz間引き（295 scan）、各scanをground truth seedから解いて検証した。
++このためbackendの初期値誤差を含まない、ゲート自体の判別力の測定である。40 scanが8mm超だった。
++
++| 平均絶対残差で拒否 | 拒否 scan | 8mm超を捕捉 | 再現率 | 拒否中の真の8mm超率 |
++|---|---:|---:|---:|---:|
++| >15mm | 295/295 | 40/40 | 100.0% | 13.6% |
++| >16mm | 261/295 | 32/40 | 80.0% | 12.3% |
++| >17mm | 188/295 | 14/40 | 35.0% | 7.4% |
++| >18mm | 90/295 | 3/40 | 7.5% | 3.3% |
++| >20mm | 2/295 | 0/40 | 0.0% | 0.0% |
++
++平均残差は全scan 17.37mm、8mm超scan 16.75mm、inlier数は各539.5/539.0本であり、むしろ悪いscanを
++見分けていない。従って現行の`planar_max_mean_residual=60mm`を厳しくしても、15～16mmではほぼ全ての
++正常観測を捨て、18mm以上では大半の悪い観測を通す。対応距離80→50mmも既に最大10.447mmへ悪化しており、
++閾値の追加厳格化は不採用とする。
++
++## 先行研究・センサ仕様との照合
++
++### ICPの局所解・共分散
++
++Andrea Censi, *An accurate closed-form estimate of ICP's covariance* (ICRA 2007) は、
++ICPの主要誤差源として真の解の吸引域外にある局所解への収束を挙げ、対応関係と計測の相関を
++考慮した共分散、ならびに可観測性解析を扱っている。
++
++https://censi.science/pub/research/2007-icra-icpcov.pdf
++
++今回の問題は完全な別局所姿勢への飛躍ではないが、「誤った最近傍対応が目的関数そのものを
++偏らせる」という同じ種類の問題である。また現行planar pathの`inverse(H)`相当値は、
++採用した対応を正しいものとして見た局所曲率に過ぎず、未登録ノーツへの誤対応を不確かさとして
++表現しない。
++
++X-ICPはHessianの固有空間でlocalizabilityを評価し、縮退方向の更新を制御する。
++
++https://arxiv.org/abs/2211.16335
++
++この考え方はplanar pathの診断改善に有用だが、今回のピークは固有値と両軸対応数が十分なので、
++縮退抑制だけでは主因を除けない。
++
++### Lidar-IMU結合とdeskew
++
++LIO-SAMはIMU preintegrationをpoint cloudのdeskewとLiDAR最適化の初期値生成に使う。
++
++https://arxiv.org/abs/2007.00258
++
++一般の40Hz回転LiDARでは重要だが、今回のUnity scanは同一時刻のray batchであり、
++IMU stampも1ms連続だった。さらにピークscanをground truth seedから解いても10.54mm偏ったため、
++今回の固定bagではdeskew、IMU callback壁時計gap、初期値誤差を主因から除外できる。
++
++### UTM-30LX仕様とUnityノイズモデル
++
++Hokuyo公式仕様は0.1～10mの測距精度を±30mmとし、同じ距離の測距分解能・繰返し精度を
++`σ<10mm`として別に記載している。
++
++https://www.hokuyo-aut.co.jp/search/single.php?serial=21
++
++一方Unityは「±30mm」をそのまま独立Gaussianの`σ=30mm`として各rayへ加えている。
++精度限界と繰返し標準偏差は同じ量ではないため、これは実機仕様の物理モデルとしては妥当でない
++可能性が高い。推奨モデルは、短期ランダム成分をまず`σ=10mm`以下に置き、必要なら材料・入射角・
++個体校正に由来する系統成分を別パラメータとして加えることである。
++
++ただし今回の固定bagは`σ=30mm`の既収録データであり、その厳しい条件でも誤対応除去を改善する
++価値がある。ノイズを10mmへ下げるだけで本番アルゴリズムの欠陥を隠すべきではない。
++
++## 現時点で除外できる仮説
++
++| 仮説 | 判断 | 根拠 |
++|---|---|---|
++| IMUの1kHz配信欠落 | 除外 | header stamp最大gap 1.000ms、欠落なし |
++| IMU callbackの壁時計gapが精度ピークを生成 | 除外 | 同一bagで精度再現、真値seedのscan単体で10.54mm |
++| iSAM2 worker化の副作用 | 主因から除外 | wall観測で既に10.44mm、smootherは全体最大を低減 |
++| 1kHz伝播誤差 | 主因から除外 | ピークでstate→odom差は約0.24mm |
++| 走査中運動歪み | 今回のbagでは除外 | Unityは瞬時ray batch、`time_increment≈1ns` |
++| 幾何縮退 | ピークでは除外 | 固有値`195/253/471`、実軸対応`225/305` |
++| 加速度の大きさ | 単独原因から除外 | ピーク3.529m/s²、より高い加速度帯で誤差は小さい |
++| note exclusionそのものが不要 | 否定 | 除外なしのオフライン最大は12.18mmへ悪化 |
++| wall factorを強くすれば改善 | 否定 | 固定bag最大10.84→11.22mm |
++
++## 実装上の副次的な問題
++
++productionで姿勢を上書きするplanar pathは、実際の対応法線を数えず
++`x_count=inliers/2`、`y_count=残り`を配信し、縮退flagを常にfalse、共分散を常に
++`diag(1e-5,1e-5,1e-5)`としている。generic ICP pathには実対応数・縮退・Censi型共分散の処理が
++あるが、Unity用planar解で上書きされる。
++
++今回のピークはオフラインの実計算でも非縮退なので、これを直すだけでは最大誤差の主因を消せない。
++それでもbackendへ誤った信頼度を渡さないため、ノーツクラスタ修正と同時に次を実装すべきである。
++
++1. 最終反復の実法線からx/y対応数を数える。
++2. 3x3情報行列の固有値から縮退方向を判定する。
++3. 残差scaleを含む共分散を計算する。
++4. 対応誤りを局所Hessianだけでは表せないため、共分散は強める方向に使わず、残差・除外率・
++   correspondence stabilityに応じて緩める。
++
++## 残る検証・改善順
++
++1. 37.276秒scanをunit/regression fixtureにし、27点・878.1mmクラスタが空間分割され、
++   中央壁から80～200mmの25点が残らないことを自動確認する。
++2. planar pathが実際の法線方向対応数・縮退・残差scaleを配信するよう改める。現状の固定
++   `diag(1e-5)`は暫定値であり、`wall_cov_inflation=2.0`はその過信を保守側へ補う設定である。
++3. UnityのLiDARを`random sigma <=10mm`と系統誤差へ分離し、seedを固定した60秒×最大5 seedで
++   再確認する。現行`σ=30mm`bagもstress regressionとして残す。
++4. ノーツ無し固定bagの全2,480 scanをground truth seedから解き、`dx/dy/yaw`の1, 2, 4, 8, 20, 40 scan
++   lag自己相関と区間別平均を記録する。これでfrontend固有の相関とseed/backend由来の相関を分離する。
++5. 既知線分mapに対するray-to-wall予測range尤度を、現行point-to-line ICPと同一bagで比較する。
++   相関が確認された後に限り、LIO-SAM型のrelative LiDAR factorと疎で弱いabsolute anchorを比較する。
++
++厳密にはGaussian分布は裾が無限なので、無期限の「最大誤差10mm」を確率1で保証することは
++できない。要件判定は「指定経路、60秒、固定した複数seedで各runの最大10mm以下」のように
++時間窓と試行集合を明記し、同時にp99.9などの分位点も保存する必要がある。
++
++## 採否
++
++- 原因判定: **当初はノーツ除外クラスタの空間的不連続。現状の8mm未達はノーツ混入ではないが、scan-to-map相関の起源は全scan真値seed ACFで要分離**
++- 100mm空間クラスタ分割: 採用
++- 80mm対応距離: 採用
++- wall共分散2倍: 採用
++- wall共分散を強くする変更: 撤回
++- Huber 15mm変更: 撤回
++- 収束停止閾値・平均残差・inlier数だけを厳格化する変更: 不採用（8mm超を判別できない）
++- IMU/backend schedulingの追加変更: 今回の精度原因に対しては不要
++- Unity `σ=30mm`: stressデータとして保存、実機相当モデルとしては再定義が必要
+diff --git a/docs/experiment_history/12_sensor_noise_datasheet_validation_2026-07-29.md b/docs/experiment_history/12_sensor_noise_datasheet_validation_2026-07-29.md
+new file mode 100644
+index 0000000..038a20b
+--- /dev/null
++++ b/docs/experiment_history/12_sensor_noise_datasheet_validation_2026-07-29.md
+@@ -0,0 +1,73 @@
++# センサデータシート準拠ノイズの段階試験 (2026-07-29)
++
++## 方針
++
++実機は未入手のため、メーカーの公開データシートを一次値とする。ただし、複数要因を
++同時に変えて原因を失わないよう、各試験は固定の60秒Unity記録bagに**一要因だけ**を
++加える。
++
++- LiDAR: 北陽電機 UTM-30LX
++- IMU: TDK InvenSense ICM-42688-P (DS-000347)
++- 比較基準: `max8_ray_to_wall_no_notes_fixed_bag_20260729_r5`
++  (mean 0.61 mm / RMSE 0.71 mm / max 2.40 mm)
++
++## 仕様値と実装上の単位
++
++| センサ | データシート値 | シミュレータ/GTSAMへ入れる値 |
++|---|---:|---:|
++| UTM-30LX 測距繰返し精度 (0.1--10m, 室内) | sigma <10 mm | LiDAR距離白色雑音 sigma=0.010 m |
++| ICM-42688-P 加速度ノイズ密度 | XY 65, Z 70 ug/sqrt(Hz) | 全軸を保守的に 70 ug/sqrt(Hz) = 6.86466e-4 m/s^2/sqrt(Hz) |
++| ICM-42688-P ジャイロノイズ密度 | 2.8 mdps/sqrt(Hz) | 4.88692e-5 rad/s/sqrt(Hz) |
++
++Unityでは連続時間ノイズ密度 `n` を各標本の標準偏差 `n/sqrt(dt)` に変換して注入する。
++GTSAMの`accelerometer_sigma`/`gyroscope_sigma`には同じ連続時間密度を渡す。
++
++UTM-30LXの`±30 mm`は測距精度の境界であり、正規分布のsigmaではない。従来の
++`sigma=30 mm`はこの二つを取り違えていたため、Unityソースと通常YAMLを10 mmへ訂正した。
++
++## 試験1: ICM-42688-P白色雑音のみ
++
++### 注入条件
++
++固定bagには旧UnityモデルのLiDAR白色雑音sigma=30 mmが既に焼き込まれている。そのため
++この試験中はlaser nodeの`wall_cov_range_sigma`だけを30 mmへ一時上書きし、新しい要因を
++ICM-42688-Pの白色雑音だけに限定した。
++
++入力bagをオフライン変換し、ROS実行中にPython callbackを増やさないようにした。
++
++- source: `/tmp/robocon_openloop_no_notes_20260729.mcap`
++- transformed: `/tmp/robocon_openloop_no_notes_icm42688_white_20260729.mcap`
++- accel sample sigma at 1kHz: 0.021707961 m/s^2
++- gyro sample sigma at 1kHz: 0.001545380 rad/s
++- seed: 42688
++
++### 結果（参考・再録待ち）
++
++run: `max8_ray_to_wall_icm42688_white_noise_20260729_r1`
++
++| mean | RMSE | max | 判定 |
++|---:|---:|---:|---|
++| 0.72 mm | 0.83 mm | 2.44 mm | 参考値（無効） |
++
++IMU stamp gapは最大1.000 msであり、IMU fail-safe、GTSAM例外、グラフリセットはなかった。
++このrunはIMU白色雑音だけを正しく追加したが、入力LiDARには旧モデルのsigma=30 mmが焼き込まれて
++いる。更新済みUTM-30LXモデル(sigma=10 mm)との入力不整合があるため、10 mm要件を満たす証拠には
++使わない。更新済みUnityから新規CSV/MCAPを録画後、同じICM-42688-P条件で取り直す。
++
++## 未実施要因と制約
++
++1. **UTM-30LX sigma=10 mm + ICM-42688-P白色雑音でのend-to-end再試験**: Unityの発行値を
++   更新済みだが、既存bagは30 mm雑音を含むため、これを後処理で10 mmへ「減らす」ことはできない。
++   更新済みUnityから新しいCSV/MCAPを記録してから実行する。
++2. **ICM-42688-P初期オフセット**: データシートには加速度zero-g初期許容差±20 mg、
++   gyro ZRO初期許容差±0.5 deg/sがある。これは起動時静止校正の対象であり、校正残差の
++   分布はデータシートにないため、白色雑音試験とは別に扱う。
++3. **バイアスランダムウォーク・温度ドリフト・振動**: ICM-42688-Pの同データシートには
++   本システムの`bias_*_random_walk_sigma`へ直接入れられる値がない。Allan偏差または実機
++   温度試験なしに任意値を採用しない。
++
++## 変更ファイル
++
++- `unity/Robocon2026Sim/Assets/Robocon2026/Scripts/UnityRosSensorPublisher.cs`
++- `config/robocon2026_unity.yaml`
++- `tools/rewrite_bag_with_imu_noise.py`
+diff --git a/docs/setup/UNITY_MCP_BENCHMARK_GUIDE.md b/docs/setup/UNITY_MCP_BENCHMARK_GUIDE.md
+new file mode 100644
+index 0000000..2c2d887
+--- /dev/null
++++ b/docs/setup/UNITY_MCP_BENCHMARK_GUIDE.md
+@@ -0,0 +1,147 @@
++# Unity MCPを使ったStage 4ベンチマークの実行方法
++
++Stage 4(Unity + ROS 本番フルスタック)のベンチマークを、キーボード/マウスの
++自動操作やウィンドウフォーカス切り替えを一切使わずに、Unity Editorの
++`com.unity.ai.assistant`(Unity MCP)経由のコード実行だけで走らせる手順。
++2026-07-28〜29のセッションで実際に使い、17回以上のベンチマークで安定して
++動作した方法。
++
++**この手順を使う前に**: 一発目の計測を信用する前のチェックは
++[`../../../../.claude/skills/unity-ros-restart-sanity-check/SKILL.md`](../../../../.claude/skills/unity-ros-restart-sanity-check/SKILL.md)
++(Claude Code固有のパスにあるが、内容はUnity再起動直後の既知の落とし穴なので
++どのツールで作業していても有効)を参照。
++
++## 前提
++
++- Unity MCP(`Unity_RunCommand`等)がツールとして使える状態になっていること。
++  新規登録した場合はセッション再起動が必要(ツール一覧はセッション開始時にしか
++  読み込まれない)
++- Unity Editorが起動済みで、対象プロジェクト(`Robocon2026Sim`)が開かれていること
++- ROS 2ワークスペースがビルド済みであること
++
++## Play/Stopの制御方法: `EditorApplication.isPlaying`を直接読み書きするだけ
++
++**キーボード操作・マウス操作・ウィンドウフォーカスは一切使わない。** `Unity_RunCommand`
++はC#スニペットをその場でコンパイル・実行できるので、Play開始・停止は次の1行で行う。
++
++Play開始:
++```csharp
++using UnityEngine;
++using UnityEditor;
++
++internal class CommandScript : IRunCommand
++{
++    public void Execute(ExecutionResult result)
++    {
++        EditorApplication.isPlaying = true;
++        result.Log("Play requested");
++    }
++}
++```
++
++Play停止:
++```csharp
++using UnityEngine;
++using UnityEditor;
++
++internal class CommandScript : IRunCommand
++{
++    public void Execute(ExecutionResult result)
++    {
++        EditorApplication.isPlaying = false;
++        result.Log("Stop requested");
++    }
++}
++```
++
++状態確認(Play開始前・停止後の検証に使う。停止直後は非同期に反映されることがあるため、
++数秒待ってから確認する):
++```csharp
++using UnityEngine;
++using UnityEditor;
++
++internal class CommandScript : IRunCommand
++{
++    public void Execute(ExecutionResult result)
++    {
++        result.Log("isPlaying={0} Time.time={1}", EditorApplication.isPlaying, Time.time);
++    }
++}
++```
++
++Unity C#スクリプトを編集した直後は、次のPlay前に明示的にリフレッシュしてコンパイル
++完了を確認する(自動検知を待たず確実に反映させるため):
++```csharp
++using UnityEngine;
++using UnityEditor;
++
++internal class CommandScript : IRunCommand
++{
++    public void Execute(ExecutionResult result)
++    {
++        AssetDatabase.Refresh();
++        result.Log("Refresh triggered, isCompiling={0}", EditorApplication.isCompiling);
++    }
++}
++```
++(`isCompiling`が`false`に戻るまで数秒おいて再確認する)
++
++## ベンチマーク1回の手順
++
++1. **ROSスタックの残留プロセスがないか確認**:
++   ```bash
++   ps aux | grep -E "imu_preintegration_node|backend_optimizer_node|laser_scan_matching_node|realtime_evaluator_node|ball_tracking_node|default_server_endpoint" | grep -v grep
++   ```
++2. **Unityが待機状態であることを確認**(前回のPlayが残っていないか):
++   上記の状態確認コードで `isPlaying=False` を確認する
++3. **ROSスタックを起動**(バックグラウンド):
++   ```bash
++   scripts/stage4_mcp_run.sh <run名> > /tmp/run_driver.log 2>&1 &
++   ```
++   このスクリプトはROSノード群を起動し、TCPエンドポイント(:10000)が開くまで待ち、
++   `$OUT/READY`ファイルを作った時点で `READY — enter play mode now` と出力する。
++   また、実行時点のYAML、両リポジトリのコミット、`git status`、未コミット差分、
++   実行条件manifestを`$OUT`へ自動保存する。
++4. **READYを待ってからPlayを開始**(`grep -q READY /tmp/run_driver.log`をポーリングするか、
++   READY出力を待ってから、上記の「Play開始」コードを実行する
++5. **進行を監視**: `$OUT/ros.log` を tail し、evaluatorが5秒おきに出す
++   `t=X.Xs  直近5秒: pos_err mean=...`行を追う。60秒経過すると
++   `判定: 定常誤差... / 最大位置誤差...` と `レポートを保存しました: /tmp/sim_eval_report.txt`
++   が出る
++6. **レポートが出たらPlayを停止**(上記の「Play停止」コード)。4秒ほど待ってから
++   状態確認コードで `isPlaying=False` を確認する
++7. `stage4_mcp_run.sh` 自体がレポートファイルの出現を検知して自動的にROSノードを
++   停止し、`sim_eval_report.txt` / `sim_eval_plot.png` / `diag_raw_errors.csv` 等を
++   `$OUT` (=`docs/stage4_runs/<run名>/`) へコピーする。プロセスが残っていないことを
++   念のため確認する
++
++## Unity生成データをROSだけで再生する
++
++Play停止時、Unityは送信前の`/imu/data`・`/scan`・`/ground_truth_pose`を実プロジェクト
++直下の`SensorRecordings/<run_id>/`へ保存する。これをMCAPへ変換すれば、TCPやUnity Editorの
++負荷を切り離してROS側だけを再試験できる。詳細は
++[`UNITY_SENSOR_CSV_ROSBAG_GUIDE.md`](UNITY_SENSOR_CSV_ROSBAG_GUIDE.md)を参照。
++
++## 入力センサ条件を変えたときの再録規則
++
++**LiDAR/IMUの生成モデルを変えた試験は、必ずUnityから新しく録画してから評価する。**
++たとえば距離ノイズ、IMU白色雑音・バイアス、欠測、時刻ずれ、取付け誤差、センサ更新率を
++変更した場合、旧bagへ後処理で加える実験は原因切り分け用の参考値に限る。性能要件のPASS/FAIL、
++採用判断、レポートの代表値には使わない。
++
++一方、ROS側の推定器実装・重み・スレッド構成だけを変える比較は、同じ入力bagを再生してよい。
++
++入力不整合が判明したrunは削除しない。runディレクトリとログを保全し、レポートに`無効（再録待ち）`
++と理由を明記する。次の有効runでは、更新済みUnityからCSVを完了状態で出力し、MCAPへ変換して、
++YAML・コミット・dirty diffとともに保存する。
++
++## なぜこの方法なのか
++
++- `EditorApplication.isPlaying`はUnity Editorの公開APIで、Playボタンを押すのと
++  完全に同じ効果を持つ。キーボードでボタンをクリックしたように見せかける必要は
++  そもそもない
++- MCP経由でPlayを開始すると、AI Assistantパッケージ自身のrelay再接続や
++  Asset Pipeline Refreshがちょうど同じタイミングで走り、`UnityRosSensorPublisher`の
++  ROS接続確立と競合する既知の問題があったが、これは`ConnectAfterRosConnectionStarts()`
++  側のリトライ実装(`HasConnectionThread`確認付き、最大10回)で解消済み
++  (`unity-ros-restart-sanity-check`スキル参照)。Play制御の方法自体を変える必要はない
+diff --git a/docs/setup/UNITY_SENSOR_CSV_ROSBAG_GUIDE.md b/docs/setup/UNITY_SENSOR_CSV_ROSBAG_GUIDE.md
+new file mode 100644
+index 0000000..ae5f5c8
+--- /dev/null
++++ b/docs/setup/UNITY_SENSOR_CSV_ROSBAG_GUIDE.md
+@@ -0,0 +1,71 @@
++# UnityセンサCSVからrosbag2(MCAP)を作る手順
++
++Unityで生成されたセンサ値を、ROS-TCP接続へ渡す**直前**にCSVへ記録し、そのCSVから
++rosbag2(MCAP)を作るための手順です。ROS側の受信遅延・TCPキューあふれ・コールバック
++遅延を含まないため、同じ物理走行をROSの条件だけ変えて再生する基準データになります。
++
++## 記録されるもの
++
++`UnityRosSensorPublisher`はPlay開始ごとに、実際に開いているUnityプロジェクト直下の
++`SensorRecordings/<UTC時刻>_<乱数>/`を作成します。
++
++- `imu.csv` — `/imu/data`、1 kHz
++- `scan.csv` — `/scan`、40 Hz
++- `ground_truth.csv` — `/ground_truth_pose`、100 Hz
++- `manifest.json` — Unity版、fixed timestep、件数、完了状態
++
++各行はUnityのセンサモデルが生成したメッセージそのものです。書き込みは専用スレッドで
++行うので、1 kHzの`FixedUpdate`でディスクI/Oをしません。`manifest.json`の
++`complete: true`は、Play停止時に全キューをCSVへフラッシュできた印です。`false`の
++記録は原則として変換しません。
++
++現行の実プロジェクトでは、Windows側の保存先は次です。
++
++```
++C:\Users\kouza\UnityProjects\Robocon2026Sim\SensorRecordings
++```
++
++WSLからは`/mnt/c/Users/kouza/UnityProjects/Robocon2026Sim/SensorRecordings`として読めます。
++
++`/clock`はCSVへ保存しません。再生時に`ros2 bag play --clock 250`がbagの時刻から新しく
++生成するため、実行時の250 Hz clock設定を再現できます。IMUサンプルのheader時刻は1 kHzの
++まま保持されます。
++
++## CSVをMCAPへ変換する
++
++一度ワークスペースをビルドし、生成された記録ディレクトリを指定します。
++
++```bash
++cd /home/yukichi6105/ros2_ws
++colcon build --packages-select lio_localization_sim
++source install/setup.bash
++
++ros2 run lio_localization_sim unity_csv_to_rosbag2 \
++  /mnt/c/Users/kouza/UnityProjects/Robocon2026Sim/SensorRecordings/<run_id> \
++  /tmp/robocon_<run_id>.mcap
++ros2 bag info /tmp/robocon_<run_id>.mcap
++```
++
++出力先は新しいディレクトリでなければなりません。変換器は各CSVの連番とトピック内時刻の
++単調性、CSV行数とmanifest件数を検証します。成功時はbag内に
++`unity_csv_conversion.json`も書き、入力manifestのSHA-256とトピック別件数を残します。
++
++同じbagを評価系へ流す例は次です。
++
++```bash
++ros2 bag play /tmp/robocon_<run_id>.mcap --clock 250
++```
++
++再生先の各ノードは`use_sim_time:=true`で起動します。bagにはUnityのROS送信後の挙動や
++`/odom_fast`を使う閉ループ制御は含まれません。したがってこれは**センサ入力に対する
++ROS側推定器の再現試験**であり、Unityまで含めた閉ループ走行の代替ではありません。
++
++## 運用上の注意
++
++- Playを強制終了せず、必ずStopして`complete: true`を確認する。
++- CSVの保存先はUnity実プロジェクトであり、リポジトリの
++  `unity/Robocon2026Sim`コピーではない。実験ごとにrunディレクトリを丸ごと保全する。
++- `manifest.json`が未完了でも救済変換が必要な場合だけ`--allow-incomplete`を使う。
++  そのbagは欠損の可能性があるため正式な比較データにしない。
++- Unity側のランダムシード、設定YAML、ソースコミットも既存の
++  `stage4_mcp_run.sh`スナップショットと同じ実験フォルダへ保存する。
+diff --git a/lio_localization_sim/unity_csv_to_rosbag2.py b/lio_localization_sim/unity_csv_to_rosbag2.py
+new file mode 100644
+index 0000000..c3dff65
+--- /dev/null
++++ b/lio_localization_sim/unity_csv_to_rosbag2.py
+@@ -0,0 +1,263 @@
++#!/usr/bin/env python3
++"""Convert Unity's transport-independent sensor CSV recording into a rosbag2 MCAP."""
++
++from __future__ import annotations
++
++import argparse
++import csv
++import hashlib
++import heapq
++import json
++import math
++from dataclasses import dataclass
++from pathlib import Path
++from typing import Any, Iterator
++
++import rosbag2_py
++from builtin_interfaces.msg import Time
++from nav_msgs.msg import Odometry
++from rclpy.serialization import serialize_message
++from sensor_msgs.msg import Imu, LaserScan
++
++
++NS_PER_SEC = 1_000_000_000
++TOPICS = {
++    "imu": ("/imu/data", "sensor_msgs/msg/Imu"),
++    "scan": ("/scan", "sensor_msgs/msg/LaserScan"),
++    "ground_truth": ("/ground_truth_pose", "nav_msgs/msg/Odometry"),
++}
++
++
++@dataclass
++class ConvertedRecord:
++    stamp_ns: int
++    priority: int
++    topic: str
++    message: Any
++
++
++def parse_scalar(value: str) -> float:
++    normalized = value.strip().lower()
++    if normalized == "inf":
++        return math.inf
++    if normalized == "-inf":
++        return -math.inf
++    if normalized == "nan":
++        return math.nan
++    return float(value)
++
++
++def parse_array(value: str, expected_length: int | None = None) -> list[float]:
++    values = [] if value == "" else [parse_scalar(item) for item in value.split(";")]
++    if expected_length is not None and len(values) != expected_length:
++        raise ValueError(f"expected {expected_length} values, got {len(values)}")
++    return values
++
++
++def stamp_from_ns(stamp_ns: int) -> Time:
++    if stamp_ns < 0:
++        raise ValueError(f"negative timestamp: {stamp_ns}")
++    stamp = Time()
++    stamp.sec = stamp_ns // NS_PER_SEC
++    stamp.nanosec = stamp_ns % NS_PER_SEC
++    return stamp
++
++
++def set_header(header: Any, row: dict[str, str], stamp_ns: int) -> None:
++    header.stamp = stamp_from_ns(stamp_ns)
++    header.frame_id = row["frame_id"]
++
++
++def imu_from_row(row: dict[str, str], stamp_ns: int) -> Imu:
++    message = Imu()
++    set_header(message.header, row, stamp_ns)
++    message.orientation.x = parse_scalar(row["orientation_x"])
++    message.orientation.y = parse_scalar(row["orientation_y"])
++    message.orientation.z = parse_scalar(row["orientation_z"])
++    message.orientation.w = parse_scalar(row["orientation_w"])
++    message.orientation_covariance = parse_array(row["orientation_covariance"], 9)
++    message.angular_velocity.x = parse_scalar(row["angular_velocity_x"])
++    message.angular_velocity.y = parse_scalar(row["angular_velocity_y"])
++    message.angular_velocity.z = parse_scalar(row["angular_velocity_z"])
++    message.angular_velocity_covariance = parse_array(row["angular_velocity_covariance"], 9)
++    message.linear_acceleration.x = parse_scalar(row["linear_acceleration_x"])
++    message.linear_acceleration.y = parse_scalar(row["linear_acceleration_y"])
++    message.linear_acceleration.z = parse_scalar(row["linear_acceleration_z"])
++    message.linear_acceleration_covariance = parse_array(row["linear_acceleration_covariance"], 9)
++    return message
++
++
++def scan_from_row(row: dict[str, str], stamp_ns: int) -> LaserScan:
++    message = LaserScan()
++    set_header(message.header, row, stamp_ns)
++    for name in (
++        "angle_min", "angle_max", "angle_increment", "time_increment", "scan_time",
++        "range_min", "range_max",
++    ):
++        setattr(message, name, parse_scalar(row[name]))
++    message.ranges = parse_array(row["ranges"])
++    message.intensities = parse_array(row["intensities"])
++    return message
++
++
++def odometry_from_row(row: dict[str, str], stamp_ns: int) -> Odometry:
++    message = Odometry()
++    set_header(message.header, row, stamp_ns)
++    message.child_frame_id = row["child_frame_id"]
++    pose = message.pose.pose
++    pose.position.x = parse_scalar(row["position_x"])
++    pose.position.y = parse_scalar(row["position_y"])
++    pose.position.z = parse_scalar(row["position_z"])
++    pose.orientation.x = parse_scalar(row["orientation_x"])
++    pose.orientation.y = parse_scalar(row["orientation_y"])
++    pose.orientation.z = parse_scalar(row["orientation_z"])
++    pose.orientation.w = parse_scalar(row["orientation_w"])
++    message.pose.covariance = parse_array(row["pose_covariance"], 36)
++    twist = message.twist.twist
++    twist.linear.x = parse_scalar(row["linear_x"])
++    twist.linear.y = parse_scalar(row["linear_y"])
++    twist.linear.z = parse_scalar(row["linear_z"])
++    twist.angular.x = parse_scalar(row["angular_x"])
++    twist.angular.y = parse_scalar(row["angular_y"])
++    twist.angular.z = parse_scalar(row["angular_z"])
++    message.twist.covariance = parse_array(row["twist_covariance"], 36)
++    return message
++
++
++ROW_CONVERTERS = {
++    "imu": imu_from_row,
++    "scan": scan_from_row,
++    "ground_truth": odometry_from_row,
++}
++
++
++def iter_records(recording_dir: Path, kind: str, priority: int) -> Iterator[ConvertedRecord]:
++    csv_path = recording_dir / {"imu": "imu.csv", "scan": "scan.csv", "ground_truth": "ground_truth.csv"}[kind]
++    expected_sequence = 0
++    previous_stamp = -1
++    converter = ROW_CONVERTERS[kind]
++    with csv_path.open("r", newline="", encoding="utf-8") as source:
++        for line_number, row in enumerate(csv.DictReader(source), start=2):
++            try:
++                sequence = int(row["seq"])
++                stamp_ns = int(row["stamp_ns"])
++                if sequence != expected_sequence:
++                    raise ValueError(f"sequence {sequence}, expected {expected_sequence}")
++                if stamp_ns < previous_stamp:
++                    raise ValueError(f"timestamp {stamp_ns} is before {previous_stamp}")
++                message = converter(row, stamp_ns)
++            except (KeyError, TypeError, ValueError) as error:
++                raise ValueError(f"{csv_path}:{line_number}: {error}") from error
++            expected_sequence += 1
++            previous_stamp = stamp_ns
++            yield ConvertedRecord(stamp_ns, priority, TOPICS[kind][0], message)
++
++
++def sha256(path: Path) -> str:
++    digest = hashlib.sha256()
++    with path.open("rb") as source:
++        for block in iter(lambda: source.read(1024 * 1024), b""):
++            digest.update(block)
++    return digest.hexdigest()
++
++
++def read_manifest(recording_dir: Path, allow_incomplete: bool) -> dict[str, Any]:
++    manifest_path = recording_dir / "manifest.json"
++    try:
++        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
++    except (OSError, json.JSONDecodeError) as error:
++        raise ValueError(f"cannot read {manifest_path}: {error}") from error
++    if manifest.get("schema_version") != 1:
++        raise ValueError(f"unsupported schema_version: {manifest.get('schema_version')}")
++    if not manifest.get("complete", False) and not allow_incomplete:
++        raise ValueError("recording manifest is incomplete; stop Unity cleanly or pass --allow-incomplete")
++    return manifest
++
++
++def convert(recording_dir: Path, output_bag: Path, allow_incomplete: bool) -> dict[str, Any]:
++    manifest = read_manifest(recording_dir, allow_incomplete)
++    if output_bag.exists():
++        raise ValueError(f"output path already exists: {output_bag}")
++    for name in ("imu.csv", "scan.csv", "ground_truth.csv"):
++        if not (recording_dir / name).is_file():
++            raise ValueError(f"missing recording file: {recording_dir / name}")
++
++    custom_data = {
++        "source": "unity_authoritative_sensor_csv",
++        "run_id": str(manifest.get("run_id", "")),
++        "manifest_sha256": sha256(recording_dir / "manifest.json"),
++    }
++    writer = rosbag2_py.SequentialWriter()
++    writer.open(
++        rosbag2_py.StorageOptions(uri=str(output_bag), storage_id="mcap", custom_data=custom_data),
++        rosbag2_py.ConverterOptions("cdr", "cdr"),
++    )
++    for topic_id, kind in enumerate(("imu", "scan", "ground_truth"), start=1):
++        topic_name, topic_type = TOPICS[kind]
++        writer.create_topic(rosbag2_py.TopicMetadata(topic_id, topic_name, topic_type, "cdr"))
++
++    heap: list[tuple[int, int, int, ConvertedRecord, Iterator[ConvertedRecord]]] = []
++    for priority, kind in enumerate(("imu", "ground_truth", "scan")):
++        iterator = iter_records(recording_dir, kind, priority)
++        try:
++            record = next(iterator)
++        except StopIteration:
++            continue
++        heapq.heappush(heap, (record.stamp_ns, record.priority, 0, record, iterator))
++
++    counts = {kind: 0 for kind in TOPICS}
++    previous_bag_stamp = -1
++    sequence_number = 0
++    while heap:
++        stamp_ns, _, _, record, iterator = heapq.heappop(heap)
++        if stamp_ns < previous_bag_stamp:
++            raise AssertionError("merged stream is not timestamp ordered")
++        writer.write(record.topic, serialize_message(record.message), stamp_ns)
++        counts[next(kind for kind, topic in TOPICS.items() if topic[0] == record.topic)] += 1
++        previous_bag_stamp = stamp_ns
++        try:
++            next_record = next(iterator)
++        except StopIteration:
++            continue
++        sequence_number += 1
++        heapq.heappush(heap, (next_record.stamp_ns, next_record.priority, sequence_number, next_record, iterator))
++    writer.close()
++
++    expected_counts = manifest.get("written_counts", {})
++    for kind, count in counts.items():
++        expected = expected_counts.get(kind)
++        if expected is not None and count != expected:
++            raise ValueError(f"{kind} row count {count} does not match manifest {expected}")
++
++    conversion_manifest = {
++        "schema_version": 1,
++        "source_recording": str(recording_dir.resolve()),
++        "source_manifest_sha256": custom_data["manifest_sha256"],
++        "bag_storage": "mcap",
++        "counts": counts,
++        "start_stamp_ns": None if previous_bag_stamp < 0 else min(
++            next(iter_records(recording_dir, kind, 0)).stamp_ns for kind in TOPICS if counts[kind]),
++        "end_stamp_ns": None if previous_bag_stamp < 0 else previous_bag_stamp,
++    }
++    (output_bag / "unity_csv_conversion.json").write_text(
++        json.dumps(conversion_manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
++    return conversion_manifest
++
++
++def main() -> None:
++    parser = argparse.ArgumentParser(
++        description="Convert Unity authoritative sensor CSV files to a rosbag2 MCAP directory.")
++    parser.add_argument("recording_dir", type=Path, help="Unity SensorRecordings/<run_id> directory")
++    parser.add_argument("output_bag", type=Path, help="new rosbag2 output directory")
++    parser.add_argument("--allow-incomplete", action="store_true",
++                        help="allow a recording whose Unity manifest was not finalized")
++    arguments = parser.parse_args()
++    try:
++        result = convert(arguments.recording_dir, arguments.output_bag, arguments.allow_incomplete)
++    except (OSError, ValueError, RuntimeError) as error:
++        parser.error(str(error))
++    print(json.dumps(result, indent=2, sort_keys=True))
++
++
++if __name__ == "__main__":
++    main()
+diff --git a/scripts/bag_component_isolation.sh b/scripts/bag_component_isolation.sh
+new file mode 100755
+index 0000000..a91edb4
+--- /dev/null
++++ b/scripts/bag_component_isolation.sh
+@@ -0,0 +1,214 @@
++#!/bin/bash
++# Replay the reproducible Unity bag with only selected non-core components.
++# Usage: bag_component_isolation.sh <tag> [--bag path] [--ball] [--endpoint]
++#        [--record-stages] [--play-rate N] [--post-play-wait N]
++#        [--scan-yaw-bias-rad N]
++#        [--laser-param name:=value] [--backend-param name:=value]
++set -euo pipefail
++
++TAG="${1:?usage: bag_component_isolation.sh <tag> [--ball] [--endpoint]}"
++shift
++WS=/home/yukichi6105/ros2_ws
++BAG=/tmp/robocon_unity_88s_20260729.mcap
++WITH_BALL=false
++WITH_ENDPOINT=false
++WITH_STAGE_RECORD=false
++PLAY_RATE=1.0
++POST_PLAY_WAIT=10
++SCAN_YAW_BIAS_RAD=0.0
++LASER_PARAMS=()
++BACKEND_PARAMS=()
++while [ "$#" -gt 0 ]; do
++  case "$1" in
++    --bag)
++      [ "$#" -ge 2 ] || { echo "--bag requires a rosbag2 path" >&2; exit 2; }
++      BAG="$2"
++      shift 2
++      ;;
++    --ball) WITH_BALL=true; shift ;;
++    --endpoint) WITH_ENDPOINT=true; shift ;;
++    --record-stages) WITH_STAGE_RECORD=true; shift ;;
++    --play-rate)
++      [ "$#" -ge 2 ] || { echo "--play-rate requires a numeric rate" >&2; exit 2; }
++      PLAY_RATE="$2"
++      shift 2
++      ;;
++    --post-play-wait)
++      [ "$#" -ge 2 ] || { echo "--post-play-wait requires seconds" >&2; exit 2; }
++      POST_PLAY_WAIT="$2"
++      shift 2
++      ;;
++    --scan-yaw-bias-rad)
++      [ "$#" -ge 2 ] || { echo "--scan-yaw-bias-rad requires radians" >&2; exit 2; }
++      SCAN_YAW_BIAS_RAD="$2"
++      shift 2
++      ;;
++    --laser-param)
++      [ "$#" -ge 2 ] || { echo "--laser-param requires name:=value" >&2; exit 2; }
++      # ros2 run requires -p before each independent name:=value override.
++      LASER_PARAMS+=("-p" "$2")
++      shift 2
++      ;;
++    --backend-param)
++      [ "$#" -ge 2 ] || { echo "--backend-param requires name:=value" >&2; exit 2; }
++      BACKEND_PARAMS+=("-p" "$2")
++      shift 2
++      ;;
++    *) echo "unknown option: $1" >&2; exit 2 ;;
++  esac
++done
++
++OUT="$WS/src/lio_localization_sim/docs/stage4_runs/$TAG"
++CFG="$WS/src/lio_localization_sim/config/robocon2026_unity.yaml"
++EVAL_OUT="$OUT/evaluator_output"
++
++test -d "$BAG" || { echo "bag not found: $BAG" >&2; exit 2; }
++mkdir -p "$OUT" "$EVAL_OUT"
++cp "$CFG" "$OUT/robocon2026_unity.yaml"
++
++snapshot_repo() {
++  local name="$1"
++  local repo="$2"
++  git -C "$repo" rev-parse HEAD > "$OUT/${name}_commit.txt"
++  git -C "$repo" status --short > "$OUT/${name}_status.txt"
++  git -C "$repo" diff --binary HEAD > "$OUT/${name}_working_tree.patch"
++  git -C "$repo" ls-files --others --exclude-standard > "$OUT/${name}_untracked_files_all.txt"
++  : > "$OUT/${name}_untracked.patch"
++  : > "$OUT/${name}_untracked_files.txt"
++  while IFS= read -r file; do
++    [ -n "$file" ] || continue
++    case "$file" in
++      docs/stage4_runs/*|.claude/*) continue ;;
++    esac
++    printf '%s\n' "$file" >> "$OUT/${name}_untracked_files.txt"
++    git -C "$repo" diff --binary --no-index /dev/null "$file" >> "$OUT/${name}_untracked.patch" 2>/dev/null || true
++  done < "$OUT/${name}_untracked_files_all.txt"
++}
++
++snapshot_repo lio_localization "$WS/src/lio_localization"
++snapshot_repo lio_localization_sim "$WS/src/lio_localization_sim"
++cat > "$OUT/run_manifest.txt" <<EOF
++run_tag=$TAG
++mode=bag_component_isolation
++with_ball=$WITH_BALL
++with_endpoint=$WITH_ENDPOINT
++with_stage_record=$WITH_STAGE_RECORD
++play_rate=$PLAY_RATE
++post_play_wait=$POST_PLAY_WAIT
++scan_yaw_bias_rad=$SCAN_YAW_BIAS_RAD
++laser_params=${LASER_PARAMS[*]}
++backend_params=${BACKEND_PARAMS[*]}
++bag=$BAG
++started_at=$(date --iso-8601=seconds)
++EOF
++
++set +u
++source /opt/ros/lyrical/setup.bash
++source "$WS/install/setup.bash"
++set -u
++export ROS_LOG_DIR="$OUT/ros2_logs"
++mkdir -p "$ROS_LOG_DIR"
++
++PIDS=()
++start_node() {
++  local log="$1"
++  shift
++  "$@" > "$OUT/$log" 2>&1 &
++  PIDS+=("$!")
++}
++cleanup() {
++  [ "${#PIDS[@]}" -gt 0 ] || return
++  kill -INT "${PIDS[@]}" 2>/dev/null || true
++  # ros2 bag record must receive SIGINT to write MCAP metadata, but a transport
++  # shutdown can occasionally leave it alive after all producers have stopped.
++  # Do not let that recorder stall a completed benchmark forever: give every
++  # process a bounded graceful period, then terminate only the remaining PIDs.
++  for _ in $(seq 1 20); do
++    local alive=false
++    for pid in "${PIDS[@]}"; do
++      kill -0 "$pid" 2>/dev/null && alive=true
++    done
++    "$alive" || break
++    sleep 0.25
++  done
++  for pid in "${PIDS[@]}"; do
++    kill -0 "$pid" 2>/dev/null && kill -TERM "$pid" 2>/dev/null || true
++  done
++  for _ in $(seq 1 8); do
++    local alive=false
++    for pid in "${PIDS[@]}"; do
++      kill -0 "$pid" 2>/dev/null && alive=true
++    done
++    "$alive" || break
++    sleep 0.25
++  done
++  for pid in "${PIDS[@]}"; do
++    kill -0 "$pid" 2>/dev/null && kill -KILL "$pid" 2>/dev/null || true
++  done
++  wait "${PIDS[@]}" 2>/dev/null || true
++}
++trap cleanup EXIT
++
++start_node backend.log ros2 run lio_localization backend_optimizer_node --ros-args \
++  --params-file "$OUT/robocon2026_unity.yaml" -p use_sim_time:=true \
++  -p initial_x:=-2.419 -p initial_y:=1.354 -p initial_theta:=0.0 \
++  -p initial_vx:=0.0 -p initial_vy:=0.0 "${BACKEND_PARAMS[@]}"
++start_node imu_preintegration.log ros2 run lio_localization imu_preintegration_node --ros-args \
++  --params-file "$OUT/robocon2026_unity.yaml" -p use_sim_time:=true
++start_node scan_matching.log ros2 run lio_localization laser_scan_matching_node --ros-args \
++  --params-file "$OUT/robocon2026_unity.yaml" -p use_sim_time:=true \
++  -p initial_x:=-2.419 -p initial_y:=1.354 -p initial_theta:=0.0 \
++  "${LASER_PARAMS[@]}"
++start_node evaluator.log nice -n 10 ros2 run lio_localization realtime_evaluator_node --ros-args \
++  --params-file "$OUT/robocon2026_unity.yaml" -p use_sim_time:=true \
++  -p duration_sec:=60.0 -p settle_sec:=3.0 -p sim_start_time_sec:=0.0 \
++  -p output_dir:="$EVAL_OUT"
++
++BAG_REMAP_ARGS=()
++if [ "$SCAN_YAW_BIAS_RAD" != "0.0" ]; then
++  # Keep the stored Unity bag immutable.  The relay applies exactly one declared
++  # perturbation and leaves IMU, ground truth and playback timing untouched.
++  start_node scan_noise_injector.log python3 "$WS/src/lio_localization_sim/tools/sensor_noise_injector.py" --ros-args \
++    -p use_sim_time:=true -p scan_yaw_bias_rad:="$SCAN_YAW_BIAS_RAD"
++  BAG_REMAP_ARGS=(--remap /scan:=/scan_raw)
++fi
++
++if "$WITH_STAGE_RECORD"; then
++  start_node stage_record.log ros2 bag record --storage mcap -o "$OUT/stage_derived" --topics \
++    /ground_truth_pose /scan_match_result /state_estimate /odom_fast
++fi
++
++if "$WITH_BALL"; then
++  start_node ball_tracking.log nice -n 10 ros2 run lio_localization ball_tracking_node --ros-args \
++    --params-file "$OUT/robocon2026_unity.yaml" -p use_sim_time:=true
++fi
++if "$WITH_ENDPOINT"; then
++  start_node endpoint.log ros2 run ros_tcp_endpoint default_server_endpoint --ros-args \
++    -p ROS_IP:=0.0.0.0 -p ROS_TCP_PORT:=10000
++fi
++
++# Give ROS 2 discovery a deterministic margin before the bag's first (non-latched)
++# scan.  A shorter, scheduler-dependent delay can leave the scan matcher with only
++# its initial scan while IMU and ground-truth already stream, which is not a valid
++# localization trial.
++sleep 6
++ros2 bag play "$BAG" --clock 250 --rate "$PLAY_RATE" --playback-duration 62 --disable-keyboard-controls \
++  "${BAG_REMAP_ARGS[@]}" \
++  --progress-bar-update-rate 0 > "$OUT/bag_play.log" 2>&1
++
++# Allow the C++ evaluator to flush its bounded CSV before signalling the
++# remaining nodes, whose orderly shutdown emits the backend diagnostics.
++for _ in $(seq 1 "$POST_PLAY_WAIT"); do
++  [ -f "$EVAL_OUT/sim_eval_report.txt" ] && break
++  sleep 1
++done
++cleanup
++trap - EXIT
++
++cp "$EVAL_OUT/sim_eval_report.txt" "$OUT/" 2>/dev/null || true
++cp "$EVAL_OUT/diag_raw_errors.csv" "$OUT/" 2>/dev/null || true
++if [ -f "$OUT/diag_raw_errors.csv" ]; then
++  python3 "$WS/src/lio_localization_sim/tools/render_eval_plot.py" \
++    "$OUT/diag_raw_errors.csv" "$OUT/sim_eval_plot.png"
++fi
++echo "DONE: $OUT"
+diff --git a/tools/planar_truth_seeded_acf.py b/tools/planar_truth_seeded_acf.py
+new file mode 100644
+index 0000000..0244615
+--- /dev/null
++++ b/tools/planar_truth_seeded_acf.py
+@@ -0,0 +1,284 @@
++#!/usr/bin/env python3
++"""Measure the Unity planar scan matcher without odometry/backend feedback.
++
++Every LaserScan is solved from interpolated ground truth.  This makes the signed
++registration-error autocorrelation a frontend-only diagnostic.  Use --start and
++--count to process bounded chunks, then --summarize to combine their CSV files.
++"""
++
++import argparse
++import bisect
++import csv
++import glob
++import math
++from pathlib import Path
++
++import numpy as np
++import rosbag2_py
++import yaml
++from rclpy.serialization import deserialize_message
++from rosidl_runtime_py.utilities import get_message
++
++
++def stamp_sec(stamp):
++    return stamp.sec + stamp.nanosec * 1e-9
++
++
++def yaw_from_quat(q):
++    return math.atan2(2.0 * (q.w * q.z + q.x * q.y),
++                      1.0 - 2.0 * (q.y * q.y + q.z * q.z))
++
++
++def wrap(a):
++    return math.atan2(math.sin(a), math.cos(a))
++
++
++def make_segments(params):
++    hw, hh = params["field_width"] / 2.0, params["field_height"] / 2.0
++    segments = [((hw, -hh), (hw, hh)), ((-hw, -hh), (-hw, hh)),
++                ((-hw, hh), (hw, hh)), ((-hw, -hh), (hw, -hh))]
++    half_thickness = params["wall_thickness"] * 0.5
++    for x1, y1, x2, y2 in zip(
++            params["wall_segment_x1"], params["wall_segment_y1"],
++            params["wall_segment_x2"], params["wall_segment_y2"]):
++        d = np.array([x2 - x1, y2 - y1], dtype=float)
++        n = np.array([-d[1], d[0]], dtype=float) / np.linalg.norm(d)
++        a, b = np.array([x1, y1]), np.array([x2, y2])
++        segments.extend(((a + n * half_thickness, b + n * half_thickness),
++                         (a - n * half_thickness, b - n * half_thickness)))
++    a = np.asarray([x[0] for x in segments], dtype=float)
++    b = np.asarray([x[1] for x in segments], dtype=float)
++    d = b - a
++    return a, d, np.sum(d * d, axis=1)
++
++
++def nearest(world, segment_a, segment_d, segment_l2):
++    rel = world[:, None, :] - segment_a[None, :, :]
++    u = np.clip(np.sum(rel * segment_d[None, :, :], axis=2) /
++                segment_l2[None, :], 0.0, 1.0)
++    projection = segment_a[None, :, :] + u[:, :, None] * segment_d[None, :, :]
++    delta = world[:, None, :] - projection
++    d2 = np.sum(delta * delta, axis=2)
++    idx = np.argmin(d2, axis=1)
++    rows = np.arange(world.shape[0])
++    tangent = segment_d[idx] / np.sqrt(segment_l2[idx])[:, None]
++    normal = np.column_stack((-tangent[:, 1], tangent[:, 0]))
++    return d2[rows, idx], projection[rows, idx], normal
++
++
++def solve_point_to_line(local, pose_start, params, segment_a, segment_d, segment_l2):
++    pose = pose_start.copy()
++    corr2 = params["planar_correspondence_distance"] ** 2
++    huber = params["planar_huber_delta"]
++    n_inliers = 0
++    mean_abs_residual = math.inf
++    for _ in range(int(params["planar_max_iterations"])):
++        c, s = math.cos(pose[2]), math.sin(pose[2])
++        world = np.column_stack((pose[0] + c * local[:, 0] - s * local[:, 1],
++                                 pose[1] + s * local[:, 0] + c * local[:, 1]))
++        d2, projection, normal = nearest(world, segment_a, segment_d, segment_l2)
++        mask = d2 <= corr2
++        world, projection, normal = world[mask], projection[mask], normal[mask]
++        active_local = local[mask]
++        n_inliers = len(world)
++        if n_inliers < int(params["planar_min_inliers"]):
++            break
++        residual = np.sum(normal * (world - projection), axis=1)
++        d_yaw = np.column_stack((-s * active_local[:, 0] - c * active_local[:, 1],
++                                 c * active_local[:, 0] - s * active_local[:, 1]))
++        jacobian = np.column_stack((normal, np.sum(normal * d_yaw, axis=1)))
++        weights = np.minimum(1.0, huber / np.maximum(np.abs(residual), 1e-15))
++        hessian = jacobian.T @ (weights[:, None] * jacobian)
++        gradient = jacobian.T @ (weights * residual)
++        hessian[np.diag_indices(3)] += 1e-6
++        delta = -np.linalg.solve(hessian, gradient)
++        pose[0] += np.clip(delta[0], -0.10, 0.10)
++        pose[1] += np.clip(delta[1], -0.10, 0.10)
++        pose[2] += np.clip(delta[2], -0.08, 0.08)
++        mean_abs_residual = float(np.mean(np.abs(residual)))
++        if np.linalg.norm(delta) < 1e-5:
++            break
++    return pose, n_inliers, mean_abs_residual
++
++
++def solve_ray_to_wall(ranges, angles, pose_start, params, segment_a, segment_d, segment_l2):
++    """Maximum-likelihood pose for range-Gaussian beams against finite map segments."""
++    pose = pose_start.copy()
++    normals = np.column_stack((-segment_d[:, 1], segment_d[:, 0])) / \
++        np.sqrt(segment_l2)[:, None]
++    a = segment_a
++    huber = params["planar_huber_delta"]
++    gate = 0.120  # Four sigma under the stress bag's 30 mm range-noise model.
++    n_inliers = 0
++    mean_abs_residual = math.inf
++    unit_local = np.column_stack((np.cos(angles), np.sin(angles)))
++    for _ in range(int(params["planar_max_iterations"])):
++        c, s = math.cos(pose[2]), math.sin(pose[2])
++        direction = np.column_stack((c * unit_local[:, 0] - s * unit_local[:, 1],
++                                     s * unit_local[:, 0] + c * unit_local[:, 1]))
++        d_yaw = np.column_stack((-direction[:, 1], direction[:, 0]))
++        denom = direction @ normals.T
++        numer = np.sum((a - pose[:2]) * normals, axis=1)[None, :]
++        predicted_all = numer / np.where(np.abs(denom) > 1e-9, denom, np.nan)
++        # Intersection must lie on the finite segment, not merely on its supporting line.
++        hit = pose[:2] + predicted_all[:, :, None] * direction[:, None, :]
++        rel = hit - a[None, :, :]
++        segment_u = np.sum(rel * segment_d[None, :, :], axis=2) / segment_l2[None, :]
++        valid = ((predicted_all > 0.0) & (segment_u >= -1e-9) &
++                 (segment_u <= 1.0 + 1e-9) & np.isfinite(predicted_all))
++        predicted_all[~valid] = np.inf
++        segment_index = np.argmin(predicted_all, axis=1)
++        predicted = predicted_all[np.arange(len(ranges)), segment_index]
++        residual = ranges - predicted
++        mask = np.isfinite(predicted) & (np.abs(residual) <= gate)
++        n_inliers = int(np.count_nonzero(mask))
++        if n_inliers < int(params["planar_min_inliers"]):
++            break
++        active = segment_index[mask]
++        n = normals[active]
++        d = direction[mask]
++        dd = d_yaw[mask]
++        den = np.sum(n * d, axis=1)
++        num = np.sum(n * (a[active] - pose[:2]), axis=1)
++        # residual = measured range - predicted range
++        jacobian = np.column_stack((n[:, 0] / den, n[:, 1] / den,
++                                   num * np.sum(n * dd, axis=1) / (den * den)))
++        active_residual = residual[mask]
++        weights = np.minimum(1.0, huber / np.maximum(np.abs(active_residual), 1e-15))
++        hessian = jacobian.T @ (weights[:, None] * jacobian)
++        gradient = jacobian.T @ (weights * active_residual)
++        hessian[np.diag_indices(3)] += 1e-6
++        delta = -np.linalg.solve(hessian, gradient)
++        pose[0] += np.clip(delta[0], -0.10, 0.10)
++        pose[1] += np.clip(delta[1], -0.10, 0.10)
++        pose[2] += np.clip(delta[2], -0.08, 0.08)
++        mean_abs_residual = float(np.mean(np.abs(active_residual)))
++        if np.linalg.norm(delta) < 1e-5:
++            break
++    return pose, n_inliers, mean_abs_residual
++
++
++def load_bag(bag_uri):
++    reader = rosbag2_py.SequentialReader()
++    reader.open(rosbag2_py.StorageOptions(uri=bag_uri, storage_id="mcap"),
++                rosbag2_py.ConverterOptions("", ""))
++    msg_types = {x.name: get_message(x.type) for x in reader.get_all_topics_and_types()}
++    gt, scans = [], []
++    while reader.has_next():
++        topic, data, _ = reader.read_next()
++        if topic == "/ground_truth_pose":
++            msg = deserialize_message(data, msg_types[topic])
++            gt.append((stamp_sec(msg.header.stamp), msg.pose.pose.position.x,
++                       msg.pose.pose.position.y, yaw_from_quat(msg.pose.pose.orientation)))
++        elif topic == "/scan":
++            msg = deserialize_message(data, msg_types[topic])
++            timestamp = stamp_sec(msg.header.stamp)
++            if 3.0 <= timestamp <= 62.0:
++                scans.append((timestamp, msg))
++    return gt, scans
++
++
++def interpolate_gt(gt, t):
++    times = [x[0] for x in gt]
++    i = bisect.bisect_left(times, t)
++    if i <= 0:
++        return np.asarray(gt[0][1:], dtype=float)
++    if i >= len(gt):
++        return np.asarray(gt[-1][1:], dtype=float)
++    a, b = gt[i - 1], gt[i]
++    ratio = (t - a[0]) / (b[0] - a[0])
++    return np.asarray((a[1] + ratio * (b[1] - a[1]),
++                       a[2] + ratio * (b[2] - a[2]),
++                       a[3] + ratio * wrap(b[3] - a[3])), dtype=float)
++
++
++def scan_to_local(msg, decimation):
++    ranges = np.asarray(msg.ranges)[::decimation]
++    indices = np.arange(len(msg.ranges))[::decimation]
++    valid = np.isfinite(ranges) & (ranges >= msg.range_min) & (ranges <= msg.range_max)
++    ranges, indices = ranges[valid], indices[valid]
++    angle = msg.angle_min + indices * msg.angle_increment
++    return ranges, angle, np.column_stack((ranges * np.cos(angle), ranges * np.sin(angle)))
++
++
++def run_chunk(args):
++    with open(args.yaml) as f:
++        params = yaml.safe_load(f)["/**"]["ros__parameters"]
++    gt, scans = load_bag(args.bag)
++    start = args.start
++    end = min(start + args.count, len(scans))
++    segment_a, segment_d, segment_l2 = make_segments(params)
++    out = Path(args.output)
++    out.parent.mkdir(parents=True, exist_ok=True)
++    with out.open("w", newline="") as f:
++        writer = csv.writer(f)
++        writer.writerow(("scan_index", "time_sec", "dx_mm", "dy_mm", "dyaw_deg",
++                         "position_error_mm", "inliers", "mean_abs_residual_mm"))
++        for index in range(start, end):
++            timestamp, msg = scans[index]
++            truth = interpolate_gt(gt, timestamp)
++            ranges, angles, local = scan_to_local(msg, max(int(params["scan_decimation"]), 1))
++            if args.solver == "point_to_line":
++                estimate, inliers, residual = solve_point_to_line(
++                    local, truth, params, segment_a, segment_d, segment_l2)
++            else:
++                estimate, inliers, residual = solve_ray_to_wall(
++                    ranges, angles, truth, params, segment_a, segment_d, segment_l2)
++            dx, dy = (estimate[:2] - truth[:2]) * 1000.0
++            dyaw = math.degrees(wrap(estimate[2] - truth[2]))
++            writer.writerow((index, f"{timestamp:.9f}", f"{dx:.9f}", f"{dy:.9f}",
++                             f"{dyaw:.9f}", f"{math.hypot(dx, dy):.9f}", inliers,
++                             f"{residual * 1000.0:.9f}"))
++    print(f"wrote {end - start} {args.solver} scans ({start}..{end - 1}) to {out}")
++
++
++def acf(values, lag):
++    if len(values) <= lag:
++        return math.nan
++    a, b = values[:-lag], values[lag:]
++    a, b = a - np.mean(a), b - np.mean(b)
++    denom = math.sqrt(float(np.dot(a, a) * np.dot(b, b)))
++    return float(np.dot(a, b) / denom) if denom else math.nan
++
++
++def summarize(pattern):
++    rows = []
++    for filename in glob.glob(pattern):
++        with open(filename, newline="") as f:
++            rows.extend(csv.DictReader(f))
++    rows.sort(key=lambda x: int(x["scan_index"]))
++    indexes = np.asarray([int(x["scan_index"]) for x in rows])
++    if len(indexes) == 0 or not np.array_equal(indexes, np.arange(len(indexes))):
++        raise RuntimeError("CSV chunks must cover every scan exactly once from index 0")
++    print(f"truth-seeded planar registration: {len(rows)} scans")
++    for field in ("dx_mm", "dy_mm", "dyaw_deg"):
++        values = np.asarray([float(x[field]) for x in rows])
++        print(f"  {field}: mean={np.mean(values):+.3f}, std={np.std(values):.3f}, "
++              f"ACF " + ", ".join(f"{lag}:{acf(values, lag):+.3f}"
++                                    for lag in (1, 2, 4, 8, 20, 40)))
++    error = np.asarray([float(x["position_error_mm"]) for x in rows])
++    print(f"  position: mean={np.mean(error):.3f}mm rmse={math.sqrt(np.mean(error**2)):.3f}mm "
++          f"p99={np.percentile(error, 99):.3f}mm max={np.max(error):.3f}mm")
++
++
++def main():
++    parser = argparse.ArgumentParser()
++    parser.add_argument("--bag")
++    parser.add_argument("--yaml")
++    parser.add_argument("--start", type=int, default=0)
++    parser.add_argument("--count", type=int, default=320)
++    parser.add_argument("--output")
++    parser.add_argument("--solver", choices=("point_to_line", "ray_to_wall"),
++                        default="point_to_line")
++    parser.add_argument("--summarize")
++    args = parser.parse_args()
++    if args.summarize:
++        summarize(args.summarize)
++    elif args.bag and args.yaml and args.output:
++        run_chunk(args)
++    else:
++        parser.error("provide --summarize PATTERN or --bag, --yaml, and --output")
++
++
++if __name__ == "__main__":
++    main()
+diff --git a/tools/render_eval_plot.py b/tools/render_eval_plot.py
+new file mode 100644
+index 0000000..f13bbd4
+--- /dev/null
++++ b/tools/render_eval_plot.py
+@@ -0,0 +1,55 @@
++#!/usr/bin/env python3
++"""Render an evaluator PNG after a ROS run has completed.
++
++The real-time evaluator deliberately writes only a compact report and CSV from
++C++.  Matplotlib stays out of the 1 kHz ROS callback path; this tool consumes
++that finished CSV afterwards.
++"""
++
++import argparse
++import csv
++import os
++from pathlib import Path
++
++
++def main() -> int:
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument('errors_csv', type=Path)
++    parser.add_argument('output_png', type=Path)
++    args = parser.parse_args()
++
++    times: list[float] = []
++    position_errors: list[float] = []
++    yaw_errors: list[float] = []
++    with args.errors_csv.open(encoding='utf-8', newline='') as file:
++        for row in csv.DictReader(file):
++            times.append(float(row['t']))
++            position_errors.append(float(row['pos_err_mm']))
++            yaw_errors.append(float(row['yaw_err_deg']))
++    if not times:
++        raise ValueError(f'No error samples in {args.errors_csv}')
++
++    args.output_png.parent.mkdir(parents=True, exist_ok=True)
++    # Do not create a user-home cache while the experiment artifacts are being
++    # produced in a sandboxed/CI environment.
++    os.environ.setdefault('MPLCONFIGDIR', str(args.output_png.parent / '.matplotlib'))
++    import matplotlib
++    matplotlib.use('Agg')
++    import matplotlib.pyplot as plt
++
++    fig, axes = plt.subplots(2, 1, figsize=(10, 7), sharex=True)
++    axes[0].plot(times, position_errors, linewidth=0.7, color='tab:red')
++    axes[0].axhline(10.0, color='green', linestyle='--', label='10 mm requirement')
++    axes[0].set_ylabel('position error [mm]')
++    axes[0].legend()
++    axes[0].grid(True)
++    axes[1].plot(times, yaw_errors, linewidth=0.7, color='tab:blue')
++    axes[1].set_xlabel('simulation time [s]')
++    axes[1].set_ylabel('yaw error [deg]')
++    axes[1].grid(True)
++    fig.tight_layout()
++    fig.savefig(args.output_png, dpi=120)
++
++
++if __name__ == '__main__':
++    main()
+diff --git a/tools/rewrite_bag_with_imu_noise.py b/tools/rewrite_bag_with_imu_noise.py
+new file mode 100644
+index 0000000..abeaa93
+--- /dev/null
++++ b/tools/rewrite_bag_with_imu_noise.py
+@@ -0,0 +1,91 @@
++#!/usr/bin/env python3
++"""Write an MCAP copy with reproducible ICM-42688-P white IMU noise added.
++
++The transformation happens before playback, so a Python callback cannot create
++timing pressure in the 1 kHz ROS localization path being measured.
++"""
++
++import argparse
++import math
++from pathlib import Path
++import random
++
++import rosbag2_py
++from rclpy.serialization import deserialize_message, serialize_message
++from rosidl_runtime_py.utilities import get_message
++
++
++def parse_args() -> argparse.Namespace:
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument("source", type=Path)
++    parser.add_argument("output", type=Path)
++    parser.add_argument("--sample-rate-hz", type=float, default=1000.0)
++    parser.add_argument("--accel-density", type=float, default=0.000686466,
++                        help="m/s^2/sqrt(Hz), ICM-42688-P conservative 70 ug/sqrt(Hz)")
++    parser.add_argument("--gyro-density", type=float, default=0.0000488692,
++                        help="rad/s/sqrt(Hz), ICM-42688-P 2.8 mdps/sqrt(Hz)")
++    parser.add_argument("--seed", type=int, default=42688)
++    return parser.parse_args()
++
++
++def main() -> None:
++    args = parse_args()
++    if args.output.exists():
++        raise ValueError(f"refusing to overwrite existing output: {args.output}")
++    if args.sample_rate_hz <= 0.0:
++        raise ValueError("sample rate must be positive")
++    accel_sigma = args.accel_density * math.sqrt(args.sample_rate_hz)
++    gyro_sigma = args.gyro_density * math.sqrt(args.sample_rate_hz)
++
++    reader = rosbag2_py.SequentialReader()
++    reader.open(rosbag2_py.StorageOptions(uri=str(args.source), storage_id="mcap"),
++                rosbag2_py.ConverterOptions("cdr", "cdr"))
++    metadata = reader.get_all_topics_and_types()
++    message_types = {item.name: get_message(item.type) for item in metadata}
++    writer = rosbag2_py.SequentialWriter()
++    writer.open(
++        rosbag2_py.StorageOptions(
++            uri=str(args.output), storage_id="mcap",
++            custom_data={
++                "source": str(args.source),
++                "injection": "ICM-42688-P white IMU noise",
++                "accel_density_mps2_per_sqrt_hz": str(args.accel_density),
++                "gyro_density_radps_per_sqrt_hz": str(args.gyro_density),
++                "sample_rate_hz": str(args.sample_rate_hz),
++                "seed": str(args.seed),
++            }),
++        rosbag2_py.ConverterOptions("cdr", "cdr"))
++    for topic_id, item in enumerate(metadata, start=1):
++        writer.create_topic(rosbag2_py.TopicMetadata(topic_id, item.name, item.type, "cdr"))
++
++    rng = random.Random(args.seed)
++    imu_count = 0
++    while reader.has_next():
++        topic, data, timestamp_ns = reader.read_next()
++        if topic == "/imu/data":
++            message = deserialize_message(data, message_types[topic])
++            for axis in ("x", "y", "z"):
++                setattr(message.linear_acceleration, axis,
++                        getattr(message.linear_acceleration, axis) + rng.gauss(0.0, accel_sigma))
++                setattr(message.angular_velocity, axis,
++                        getattr(message.angular_velocity, axis) + rng.gauss(0.0, gyro_sigma))
++            message.linear_acceleration_covariance = [
++                accel_sigma * accel_sigma, 0.0, 0.0,
++                0.0, accel_sigma * accel_sigma, 0.0,
++                0.0, 0.0, accel_sigma * accel_sigma,
++            ]
++            message.angular_velocity_covariance = [
++                gyro_sigma * gyro_sigma, 0.0, 0.0,
++                0.0, gyro_sigma * gyro_sigma, 0.0,
++                0.0, 0.0, gyro_sigma * gyro_sigma,
++            ]
++            data = serialize_message(message)
++            imu_count += 1
++        writer.write(topic, data, timestamp_ns)
++    writer.close()
++    print(f"wrote {args.output}: IMU samples={imu_count}, "
++          f"accel_sigma={accel_sigma:.9f}m/s^2, gyro_sigma={gyro_sigma:.9f}rad/s")
++
++
++if __name__ == "__main__":
++    main()
+diff --git a/tools/sensor_noise_injector.py b/tools/sensor_noise_injector.py
+new file mode 100644
+index 0000000..6b51d5f
+--- /dev/null
++++ b/tools/sensor_noise_injector.py
+@@ -0,0 +1,80 @@
++#!/usr/bin/env python3
++"""Inject one reproducible LiDAR measurement perturbation into a replay stream.
++
++This is intentionally a ROS-side replay tool: it lets a single sensor-error
++factor be tested against a fixed Unity recording without changing the motion,
++ground truth, or any other already-recorded sensor stream.
++"""
++
++import copy
++import math
++import random
++
++import rclpy
++from rclpy.executors import ExternalShutdownException
++from rclpy.node import Node
++from rclpy.qos import qos_profile_sensor_data
++from sensor_msgs.msg import LaserScan
++
++
++class ScanNoiseInjector(Node):
++    def __init__(self) -> None:
++        super().__init__("scan_noise_injector")
++        self.yaw_bias_rad = float(self.declare_parameter("scan_yaw_bias_rad", 0.0).value)
++        self.range_bias_m = float(self.declare_parameter("scan_range_bias_m", 0.0).value)
++        self.range_scale = float(self.declare_parameter("scan_range_scale", 1.0).value)
++        self.range_noise_sigma_m = float(
++            self.declare_parameter("scan_range_noise_sigma_m", 0.0).value)
++        self.dropout_probability = float(
++            self.declare_parameter("scan_dropout_probability", 0.0).value)
++        seed = int(self.declare_parameter("random_seed", 20260729).value)
++        if self.range_scale <= 0.0:
++            raise ValueError("scan_range_scale must be positive")
++        if not 0.0 <= self.dropout_probability <= 1.0:
++            raise ValueError("scan_dropout_probability must be in [0, 1]")
++        self.rng = random.Random(seed)
++        self.scan_count = 0
++        self.publisher = self.create_publisher(LaserScan, "/scan", qos_profile_sensor_data)
++        self.subscription = self.create_subscription(
++            LaserScan, "/scan_raw", self.callback, qos_profile_sensor_data)
++        self.get_logger().info(
++            "scan noise injector: yaw_bias=%.6frad range_bias=%.4fm scale=%.6f "
++            "range_sigma=%.4fm dropout=%.4f seed=%d"
++            % (self.yaw_bias_rad, self.range_bias_m, self.range_scale,
++               self.range_noise_sigma_m, self.dropout_probability, seed))
++
++    def callback(self, message: LaserScan) -> None:
++        output = copy.deepcopy(message)
++        output.angle_min += self.yaw_bias_rad
++        output.angle_max += self.yaw_bias_rad
++        adjusted = []
++        for measured_range in message.ranges:
++            if not math.isfinite(measured_range):
++                adjusted.append(measured_range)
++                continue
++            if self.rng.random() < self.dropout_probability:
++                adjusted.append(float("inf"))
++                continue
++            value = self.range_scale * measured_range + self.range_bias_m
++            value += self.rng.gauss(0.0, self.range_noise_sigma_m)
++            adjusted.append(min(max(value, message.range_min), message.range_max))
++        output.ranges = adjusted
++        self.publisher.publish(output)
++        self.scan_count += 1
++
++
++def main() -> None:
++    rclpy.init()
++    node = ScanNoiseInjector()
++    try:
++        rclpy.spin(node)
++    except (KeyboardInterrupt, ExternalShutdownException):
++        pass
++    finally:
++        node.get_logger().info(f"forwarded {node.scan_count} scans")
++        node.destroy_node()
++        rclpy.shutdown()
++
++
++if __name__ == "__main__":
++    main()
+diff --git a/unity/Robocon2026Sim/Assets/Robocon2026/Editor/HeadlessSensorRecordRunner.cs b/unity/Robocon2026Sim/Assets/Robocon2026/Editor/HeadlessSensorRecordRunner.cs
+new file mode 100644
+index 0000000..9620256
+--- /dev/null
++++ b/unity/Robocon2026Sim/Assets/Robocon2026/Editor/HeadlessSensorRecordRunner.cs
+@@ -0,0 +1,63 @@
++using System;
++using System.Globalization;
++using UnityEditor;
++using UnityEngine;
++
++namespace Robocon2026.Simulation.Editor
++{
++    /// <summary>
++    /// Batch-mode entry point that runs the simulation long enough to create an
++    /// authoritative Unity sensor CSV recording.  This deliberately does not use
++    /// the Unity Test Framework: on Unity 6000.5 its -runTests CLI option can exit
++    /// after import without dispatching PlayMode tests.
++    /// </summary>
++    public static class HeadlessSensorRecordRunner
++    {
++        private const string SecondsArgument = "-roboconSeconds";
++        private const float DefaultSeconds = 60f;
++        private static float durationSeconds;
++        private static bool started;
++
++        public static void Start()
++        {
++            durationSeconds = ParseSeconds();
++            Debug.Log($"[HeadlessRecord] starting {durationSeconds:F1}s PlayMode sensor recording.");
++            EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
++            EditorApplication.update += Poll;
++            EditorApplication.isPlaying = true;
++        }
++
++        private static void OnPlayModeStateChanged(PlayModeStateChange state)
++        {
++            if (state != PlayModeStateChange.EnteredPlayMode) return;
++            started = true;
++            Debug.Log($"[HeadlessRecord] PlayMode entered at Time.time={Time.time:F3}.");
++        }
++
++        private static void Poll()
++        {
++            if (!started || !EditorApplication.isPlaying || Time.time < durationSeconds) return;
++            Debug.Log($"[HeadlessRecord] duration reached at Time.time={Time.time:F3}; stopping PlayMode.");
++            EditorApplication.isPlaying = false;
++            EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
++            EditorApplication.update -= Poll;
++            EditorApplication.delayCall += () => EditorApplication.Exit(0);
++        }
++
++        private static float ParseSeconds()
++        {
++            var args = Environment.GetCommandLineArgs();
++            for (var i = 0; i < args.Length - 1; ++i)
++            {
++                if (!string.Equals(args[i], SecondsArgument, StringComparison.Ordinal)) continue;
++                if (float.TryParse(args[i + 1], NumberStyles.Float, CultureInfo.InvariantCulture,
++                        out var parsed) && parsed > 0f)
++                {
++                    return parsed;
++                }
++                break;
++            }
++            return DefaultSeconds;
++        }
++    }
++}
+diff --git a/unity/Robocon2026Sim/Assets/Robocon2026/Scripts/UnitySensorCsvRecorder.cs b/unity/Robocon2026Sim/Assets/Robocon2026/Scripts/UnitySensorCsvRecorder.cs
+new file mode 100644
+index 0000000..2606a2f
+--- /dev/null
++++ b/unity/Robocon2026Sim/Assets/Robocon2026/Scripts/UnitySensorCsvRecorder.cs
+@@ -0,0 +1,303 @@
++using System;
++using System.Collections.Concurrent;
++using System.Globalization;
++using System.IO;
++using System.Text;
++using System.Threading;
++using RosMessageTypes.BuiltinInterfaces;
++using RosMessageTypes.Nav;
++using RosMessageTypes.Sensor;
++using UnityEngine;
++
++namespace Robocon2026.Simulation
++{
++    /// <summary>
++    /// Records the messages generated by Unity before they enter ROS-TCP-Connector.
++    /// The writer is deliberately independent from ROS transport: a CSV row means that the
++    /// Unity sensor model produced that sample, not that a subscriber happened to receive it.
++    /// </summary>
++    internal sealed class UnitySensorCsvRecorder : IDisposable
++    {
++        private enum RecordKind { Imu, Scan, GroundTruth }
++
++        private struct PendingRecord
++        {
++            public RecordKind Kind;
++            public long Sequence;
++            public object Message;
++        }
++
++        private readonly BlockingCollection<PendingRecord> queue = new();
++        private readonly Thread writerThread;
++        private readonly string outputDirectory;
++        private readonly string manifestPath;
++        private readonly string runId;
++        private readonly double fixedDeltaTime;
++        private readonly string unityVersion;
++        private readonly StreamWriter imuWriter;
++        private readonly StreamWriter scanWriter;
++        private readonly StreamWriter groundTruthWriter;
++        private Exception writerFailure;
++        private int disposed;
++        private long imuWritten;
++        private long scanWritten;
++        private long groundTruthWritten;
++        private long queued;
++        private long maximumQueued;
++
++        public string OutputDirectory => outputDirectory;
++
++        public UnitySensorCsvRecorder(double fixedDeltaTime)
++        {
++            this.fixedDeltaTime = fixedDeltaTime;
++            unityVersion = Application.unityVersion;
++            runId = DateTime.UtcNow.ToString("yyyyMMdd_HHmmss_fff", CultureInfo.InvariantCulture)
++                + "_" + Guid.NewGuid().ToString("N").Substring(0, 8);
++            outputDirectory = Path.Combine(Application.dataPath, "..", "SensorRecordings", runId);
++            Directory.CreateDirectory(outputDirectory);
++            manifestPath = Path.Combine(outputDirectory, "manifest.json");
++
++            imuWriter = CreateWriter("imu.csv");
++            scanWriter = CreateWriter("scan.csv");
++            groundTruthWriter = CreateWriter("ground_truth.csv");
++            imuWriter.WriteLine("seq,stamp_ns,frame_id,orientation_x,orientation_y,orientation_z,orientation_w,orientation_covariance,angular_velocity_x,angular_velocity_y,angular_velocity_z,angular_velocity_covariance,linear_acceleration_x,linear_acceleration_y,linear_acceleration_z,linear_acceleration_covariance");
++            scanWriter.WriteLine("seq,stamp_ns,frame_id,angle_min,angle_max,angle_increment,time_increment,scan_time,range_min,range_max,ranges,intensities");
++            groundTruthWriter.WriteLine("seq,stamp_ns,frame_id,child_frame_id,position_x,position_y,position_z,orientation_x,orientation_y,orientation_z,orientation_w,pose_covariance,linear_x,linear_y,linear_z,angular_x,angular_y,angular_z,twist_covariance");
++            WriteManifest(false);
++
++            writerThread = new Thread(WriterLoop)
++            {
++                IsBackground = true,
++                Name = "UnitySensorCsvRecorder"
++            };
++            writerThread.Start();
++        }
++
++        public void RecordImu(ImuMsg message, long sequence) =>
++            Enqueue(RecordKind.Imu, sequence, message);
++
++        public void RecordScan(LaserScanMsg message, long sequence) =>
++            Enqueue(RecordKind.Scan, sequence, message);
++
++        public void RecordGroundTruth(OdometryMsg message, long sequence) =>
++            Enqueue(RecordKind.GroundTruth, sequence, message);
++
++        private StreamWriter CreateWriter(string name) => new(
++            new FileStream(Path.Combine(outputDirectory, name), FileMode.CreateNew, FileAccess.Write,
++                FileShare.Read, 1024 * 1024, FileOptions.SequentialScan),
++            new UTF8Encoding(false), 1024 * 1024);
++
++        private void Enqueue(RecordKind kind, long sequence, object message)
++        {
++            if (Volatile.Read(ref disposed) != 0)
++                throw new ObjectDisposedException(nameof(UnitySensorCsvRecorder));
++            if (writerFailure != null)
++                throw new InvalidOperationException("Sensor CSV writer failed.", writerFailure);
++
++            var pending = new PendingRecord { Kind = kind, Sequence = sequence, Message = message };
++            var current = Interlocked.Increment(ref queued);
++            try
++            {
++                queue.Add(pending);
++                while (current > Volatile.Read(ref maximumQueued))
++                {
++                    var observed = Volatile.Read(ref maximumQueued);
++                    if (observed >= current || Interlocked.CompareExchange(ref maximumQueued, current, observed) == observed)
++                        break;
++                }
++            }
++            catch
++            {
++                Interlocked.Decrement(ref queued);
++                throw;
++            }
++        }
++
++        private void WriterLoop()
++        {
++            try
++            {
++                foreach (var pending in queue.GetConsumingEnumerable())
++                {
++                    switch (pending.Kind)
++                    {
++                        case RecordKind.Imu:
++                            WriteImu((ImuMsg)pending.Message, pending.Sequence);
++                            imuWritten++;
++                            break;
++                        case RecordKind.Scan:
++                            WriteScan((LaserScanMsg)pending.Message, pending.Sequence);
++                            scanWritten++;
++                            break;
++                        case RecordKind.GroundTruth:
++                            WriteGroundTruth((OdometryMsg)pending.Message, pending.Sequence);
++                            groundTruthWritten++;
++                            break;
++                    }
++                    Interlocked.Decrement(ref queued);
++                }
++                imuWriter.Flush();
++                scanWriter.Flush();
++                groundTruthWriter.Flush();
++            }
++            catch (Exception exception)
++            {
++                writerFailure = exception;
++            }
++        }
++
++        private void WriteImu(ImuMsg message, long sequence)
++        {
++            var writer = imuWriter;
++            WritePrefix(writer, sequence, message.header.stamp, message.header.frame_id);
++            WriteNumber(writer, message.orientation.x); writer.Write(',');
++            WriteNumber(writer, message.orientation.y); writer.Write(',');
++            WriteNumber(writer, message.orientation.z); writer.Write(',');
++            WriteNumber(writer, message.orientation.w); writer.Write(',');
++            WriteArray(writer, message.orientation_covariance); writer.Write(',');
++            WriteNumber(writer, message.angular_velocity.x); writer.Write(',');
++            WriteNumber(writer, message.angular_velocity.y); writer.Write(',');
++            WriteNumber(writer, message.angular_velocity.z); writer.Write(',');
++            WriteArray(writer, message.angular_velocity_covariance); writer.Write(',');
++            WriteNumber(writer, message.linear_acceleration.x); writer.Write(',');
++            WriteNumber(writer, message.linear_acceleration.y); writer.Write(',');
++            WriteNumber(writer, message.linear_acceleration.z); writer.Write(',');
++            WriteArray(writer, message.linear_acceleration_covariance);
++            writer.WriteLine();
++        }
++
++        private void WriteScan(LaserScanMsg message, long sequence)
++        {
++            var writer = scanWriter;
++            WritePrefix(writer, sequence, message.header.stamp, message.header.frame_id);
++            WriteNumber(writer, message.angle_min); writer.Write(',');
++            WriteNumber(writer, message.angle_max); writer.Write(',');
++            WriteNumber(writer, message.angle_increment); writer.Write(',');
++            WriteNumber(writer, message.time_increment); writer.Write(',');
++            WriteNumber(writer, message.scan_time); writer.Write(',');
++            WriteNumber(writer, message.range_min); writer.Write(',');
++            WriteNumber(writer, message.range_max); writer.Write(',');
++            WriteArray(writer, message.ranges); writer.Write(',');
++            WriteArray(writer, message.intensities);
++            writer.WriteLine();
++        }
++
++        private void WriteGroundTruth(OdometryMsg message, long sequence)
++        {
++            var writer = groundTruthWriter;
++            WritePrefix(writer, sequence, message.header.stamp, message.header.frame_id);
++            WriteCsvString(writer, message.child_frame_id); writer.Write(',');
++            var pose = message.pose.pose;
++            WriteNumber(writer, pose.position.x); writer.Write(',');
++            WriteNumber(writer, pose.position.y); writer.Write(',');
++            WriteNumber(writer, pose.position.z); writer.Write(',');
++            WriteNumber(writer, pose.orientation.x); writer.Write(',');
++            WriteNumber(writer, pose.orientation.y); writer.Write(',');
++            WriteNumber(writer, pose.orientation.z); writer.Write(',');
++            WriteNumber(writer, pose.orientation.w); writer.Write(',');
++            WriteArray(writer, message.pose.covariance); writer.Write(',');
++            var twist = message.twist.twist;
++            WriteNumber(writer, twist.linear.x); writer.Write(',');
++            WriteNumber(writer, twist.linear.y); writer.Write(',');
++            WriteNumber(writer, twist.linear.z); writer.Write(',');
++            WriteNumber(writer, twist.angular.x); writer.Write(',');
++            WriteNumber(writer, twist.angular.y); writer.Write(',');
++            WriteNumber(writer, twist.angular.z); writer.Write(',');
++            WriteArray(writer, message.twist.covariance);
++            writer.WriteLine();
++        }
++
++        private static void WritePrefix(StreamWriter writer, long sequence, TimeMsg stamp, string frameId)
++        {
++            writer.Write(sequence.ToString(CultureInfo.InvariantCulture));
++            writer.Write(',');
++            writer.Write(ToNanoseconds(stamp).ToString(CultureInfo.InvariantCulture));
++            writer.Write(',');
++            WriteCsvString(writer, frameId);
++            writer.Write(',');
++        }
++
++        private static long ToNanoseconds(TimeMsg stamp) =>
++            checked(Convert.ToInt64(stamp.sec, CultureInfo.InvariantCulture) * 1_000_000_000L
++                + Convert.ToInt64(stamp.nanosec, CultureInfo.InvariantCulture));
++
++        private static void WriteCsvString(StreamWriter writer, string value)
++        {
++            writer.Write('"');
++            writer.Write((value ?? string.Empty).Replace("\"", "\"\""));
++            writer.Write('"');
++        }
++
++        private static void WriteArray(StreamWriter writer, double[] values)
++        {
++            writer.Write('"');
++            for (var i = 0; i < values.Length; i++)
++            {
++                if (i != 0) writer.Write(';');
++                WriteNumber(writer, values[i]);
++            }
++            writer.Write('"');
++        }
++
++        private static void WriteArray(StreamWriter writer, float[] values)
++        {
++            writer.Write('"');
++            for (var i = 0; i < values.Length; i++)
++            {
++                if (i != 0) writer.Write(';');
++                WriteNumber(writer, values[i]);
++            }
++            writer.Write('"');
++        }
++
++        private static void WriteNumber(StreamWriter writer, double value)
++        {
++            if (double.IsPositiveInfinity(value)) writer.Write("inf");
++            else if (double.IsNegativeInfinity(value)) writer.Write("-inf");
++            else if (double.IsNaN(value)) writer.Write("nan");
++            else writer.Write(value.ToString("R", CultureInfo.InvariantCulture));
++        }
++
++        private static void WriteNumber(StreamWriter writer, float value)
++        {
++            if (float.IsPositiveInfinity(value)) writer.Write("inf");
++            else if (float.IsNegativeInfinity(value)) writer.Write("-inf");
++            else if (float.IsNaN(value)) writer.Write("nan");
++            else writer.Write(value.ToString("R", CultureInfo.InvariantCulture));
++        }
++
++        private void WriteManifest(bool complete)
++        {
++            var json = "{\n"
++                + "  \"schema_version\": 1,\n"
++                + "  \"run_id\": \"" + EscapeJson(runId) + "\",\n"
++                + "  \"created_utc\": \"" + DateTime.UtcNow.ToString("O", CultureInfo.InvariantCulture) + "\",\n"
++                + "  \"unity_version\": \"" + EscapeJson(unityVersion) + "\",\n"
++                + "  \"fixed_delta_time_sec\": " + fixedDeltaTime.ToString("R", CultureInfo.InvariantCulture) + ",\n"
++                + "  \"topics\": {\"/imu/data\": \"sensor_msgs/msg/Imu\", \"/scan\": \"sensor_msgs/msg/LaserScan\", \"/ground_truth_pose\": \"nav_msgs/msg/Odometry\"},\n"
++                + "  \"complete\": " + (complete ? "true" : "false") + ",\n"
++                + "  \"written_counts\": {\"imu\": " + imuWritten + ", \"scan\": " + scanWritten + ", \"ground_truth\": " + groundTruthWritten + "},\n"
++                + "  \"maximum_pending_records\": " + maximumQueued + "\n"
++                + "}\n";
++            File.WriteAllText(manifestPath, json, new UTF8Encoding(false));
++        }
++
++        private static string EscapeJson(string value) => (value ?? string.Empty)
++            .Replace("\\", "\\\\").Replace("\"", "\\\"");
++
++        public void Dispose()
++        {
++            if (Interlocked.Exchange(ref disposed, 1) != 0) return;
++            queue.CompleteAdding();
++            if (!writerThread.Join(TimeSpan.FromSeconds(30)))
++                throw new TimeoutException("Timed out while flushing Unity sensor CSV records.");
++            imuWriter.Dispose();
++            scanWriter.Dispose();
++            groundTruthWriter.Dispose();
++            queue.Dispose();
++            WriteManifest(writerFailure == null);
++            if (writerFailure != null)
++                throw new InvalidOperationException("Sensor CSV writer failed.", writerFailure);
++        }
++    }
++}
+diff --git a/unity/Robocon2026Sim/Assets/Robocon2026/Scripts/UnitySensorCsvRecorder.cs.meta b/unity/Robocon2026Sim/Assets/Robocon2026/Scripts/UnitySensorCsvRecorder.cs.meta
+new file mode 100755
+index 0000000..89faa74
+--- /dev/null
++++ b/unity/Robocon2026Sim/Assets/Robocon2026/Scripts/UnitySensorCsvRecorder.cs.meta
+@@ -0,0 +1,2 @@
++fileFormatVersion: 2
++guid: 6f80b8e8c138146438ebdfec1a7a885c
+\ No newline at end of file

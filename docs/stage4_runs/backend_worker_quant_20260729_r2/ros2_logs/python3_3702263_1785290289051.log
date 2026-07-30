@@ -1,0 +1,4 @@
+[INFO] [1785290289.248811368] [unity_evaluator_node]: evaluator_node started: will run for 60.0s starting from the first /ground_truth_pose
+[INFO] [1785290366.124130155] [unity_evaluator_node]: first ground truth received: measuring for 60.0s
+[INFO] [1785290371.929631701] [unity_evaluator_node]: t=5.0s  直近5秒: pos_err mean=4.09mm max=40.71mm  samples=4662  detected_balls=0
+[INFO] [1785290378.292021996] [unity_evaluator_node]: t=10.0s  直近5秒: pos_err mean=4.01mm max=5.45mm  samples=9654  detected_balls=0

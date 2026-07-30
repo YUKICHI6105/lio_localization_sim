@@ -86,6 +86,11 @@ never publishes.
 bash src/lio_localization_sim/scripts/stage4_sweep_run.sh off 0.15 0.003 1
 ```
 
+For an agent driving Play/Stop programmatically via Unity MCP instead of a human clicking
+the button, see [`UNITY_MCP_BENCHMARK_GUIDE.md`](UNITY_MCP_BENCHMARK_GUIDE.md): Play/Stop is
+just reading and writing `EditorApplication.isPlaying` through `Unity_RunCommand` -- no
+keyboard/mouse automation or window-focus tricks are needed or used.
+
 `docs/experiment_history/04_stage4_resume_notes.md` covers the operational pitfalls found the hard way: stale
 endpoints holding port 10000, publisher queue sizing against the 1 kHz IMU, and why a run must
 never be judged from an open-loop session.

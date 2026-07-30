@@ -1,7 +1,46 @@
-# Backend Optimizer 推定手順(2026-07-28時点)
+# Backend Optimizer 推定手順(2026-07-29更新)
 
 `lio_localization::BackendOptimizerNode` の因子グラフ構造とデータフローの図。
-2026-07-28の減速時誤差スパイク調査で確認した構造を元に作成。
+2026-07-28の減速時誤差スパイク調査で確認した構造を元に作成し、2026-07-29の
+専用最適化ワーカー、IMU専用executor、lock-free SPSC IMUリングバッファを反映。
+
+## 実行ドメイン
+
+```mermaid
+flowchart TB
+    IMU["/imu/data<br/>1kHz"] --> IMUCB
+    SMR["/scan_match_result<br/>40Hz"] --> SCANCB
+
+    subgraph BACKEND["backend_optimizer_node"]
+        direction TB
+        subgraph IMUE["IMU executor / 1 thread"]
+            IMUCB["imu_callback<br/>受信・時刻検査・リング投入・通知だけ"]
+        end
+        RING[("lock-free SPSC IMUリング<br/>8,192 samples / 約8秒")]
+        subgraph CONTROLE["control executor / 1 thread"]
+            SCANCB["scan_match_callback<br/>結果FIFO投入・通知だけ"]
+            WATCH["IMU watchdog<br/>fail-safe監視"]
+        end
+        PEND["pending scan FIFO<br/>最大40件"]
+        subgraph WORKER["optimizer worker / 1 thread"]
+            DRAIN["IMU coverage確認"]
+            GTSAM["積分・因子生成・iSAM2"]
+        end
+    end
+
+    IMUCB --> RING
+    SCANCB --> PEND
+    RING -.->|condition_variable| DRAIN
+    PEND -.->|condition_variable| DRAIN
+    DRAIN --> GTSAM
+    WATCH -.->|IMU途絶 / overflow| GTSAM
+```
+
+IMU callback groupはnodeへ自動登録せず、IMU executorへ手動で割り当てる。そのため
+scan callbackやwatchdogがreadyでも、IMU callbackの実行枠を奪えない。iSAM2はROS
+executorではなくoptimizer workerだけが所有する。したがって、3スレッドは同じ仕事を
+競合して実行するためではなく、**IMU受信・control callback・最適化を互いにブロックしない
+ための固定した責務分離**である。
 
 ## 全体フロー
 
@@ -12,10 +51,11 @@ flowchart TD
     PERCEPTION --> SMR["ScanMatchResult<br/>(wall + cylinders)"]
 
     SMR --> PEND["pending_results_<br/>(scan_match_callback)"]
-    PEND --> DRAIN{"drain_pending_results<br/>スキャン時刻分のIMUは<br/>全部届いた?"}
-    QUEUE -.->|"IMU到着時にも同期的に呼ばれる"| DRAIN
-    DRAIN -->|"まだ→待つ"| PEND
-    DRAIN -->|"揃った→そのコールバックの中で続行"| PROCESS["process_scan_result<br/>(同一コールバック内で実行、他のコールバックは待たされる)"]
+    PEND --> EVENT["condition_variableへ通知<br/>(callbackはここで終了)"]
+    QUEUE -.->|"IMU到着時にも通知"| EVENT
+    EVENT --> DRAIN{"専用optimizer worker<br/>スキャン時刻分のIMUは<br/>全部届いた?"}
+    DRAIN -->|"未着"| WAIT["condition_variableで待機<br/>(次の通知で再判定)"]
+    DRAIN -->|"到着済み"| PROCESS["process_scan_result<br/>(GTSAMは専用workerだけが実行)"]
 
     PROCESS --> INTEGRATE["integrate_imu_up_to<br/>実測dtで積分<br/>+端数はゼロ次ホールドで詰める"]
     INTEGRATE --> ACCUMULATOR[("accumulator_<br/>backend_optimizer_nodeの<br/>メンバ変数(常駐バッファ)")]
@@ -36,8 +76,6 @@ flowchart TD
     RESETACC -.-> ACCUMULATOR
     ISAM2 -.->|"数値例外"| DIVERGE["reset_graph_after_divergence"]
     REJECT -.->|"40回連続(~1秒)<br/>※現行Unity設定では円柱0件のため機能しない"| RELOC["円柱で真偽判定→再ローカライズ<br/>(dead code path、後述)"]
-    IMU -.->|"途絶検知"| WATCHDOG["imu_watchdog<br/>backend更新・/state_estimate配信を停止<br/>(ロボット自体の停止は保証しない)"]
-
     style SCAN fill:#2a2410,stroke:#996
     style PERCEPTION fill:#2a2410,stroke:#996
     style SMR fill:#2a2410,stroke:#996
@@ -58,21 +96,33 @@ flowchart TD
 
     style DIVERGE fill:#3a1a1a,stroke:#a33
     style RELOC fill:#555,stroke:#888,stroke-dasharray: 5 5
-    style WATCHDOG fill:#3a1a1a,stroke:#a33
 ```
 
 ### 図の各ブロックの補足説明
 
-**両方のコールバックは、積んだ直後に同期的な処理判定へ進む**
+**両方のコールバックは受信・キュー追加・ワーカー通知だけを行う**
 
 `imu_callback`(IMU到着時)・`scan_match_callback`(スキャン結果到着時)は、それぞれ
-自分のFIFO(`imu_queue_`, `pending_results_`)に積んだ**直後に、同じコールバックの中で
-`drain_pending_results()`を同期呼び出しする**。IMUカバレッジ条件が揃っていれば、
-`process_scan_result`・IMU積分・ISAM2更新まで**そのコールバック実行中に最後まで
-実行される**。backendは`rclcpp::spin()`(既定のSingleThreadedExecutor、単一スレッド)
-で動いているため、ISAM2更新に時間がかかっている間は他方のコールバック(IMU受信含む)も
-待たされる。IMU側のサブスクリプションキューを深く取っている(`SensorDataQoS().keep_last(2000)`)
-のは、この間に届くIMUメッセージを取りこぼさないための設計。
+自分のFIFO(`imu_queue_`, `pending_results_`)へ追加し、condition variableで専用
+optimizer workerを起こして終了する。workerは先頭スキャンの時刻までIMUが届いたことを
+確認してから`process_scan_result`・IMU積分・ISAM2更新を直列実行する。GTSAMの状態を
+触るのはこのworkerだけである。IMU callback groupは専用`SingleThreadedExecutor`、
+scan callbackとwatchdogは別の`SingleThreadedExecutor`で動くため、ISAM2更新中だけでなく
+control executor内のcallback実行中にもIMU executorは1kHz受信を継続できる。
+
+`imu_queue_`は動的に伸びる`deque`ではなく8,192件の固定長**lock-free SPSCリング**である。
+専用IMU executorだけがproducer、optimizer workerだけがconsumerなので、1kHzの投入・取り出し・
+積分に`work_mutex_`は使わない。通常は2秒ホライズンで古い値を削除する。この削除もproducerでは
+なくwatchdogから通知されたworkerが、保留スキャンも実行中ジョブも無いときだけ行う。従ってworkerが
+必要とする積分区間を並行して消すことはない。8秒相当まで滞留した場合は、IMUを黙って捨てて不連続な
+因子を作る代わりにoverflowをfail-safeとしてラッチする。`pending_results_`は40Hz・最大40件の
+低頻度FIFOで、こちらと`worker_stop_`・`optimizer_busy_`だけを`work_mutex_`で保護する。
+重いISAM2更新中にはmutexを保持しない。IMUサブスクリプションの深いQoS(`SensorDataQoS().keep_last(2000)`)も輸送・
+スケジューリングの短時間ジッタに対する余裕として維持する。
+
+ノード破棄時は停止フラグを設定してworkerを起こし、`join()`完了後にメンバを破棄する。
+また、IMU watchdogが並行してfail-safeをラッチした場合は保留スキャンを破棄し、
+取り出し済みジョブからの`/state_estimate`公開も抑止する。
 
 **IMU積分(`integrate_imu_up_to`)は「時間を揃えるための作業」**
 

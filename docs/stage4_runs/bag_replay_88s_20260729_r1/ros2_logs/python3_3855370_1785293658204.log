@@ -1,0 +1,7 @@
+[INFO] [1785293658.332836607] [unity_endpoint]: Starting server on 0.0.0.0:10000
+[INFO] [1785293658.633452276] [unity_endpoint]: Connection from 127.0.0.1
+[ERROR] [1785293658.635221509] [unity_endpoint]: Exception: No more data available
+[INFO] [1785293658.635859117] [unity_endpoint]: Disconnected from 127.0.0.1
+[INFO] [1785293658.744299596] [unity_endpoint]: Connection from 127.0.0.1
+[ERROR] [1785293658.746184168] [unity_endpoint]: Exception: No more data available
+[INFO] [1785293658.746890371] [unity_endpoint]: Disconnected from 127.0.0.1

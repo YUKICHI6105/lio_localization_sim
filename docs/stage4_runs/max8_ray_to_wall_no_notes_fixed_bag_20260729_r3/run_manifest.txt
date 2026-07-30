@@ -1,0 +1,11 @@
+run_tag=max8_ray_to_wall_no_notes_fixed_bag_20260729_r3
+mode=bag_component_isolation
+with_ball=false
+with_endpoint=false
+with_stage_record=false
+play_rate=4
+post_play_wait=3
+laser_params=
+backend_params=
+bag=/tmp/robocon_openloop_no_notes_20260729.mcap
+started_at=2026-07-29T20:27:49+09:00

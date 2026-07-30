@@ -11,10 +11,13 @@ namespace Robocon2026.Simulation
     public sealed class RoboconFieldBuilder : MonoBehaviour
     {
         public const string DefinitionFileName = "robocon2026_field.json";
+        public const string DisableNotesExperimentFlag =
+            "DisableNotesForLocalizationExperiment.flag";
 
         private readonly Dictionary<string, Material> materials = new();
         private PhysicsMaterial fieldPhysicsMaterial = null!;
         private Transform generatedRoot = null!;
+        private bool disableNotesForLocalizationExperiment;
 
         public FieldDefinition Definition { get; private set; } = null!;
 
@@ -23,6 +26,8 @@ namespace Robocon2026.Simulation
             Definition = LoadDefinition();
             Definition.Validate();
             ConfigurePhysics();
+            disableNotesForLocalizationExperiment = File.Exists(Path.GetFullPath(
+                Path.Combine(Application.dataPath, "..", DisableNotesExperimentFlag)));
 
             var oldRoot = transform.Find("GeneratedField");
             if (oldRoot != null) Destroy(oldRoot.gameObject);
@@ -46,6 +51,10 @@ namespace Robocon2026.Simulation
             BuildNotes("Orange", Definition.Notes.Orange, "#FF6412");
             BuildView();
 
+            if (disableNotesForLocalizationExperiment)
+                Debug.LogWarning(
+                    $"[Robocon2026] Localization experiment: all note GameObjects are inactive " +
+                    $"because {DisableNotesExperimentFlag} exists.");
             Debug.Log($"[Robocon2026] Built '{Definition.Name}' from {DefinitionFileName}.");
         }
 
@@ -163,6 +172,12 @@ namespace Robocon2026.Simulation
                 body.angularDamping = 0.05f;
                 body.solverIterations = 12;
                 body.solverVelocityIterations = 4;
+
+                // Keep the generated hierarchy intact for editor validation, while removing
+                // rendering, raycast and collision participation for the controlled
+                // localization A/B experiment. The default remains the competition scene.
+                if (disableNotesForLocalizationExperiment)
+                    go.SetActive(false);
             }
         }
 

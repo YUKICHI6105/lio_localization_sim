@@ -1,0 +1,8 @@
+run_tag=max10_note_gap100_corr080_stage_fixed_bag_20260729_r1
+mode=bag_component_isolation
+with_ball=false
+with_endpoint=false
+with_stage_record=true
+laser_params=-p planar_correspondence_distance:=0.08
+bag=/tmp/robocon_unity_88s_20260729.mcap
+started_at=2026-07-29T17:31:30+09:00

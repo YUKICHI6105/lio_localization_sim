@@ -1,0 +1,16 @@
+stdin is not a terminal device. Keyboard handling disabled.[INFO] [1785336023.162561637] [rosbag2_recorder]: Press SPACE for pausing/resuming
+[INFO] [1785336023.162575677] [rosbag2_recorder]: Event publisher thread: Started
+[INFO] [1785336023.171774583] [rosbag2_recorder]: Starting recording to '/home/yukichi6105/ros2_ws/src/lio_localization_sim/docs/stage4_runs/datasheet_gyro_crossaxis_125pct_20260729_r1/stage_derived'
+[WARN] [1785336023.171903691] [rosbag2_recorder]: No input serialization format specified, using default rmw serialization format: 'cdr'.
+[INFO] [1785336023.177532861] [rosbag2_recorder]: Listening for topics...
+[INFO] [1785336023.177604970] [rosbag2_recorder]: Topics discovery started.
+[INFO] [1785336023.177854568] [rosbag2_recorder]: Recording...
+[INFO] [1785336023.339019649] [rosbag2_recorder]: Subscribed to topic '/state_estimate'
+[INFO] [1785336023.357654144] [rosbag2_recorder]: Subscribed to topic '/scan_match_result'
+[INFO] [1785336026.306754918] [rosbag2_recorder]: Subscribed to topic '/odom_fast'
+[INFO] [1785336028.244550773] [rosbag2_recorder]: Subscribed to topic '/ground_truth_pose'
+[INFO] [1785336028.244677605] [rosbag2_recorder]: All requested topics are subscribed. Stopping discovery...
+[INFO] [1785336028.244699560] [rosbag2_recorder]: Topics discovery stopped.
+[INFO] [1785336095.713830415] [rosbag2_cpp]: Writing remaining messages from cache to the bag. It may take a while
+[INFO] [1785336095.718799342] [rosbag2_recorder]: Recording stopped
+[INFO] [1785336095.725733008] [rosbag2_recorder]: Event publisher thread: Exited

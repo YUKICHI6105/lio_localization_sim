@@ -1,0 +1,3 @@
+run_tag=imu_receiver_with_cpp_evaluator_20260729_r2
+mode=minimal_lio_plus_cpp_evaluator
+started_at=2026-07-29T12:56:35+09:00

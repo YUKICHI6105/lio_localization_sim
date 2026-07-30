@@ -1,0 +1,1273 @@
+diff --git a/docs/experiment_history/09_backend_worker_evaluation_2026-07-29.md b/docs/experiment_history/09_backend_worker_evaluation_2026-07-29.md
+new file mode 100644
+index 0000000..da7d037
+--- /dev/null
++++ b/docs/experiment_history/09_backend_worker_evaluation_2026-07-29.md
+@@ -0,0 +1,169 @@
++# 実験履歴: Backend専用optimizer worker導入影響評価(2026-07-29)
++
++## 1. 目的
++
++`backend_optimizer_node`は`SingleThreadedExecutor`で動作しており、従来は
++`scan_match_callback`からiSAM2更新までを同期実行していた。このため最適化中は
++1kHz IMU callbackも停止していた。
++
++今回、callbackをキュー追加とcondition variable通知だけに限定し、IMU積分・因子生成・
++iSAM2更新・`/state_estimate`配信を専用optimizer workerへ移した。GTSAM状態は引き続き
++単一スレッドだけが所有する。本試験は、この変更がclosed-loop測位精度へ与える影響を
++確認する初回評価である。
++
++## 2. 再現性の確保
++
++`scripts/stage4_mcp_run.sh`を変更し、各runへ次を自動保存するようにした。
++
++- 実際に使用した`robocon2026_unity.yaml`
++- `lio_localization` / `lio_localization_sim`のコミットID
++- 両リポジトリの`git status`
++- tracked fileの未コミット差分(binary patch)
++- run名、開始時刻、probe有無を記したmanifest
++
++これにより、2026-07-28以前の一部runにあった「run名から設定を推測するしかない」
++状態を解消した。
++
++## 3. 実験条件
++
++- Unity Editor 6000.5.5f1、MCPからPlay/Stop
++- Stage 4フルスタックclosed-loop、60秒評価
++- IMU 1kHz設定、`/clock` 250Hz
++- `smoother_lag_sec=0.5`
++- `bias_acc_random_walk_sigma=0.0001`
++- `bias_gyro_random_walk_sigma=0.0001`
++- `zupt_enabled=false`
++- `imu_dynamics_enabled=false`
++
++比較対象はworker導入前の同系列3run
++(`bias_random_walk_20260728`、`bias_random_walk_rep2_20260728`、
++`bias_random_walk_rep3_20260728`)とした。
++
++## 4. 結果
++
++### 4.1 通常構成による3回反復
++
++| 構成 | run | samples | mean | RMSE | max | slow smoother回数 |
++|---|---|---:|---:|---:|---:|---:|
++| worker前 | bias_random_walk | 58,769 | 6.28mm | 6.91mm | 12.90mm | 2 |
++| worker前 | bias_random_walk_rep2 | 59,987 | 6.06mm | 6.59mm | 13.07mm | 3 |
++| worker前 | bias_random_walk_rep3 | 59,361 | 6.14mm | 6.83mm | 12.99mm | 4 |
++| worker後 | backend_worker_20260729_r2 | 58,933 | 6.19mm | 6.84mm | **22.72mm** | 2 |
++| worker後 | backend_worker_20260729_r3 | 55,090 | 6.12mm | 6.77mm | 13.11mm | 0 |
++| worker後 | backend_worker_20260729_r4 | 55,634 | 6.01mm | 6.63mm | 13.00mm | 7 |
++
++3runの代表値:
++
++| 指標 | worker前 | worker後 |
++|---|---:|---:|
++| meanの平均 | 6.16mm | 6.11mm |
++| RMSEの平均 | 6.78mm | 6.75mm |
++| maxの中央値 | 12.99mm | 13.11mm |
++| slow smoother回数の中央値 | 3 | 2 |
++
++定常的なmean/RMSEおよび典型的なmaxは実質同水準であり、worker化による通常精度の
++明確な回帰は観測されなかった。最大10mm要件は従来どおり未達。
++
++`backend_worker_20260729_r2`だけはt=58.454秒に22.72mmのピークを記録した。同runでは
++GTSAM例外、IMU fail-safe、壁補正拒否、グラフリセットは発生しておらず、
++slow smoother警告も2回でworker導入前の通常範囲だった。後続2runでは再現せず
++13.11mm / 13.00mmへ戻ったため、現時点ではworker化に起因する再現性のある回帰とは
++判定しない。ただし単発外れ値として保留し、今後同位相で再発するか監視する。
++
++### 4.2 診断プローブ付きrun
++
++`backend_worker_20260729_r1`は`--probes`付きで実行し、RMSE 6.54mm、max 55.30mmだった。
++slow smoother警告15回、laser scan matcherのIMU coverage timeout 32回と、通常runより
++明らかに高負荷だった。ピークは衝突相当の高加速度窓内で、窓外maxは15.38mm。
++
++このプロジェクトでは過去にも診断subscriber自身が受信率を低下させ、「IMUを58%落とした」
++ように見せた事例がある。そのため、このrunはworker精度の主比較から除外し、診断負荷を
++含むストレスrunとしてのみ保存する。
++
++## 5. Backend内部カウンタによる直接定量化
++
++外部subscriberを増やさずに並行動作を測るため、backend内部へ次の軽量カウンタを追加した。
++hot pathでは整数加算とatomicフラグ参照だけを行い、ログ出力はノード終了時の1回だけとした。
++
++- IMU callback総数
++- optimizer worker処理中に実行されたIMU callback数
++- `smoother_->update()`と`calculateEstimate()`の実行中に実行されたIMU callback数
++- IMU callback壁時計gapの最大値と2ms / 10ms超過回数
++- worker jobとsmoother updateの回数、平均時間、最大時間
++
++通常構成の`backend_worker_quant_20260729_r1`で得た値:
++
++| 指標 | 結果 |
++|---|---:|
++| IMU callback総数 | 63,466 |
++| worker処理中のIMU callback | 5,572 (総数の8.8%) |
++| iSAM2/estimate処理中のIMU callback | 3,905 (総数の6.2%) |
++| worker job | 2,336回、平均2.653ms、最大48.000ms |
++| smoother update | 2,335回、平均1.713ms、最大35.068ms |
++| callback gap最大 | 188.229ms |
++| callback gap >2ms | 8,206回 |
++| callback gap >10ms | 2,127回 |
++
++丸め済み平均時間から概算すると、workerが実際に動いていた累計時間は約6.20秒、
++smoother処理の累計時間は約4.00秒である。その間のIMU callback実行密度はそれぞれ
++約899 callback/s、約976 callback/sだった。
++
++従来構造ではiSAM2がIMU callbackと同じSingleThreadedExecutor上で同期実行されていたため、
++iSAM2処理中に実行できるIMU callbackは構造上0件である。今回3,905件を直接計測できたことから、
++**専用worker化によって最適化中もIMU callbackが継続することを定量確認した**。
++
++一方、最大188msのcallback gapと10ms超過2,127回は残っている。専用workerは
++「backend自身のiSAM2がexecutorを止める」原因を除いたが、Unity→ROS TCP輸送、
++DDS/executorスケジューリング、ホスト負荷などによるバースト到着や欠落までは解消しない。
++この2つは分けて扱う必要がある。
++
++同runの精度はmean 6.30mm、RMSE 6.95mm、max 13.79mmで、定常RMSEはPASS、
++最大10mm要件はFAIL。内部カウンタ追加後も過去系列と同水準だった。
++
++### 5.1 再試験(最大5回、正常データ取得時点で終了)
++
++再現確認では、次を「問題のないデータ」の条件とした。
++
++- レポートが正常生成され、GTSAM例外・グラフリセット・IMU fail-safeがない
++- iSAM2処理中のIMU callback数が0件より多い
++- 定常RMSE 10mm以下
++- 最大誤差が過去通常帯付近の15mm以下
++
++`backend_worker_quant_20260729_r2`はPlay要求後30秒以上たってもUnityセンサーの
++ROS実接続が成立せず、ground truthが1件も届かなかった。推定器評価ではなく既知の
++Unity–ROS接続失敗としてログを保全し、無効runとした。
++
++次の`backend_worker_quant_20260729_r3`で正常データが得られたため、最大5回まで
++繰り返す予定をここで終了した。
++
++| 指標 | 初回定量run | 正常再試験r3 |
++|---|---:|---:|
++| mean / RMSE / max | 6.30 / 6.95 / 13.79mm | 6.20 / 6.83 / 12.53mm |
++| IMU callback総数 | 63,466 | 64,222 |
++| worker中callback | 5,572 (8.8%) | 5,365 (8.4%) |
++| iSAM2中callback | 3,905 (6.2%) | 3,660 (5.7%) |
++| worker平均 / 最大 | 2.653 / 48.000ms | 2.626 / 42.575ms |
++| smoother平均 / 最大 | 1.713 / 35.068ms | 1.668 / 36.758ms |
++| callback gap最大 | 188.229ms | 177.674ms |
++| gap >2ms / >10ms | 8,206 / 2,127回 | 9,466 / 2,232回 |
++
++正常再試験r3ではworker累計時間が概算約6.37秒、smoother累計時間が約4.04秒であり、
++その間のIMU callback実行密度はそれぞれ約842 callback/s、約905 callback/sだった。
++初回定量runと独立に、iSAM2中もIMU callbackが継続することを再確認した。
++
++## 6. 結論
++
++- worker化後も定常RMSEは3runすべて10mm以下で、通常精度の明確な回帰はない
++- 典型的な最大誤差は約13mmでworker導入前と同水準。最大10mm要件は未達のまま
++- 22.72mmの単発ピークは再現せず、原因は未確定
++- slow smoother回数は中央値では3回から2回だが、0〜7回とばらつきが大きく、
++  worker化による計算時間改善を示す結果ではない
++- evaluator sample数はworker後に平均約4.7%少なかったが、これはUnity/ホスト実行速度も
++  含む値であり、backendのIMU callback受信数そのものではない
++- iSAM2処理中に3,905件(概算976 callback/s)のIMU callbackが実行され、
++  worker分離の目的は定量的に達成した
++- 最大188msのcallback gapは残っており、輸送・ホストスケジューリング層は別途調査が必要
++
++したがって、専用worker実装は**通常精度を維持し、iSAM2によるcallback停止を解消したため
++採用可能**と判断する。22.72mmピークの再発監視と、iSAM2以外を原因とする受信gapの調査は
++残課題とする。
+diff --git a/docs/experiment_history/10_callback_delay_component_isolation_2026-07-29.md b/docs/experiment_history/10_callback_delay_component_isolation_2026-07-29.md
+new file mode 100644
+index 0000000..66faa52
+--- /dev/null
++++ b/docs/experiment_history/10_callback_delay_component_isolation_2026-07-29.md
+@@ -0,0 +1,99 @@
++# 実験履歴: IMU callback遅延の構成要素切り分け (2026-07-29)
++
++## 目的
++
++backendのiSAM2を専用workerへ移し、1 kHz `/odom_fast`評価器をC++化した後にも、
++フル構成bag再生で最大145.981msのIMU callback gapが一度観測された。
++Unity CSVから変換した同一88.42秒MCAPの先頭62秒を使い、フル構成だけに含まれる
++`ball_tracking_node` とROS-TCP endpointが原因かを切り分けた。
++
++全runでIMUのheader stamp gapは最大1.000ms、`>1ms`は0件だった。従って、ここでの
++gapはUnityのセンサ生成時刻ではなく、ROS側でbackend callbackが実行されるまでの壁時計遅延である。
++
++## 結果
++
++| 構成 | run | callback gap最大 | >10ms | IMU callback数 |
++|---|---|---:|---:|---:|
++| 最小LIO + C++評価器 | `imu_receiver_with_cpp_evaluator_20260729_r2` | 20.476ms | 28 | 62,001 |
++| 最小LIO + ball | `imu_receiver_cpp_plus_ball_20260729_r1` | 16.923ms | 24 | 62,001 |
++| 最小LIO + endpoint | `imu_receiver_cpp_plus_endpoint_20260729_r1` | 28.482ms | 11 | 61,202 |
++| 最小LIO + ball + endpoint | `imu_receiver_cpp_plus_ball_endpoint_20260729_r1` | 21.872ms | 25 | 62,001 |
++| フルlaunch（初回） | `bag_replay_88s_cpp_evaluator_20260729_r1` | **145.981ms** | 236 | 60,286 |
++| フルlaunch（再試験） | `bag_replay_88s_cpp_full_retest_20260729_r1` | 32.417ms | 39 | 60,502 |
++| フルlaunch（評価器・ballをnice +10） | `bag_replay_88s_cpp_nice10_20260729_r2` | **22.408ms** | **17** | 60,268 |
++
++全runの評価精度はmean約6.25mm、RMSE約6.94mm、最大約13.1〜13.2mmで同水準だった。
++定常RMSE 10mm要件はPASS、最大位置誤差10mm要件はFAILのままである。
++
++## 判断
++
++- `ball_tracking_node`の有無で悪化はなく、原因ではない。
++- idle状態のROS-TCP endpointも単独・ballとの同時追加のいずれでも145ms級を再現しなかった。
++- フル構成の再試験は32.417msまで低下した。初回145.981msは再現しないため、現時点では
++  恒常的なノード構成の問題ではなく、試験時のホスト／WSLスケジューリング外乱として扱う。
++- いずれもstamp gapはない。Unityの1kHz生成・CSV記録が原因という仮説は否定される。
++
++## 実施した改善
++
++`stage4_mcp_run.sh`のendpoint起動確認は、従来`/dev/tcp`で実接続して直ちに切断していた。
++そのためendpoint自身が「No more data available」という偽の例外を記録していた。現在は`ss`で
++listen socketのみを確認し、実験へ偽クライアントを注入しないよう修正した。
++
++同時に`bag_component_isolation.sh`を追加した。YAML、commit、dirty diff、未追跡ソースを
++runごとに保存して、今後の構成追加試験を再現可能にする。巨大な過去run成果物はソース
++スナップショットから除外する。
++
++フルlaunchでは、計測専用のC++評価器と自己位置推定の安全経路ではない
++`ball_tracking_node`を`nice +10`で起動するよう変更した。backend、IMU前積分、scan matching、
++ROS-TCP endpointは通常優先度のままとした。適用後の有効runは最大22.408ms、10ms超17回で、
++位置誤差mean/RMSE/maxは6.26/6.94/13.17mmと変更前と同水準だった。
++
++最初の`bag_replay_88s_cpp_nice10_20260729_r1`はROS launchのprefixをリスト形式で渡したため
++`nice-n10`という存在しない実行ファイルになり、評価器とball追跡が起動しなかった無効runとして
++ログを保全した。prefixを`"nice -n 10"`へ修正したr2のみを有効結果としている。
++
++### IMU専用executor・固定リングバッファ
++
++backend内の2-thread `MultiThreadedExecutor`を廃止した。IMU callback groupをnodeへ自動登録せず、
++専用`SingleThreadedExecutor`へ手動割当した。scan結果callbackとwatchdogは別のcontrol
++`SingleThreadedExecutor`、GTSAMは従来どおりoptimizer workerが所有する。さらに高頻度
++`imu_queue_`を8,192件（1kHzで約8秒）の固定長リングに置換した。通常2秒の保持域を超える
++過負荷では古いIMUを黙って破棄せず、overflowをfail-safeとしてラッチする。
++
++`bag_replay_88s_dedicated_imu_executor_20260729_r1`では、位置誤差mean/RMSE/maxは
++6.26/6.94/13.17mmで従来同一、IMU stamp gapは最大1.000ms・>1ms 0件だった。callback統計は
++最大gap **12.900ms**、>2ms 201回、>10ms **1回**、queue mutex待ち最大1.539ms、callback処理時間
++最大1.541msである。リングoverflow、IMU fail-safe、GTSAM例外は発生しなかった。
++
++この結果は、スレッド数を一律に減らすのではなく、IMU受信・control callback・最適化を
++固定した責務の3実行ドメインに分けたことで、callback内外の待ちを抑えたことを示す。
++
++### lock-free SPSC IMUリング（mutex待ちの除去）
++
++固定リングの初回測定では、専用IMU executorによりcallback gapは大幅に縮小した一方、
++IMU callbackがworkerと`work_mutex_`を共有していたため、queue mutex待ち最大1.539ms、
++callback処理時間最大1.541msが残った。そこでリングを、IMU executorだけがproducer、
++optimizer workerだけがconsumerとなるlock-free SPSC実装へ変更した。2秒ホライズンの掃除は
++IMU callbackから外し、watchdog通知を受けたworkerだけが、保留スキャンも実行中ジョブも無い
++ときに行うようにした。overflow時は従来どおりfail-safeをラッチし、古いIMUを黙って捨てない。
++
++最終ソースを再リンクして実行した `bag_replay_88s_lockfree_imu_ring_20260729_r3`（同じ88.42秒
++MCAPの先頭62秒、bag再生倍率は1倍、`--clock 250`は`/clock`発行周波数250Hz）では、位置誤差
++mean/RMSE/maxは **6.25/6.94/13.17mm**、IMU stamp gapは最大1.000ms・>1ms 0件で、推定精度と
++入力連続性は維持した。IMUリング投入時間は最大**0.065ms**、>2ms **0回**である。callback全体では
++最大4.063ms、>2ms 2回、callback gap最大28.828ms・>10ms 11回だった。直前の同構成r2でも投入時間
++最大0.192ms・>2ms 0回だった一方で、gap最大は15.807msだった。callback全体の壁時計計測にはOSによる
++deschedule時間も含まれるため、run間で揺れる残余の超過をmutex待ちと解釈してはいけない。少なくとも
++共有mutexが直接作っていた1.539ms待ちは除去済みであり、残余はホストスケジューリング側の問題として
++分離された。ring overflow、IMU fail-safe、GTSAM例外は両runで発生しなかった。
++
++なお `bag_replay_88s_lockfree_imu_ring_20260729_r1` は、更新済みソースに対して古いリンク済み
++実行物が起動していたことをログ文字列（`queue_lock_wait`）で検出したため、無効runとして保全した。
++再リンク後に実行物へ`ring_enqueue`文字列が含まれることを確認してr2を実行し、起動時掃除も
++含む最終ソースをr3で再確認した。
++
++## 次の調査条件
++
++145ms級が再発した場合のみ、そのrunのホスト負荷・同時プロセス・WSL CPU使用率を同じ時刻軸で
++採取する。再発していない状態でscheduler優先度やCPU affinityを固定すると、偶然の外乱を
++恒久設定として持ち込むだけになるため、現段階では採用しない。
+diff --git a/docs/setup/UNITY_MCP_BENCHMARK_GUIDE.md b/docs/setup/UNITY_MCP_BENCHMARK_GUIDE.md
+new file mode 100644
+index 0000000..ec95ba5
+--- /dev/null
++++ b/docs/setup/UNITY_MCP_BENCHMARK_GUIDE.md
+@@ -0,0 +1,134 @@
++# Unity MCPを使ったStage 4ベンチマークの実行方法
++
++Stage 4(Unity + ROS 本番フルスタック)のベンチマークを、キーボード/マウスの
++自動操作やウィンドウフォーカス切り替えを一切使わずに、Unity Editorの
++`com.unity.ai.assistant`(Unity MCP)経由のコード実行だけで走らせる手順。
++2026-07-28〜29のセッションで実際に使い、17回以上のベンチマークで安定して
++動作した方法。
++
++**この手順を使う前に**: 一発目の計測を信用する前のチェックは
++[`../../../../.claude/skills/unity-ros-restart-sanity-check/SKILL.md`](../../../../.claude/skills/unity-ros-restart-sanity-check/SKILL.md)
++(Claude Code固有のパスにあるが、内容はUnity再起動直後の既知の落とし穴なので
++どのツールで作業していても有効)を参照。
++
++## 前提
++
++- Unity MCP(`Unity_RunCommand`等)がツールとして使える状態になっていること。
++  新規登録した場合はセッション再起動が必要(ツール一覧はセッション開始時にしか
++  読み込まれない)
++- Unity Editorが起動済みで、対象プロジェクト(`Robocon2026Sim`)が開かれていること
++- ROS 2ワークスペースがビルド済みであること
++
++## Play/Stopの制御方法: `EditorApplication.isPlaying`を直接読み書きするだけ
++
++**キーボード操作・マウス操作・ウィンドウフォーカスは一切使わない。** `Unity_RunCommand`
++はC#スニペットをその場でコンパイル・実行できるので、Play開始・停止は次の1行で行う。
++
++Play開始:
++```csharp
++using UnityEngine;
++using UnityEditor;
++
++internal class CommandScript : IRunCommand
++{
++    public void Execute(ExecutionResult result)
++    {
++        EditorApplication.isPlaying = true;
++        result.Log("Play requested");
++    }
++}
++```
++
++Play停止:
++```csharp
++using UnityEngine;
++using UnityEditor;
++
++internal class CommandScript : IRunCommand
++{
++    public void Execute(ExecutionResult result)
++    {
++        EditorApplication.isPlaying = false;
++        result.Log("Stop requested");
++    }
++}
++```
++
++状態確認(Play開始前・停止後の検証に使う。停止直後は非同期に反映されることがあるため、
++数秒待ってから確認する):
++```csharp
++using UnityEngine;
++using UnityEditor;
++
++internal class CommandScript : IRunCommand
++{
++    public void Execute(ExecutionResult result)
++    {
++        result.Log("isPlaying={0} Time.time={1}", EditorApplication.isPlaying, Time.time);
++    }
++}
++```
++
++Unity C#スクリプトを編集した直後は、次のPlay前に明示的にリフレッシュしてコンパイル
++完了を確認する(自動検知を待たず確実に反映させるため):
++```csharp
++using UnityEngine;
++using UnityEditor;
++
++internal class CommandScript : IRunCommand
++{
++    public void Execute(ExecutionResult result)
++    {
++        AssetDatabase.Refresh();
++        result.Log("Refresh triggered, isCompiling={0}", EditorApplication.isCompiling);
++    }
++}
++```
++(`isCompiling`が`false`に戻るまで数秒おいて再確認する)
++
++## ベンチマーク1回の手順
++
++1. **ROSスタックの残留プロセスがないか確認**:
++   ```bash
++   ps aux | grep -E "imu_preintegration_node|backend_optimizer_node|laser_scan_matching_node|realtime_evaluator_node|ball_tracking_node|default_server_endpoint" | grep -v grep
++   ```
++2. **Unityが待機状態であることを確認**(前回のPlayが残っていないか):
++   上記の状態確認コードで `isPlaying=False` を確認する
++3. **ROSスタックを起動**(バックグラウンド):
++   ```bash
++   scripts/stage4_mcp_run.sh <run名> > /tmp/run_driver.log 2>&1 &
++   ```
++   このスクリプトはROSノード群を起動し、TCPエンドポイント(:10000)が開くまで待ち、
++   `$OUT/READY`ファイルを作った時点で `READY — enter play mode now` と出力する。
++   また、実行時点のYAML、両リポジトリのコミット、`git status`、未コミット差分、
++   実行条件manifestを`$OUT`へ自動保存する。
++4. **READYを待ってからPlayを開始**(`grep -q READY /tmp/run_driver.log`をポーリングするか、
++   READY出力を待ってから、上記の「Play開始」コードを実行する
++5. **進行を監視**: `$OUT/ros.log` を tail し、evaluatorが5秒おきに出す
++   `t=X.Xs  直近5秒: pos_err mean=...`行を追う。60秒経過すると
++   `判定: 定常誤差... / 最大位置誤差...` と `レポートを保存しました: /tmp/sim_eval_report.txt`
++   が出る
++6. **レポートが出たらPlayを停止**(上記の「Play停止」コード)。4秒ほど待ってから
++   状態確認コードで `isPlaying=False` を確認する
++7. `stage4_mcp_run.sh` 自体がレポートファイルの出現を検知して自動的にROSノードを
++   停止し、`sim_eval_report.txt` / `sim_eval_plot.png` / `diag_raw_errors.csv` 等を
++   `$OUT` (=`docs/stage4_runs/<run名>/`) へコピーする。プロセスが残っていないことを
++   念のため確認する
++
++## Unity生成データをROSだけで再生する
++
++Play停止時、Unityは送信前の`/imu/data`・`/scan`・`/ground_truth_pose`を実プロジェクト
++直下の`SensorRecordings/<run_id>/`へ保存する。これをMCAPへ変換すれば、TCPやUnity Editorの
++負荷を切り離してROS側だけを再試験できる。詳細は
++[`UNITY_SENSOR_CSV_ROSBAG_GUIDE.md`](UNITY_SENSOR_CSV_ROSBAG_GUIDE.md)を参照。
++
++## なぜこの方法なのか
++
++- `EditorApplication.isPlaying`はUnity Editorの公開APIで、Playボタンを押すのと
++  完全に同じ効果を持つ。キーボードでボタンをクリックしたように見せかける必要は
++  そもそもない
++- MCP経由でPlayを開始すると、AI Assistantパッケージ自身のrelay再接続や
++  Asset Pipeline Refreshがちょうど同じタイミングで走り、`UnityRosSensorPublisher`の
++  ROS接続確立と競合する既知の問題があったが、これは`ConnectAfterRosConnectionStarts()`
++  側のリトライ実装(`HasConnectionThread`確認付き、最大10回)で解消済み
++  (`unity-ros-restart-sanity-check`スキル参照)。Play制御の方法自体を変える必要はない
+diff --git a/docs/setup/UNITY_SENSOR_CSV_ROSBAG_GUIDE.md b/docs/setup/UNITY_SENSOR_CSV_ROSBAG_GUIDE.md
+new file mode 100644
+index 0000000..ae5f5c8
+--- /dev/null
++++ b/docs/setup/UNITY_SENSOR_CSV_ROSBAG_GUIDE.md
+@@ -0,0 +1,71 @@
++# UnityセンサCSVからrosbag2(MCAP)を作る手順
++
++Unityで生成されたセンサ値を、ROS-TCP接続へ渡す**直前**にCSVへ記録し、そのCSVから
++rosbag2(MCAP)を作るための手順です。ROS側の受信遅延・TCPキューあふれ・コールバック
++遅延を含まないため、同じ物理走行をROSの条件だけ変えて再生する基準データになります。
++
++## 記録されるもの
++
++`UnityRosSensorPublisher`はPlay開始ごとに、実際に開いているUnityプロジェクト直下の
++`SensorRecordings/<UTC時刻>_<乱数>/`を作成します。
++
++- `imu.csv` — `/imu/data`、1 kHz
++- `scan.csv` — `/scan`、40 Hz
++- `ground_truth.csv` — `/ground_truth_pose`、100 Hz
++- `manifest.json` — Unity版、fixed timestep、件数、完了状態
++
++各行はUnityのセンサモデルが生成したメッセージそのものです。書き込みは専用スレッドで
++行うので、1 kHzの`FixedUpdate`でディスクI/Oをしません。`manifest.json`の
++`complete: true`は、Play停止時に全キューをCSVへフラッシュできた印です。`false`の
++記録は原則として変換しません。
++
++現行の実プロジェクトでは、Windows側の保存先は次です。
++
++```
++C:\Users\kouza\UnityProjects\Robocon2026Sim\SensorRecordings
++```
++
++WSLからは`/mnt/c/Users/kouza/UnityProjects/Robocon2026Sim/SensorRecordings`として読めます。
++
++`/clock`はCSVへ保存しません。再生時に`ros2 bag play --clock 250`がbagの時刻から新しく
++生成するため、実行時の250 Hz clock設定を再現できます。IMUサンプルのheader時刻は1 kHzの
++まま保持されます。
++
++## CSVをMCAPへ変換する
++
++一度ワークスペースをビルドし、生成された記録ディレクトリを指定します。
++
++```bash
++cd /home/yukichi6105/ros2_ws
++colcon build --packages-select lio_localization_sim
++source install/setup.bash
++
++ros2 run lio_localization_sim unity_csv_to_rosbag2 \
++  /mnt/c/Users/kouza/UnityProjects/Robocon2026Sim/SensorRecordings/<run_id> \
++  /tmp/robocon_<run_id>.mcap
++ros2 bag info /tmp/robocon_<run_id>.mcap
++```
++
++出力先は新しいディレクトリでなければなりません。変換器は各CSVの連番とトピック内時刻の
++単調性、CSV行数とmanifest件数を検証します。成功時はbag内に
++`unity_csv_conversion.json`も書き、入力manifestのSHA-256とトピック別件数を残します。
++
++同じbagを評価系へ流す例は次です。
++
++```bash
++ros2 bag play /tmp/robocon_<run_id>.mcap --clock 250
++```
++
++再生先の各ノードは`use_sim_time:=true`で起動します。bagにはUnityのROS送信後の挙動や
++`/odom_fast`を使う閉ループ制御は含まれません。したがってこれは**センサ入力に対する
++ROS側推定器の再現試験**であり、Unityまで含めた閉ループ走行の代替ではありません。
++
++## 運用上の注意
++
++- Playを強制終了せず、必ずStopして`complete: true`を確認する。
++- CSVの保存先はUnity実プロジェクトであり、リポジトリの
++  `unity/Robocon2026Sim`コピーではない。実験ごとにrunディレクトリを丸ごと保全する。
++- `manifest.json`が未完了でも救済変換が必要な場合だけ`--allow-incomplete`を使う。
++  そのbagは欠損の可能性があるため正式な比較データにしない。
++- Unity側のランダムシード、設定YAML、ソースコミットも既存の
++  `stage4_mcp_run.sh`スナップショットと同じ実験フォルダへ保存する。
+diff --git a/lio_localization_sim/unity_csv_to_rosbag2.py b/lio_localization_sim/unity_csv_to_rosbag2.py
+new file mode 100644
+index 0000000..c3dff65
+--- /dev/null
++++ b/lio_localization_sim/unity_csv_to_rosbag2.py
+@@ -0,0 +1,263 @@
++#!/usr/bin/env python3
++"""Convert Unity's transport-independent sensor CSV recording into a rosbag2 MCAP."""
++
++from __future__ import annotations
++
++import argparse
++import csv
++import hashlib
++import heapq
++import json
++import math
++from dataclasses import dataclass
++from pathlib import Path
++from typing import Any, Iterator
++
++import rosbag2_py
++from builtin_interfaces.msg import Time
++from nav_msgs.msg import Odometry
++from rclpy.serialization import serialize_message
++from sensor_msgs.msg import Imu, LaserScan
++
++
++NS_PER_SEC = 1_000_000_000
++TOPICS = {
++    "imu": ("/imu/data", "sensor_msgs/msg/Imu"),
++    "scan": ("/scan", "sensor_msgs/msg/LaserScan"),
++    "ground_truth": ("/ground_truth_pose", "nav_msgs/msg/Odometry"),
++}
++
++
++@dataclass
++class ConvertedRecord:
++    stamp_ns: int
++    priority: int
++    topic: str
++    message: Any
++
++
++def parse_scalar(value: str) -> float:
++    normalized = value.strip().lower()
++    if normalized == "inf":
++        return math.inf
++    if normalized == "-inf":
++        return -math.inf
++    if normalized == "nan":
++        return math.nan
++    return float(value)
++
++
++def parse_array(value: str, expected_length: int | None = None) -> list[float]:
++    values = [] if value == "" else [parse_scalar(item) for item in value.split(";")]
++    if expected_length is not None and len(values) != expected_length:
++        raise ValueError(f"expected {expected_length} values, got {len(values)}")
++    return values
++
++
++def stamp_from_ns(stamp_ns: int) -> Time:
++    if stamp_ns < 0:
++        raise ValueError(f"negative timestamp: {stamp_ns}")
++    stamp = Time()
++    stamp.sec = stamp_ns // NS_PER_SEC
++    stamp.nanosec = stamp_ns % NS_PER_SEC
++    return stamp
++
++
++def set_header(header: Any, row: dict[str, str], stamp_ns: int) -> None:
++    header.stamp = stamp_from_ns(stamp_ns)
++    header.frame_id = row["frame_id"]
++
++
++def imu_from_row(row: dict[str, str], stamp_ns: int) -> Imu:
++    message = Imu()
++    set_header(message.header, row, stamp_ns)
++    message.orientation.x = parse_scalar(row["orientation_x"])
++    message.orientation.y = parse_scalar(row["orientation_y"])
++    message.orientation.z = parse_scalar(row["orientation_z"])
++    message.orientation.w = parse_scalar(row["orientation_w"])
++    message.orientation_covariance = parse_array(row["orientation_covariance"], 9)
++    message.angular_velocity.x = parse_scalar(row["angular_velocity_x"])
++    message.angular_velocity.y = parse_scalar(row["angular_velocity_y"])
++    message.angular_velocity.z = parse_scalar(row["angular_velocity_z"])
++    message.angular_velocity_covariance = parse_array(row["angular_velocity_covariance"], 9)
++    message.linear_acceleration.x = parse_scalar(row["linear_acceleration_x"])
++    message.linear_acceleration.y = parse_scalar(row["linear_acceleration_y"])
++    message.linear_acceleration.z = parse_scalar(row["linear_acceleration_z"])
++    message.linear_acceleration_covariance = parse_array(row["linear_acceleration_covariance"], 9)
++    return message
++
++
++def scan_from_row(row: dict[str, str], stamp_ns: int) -> LaserScan:
++    message = LaserScan()
++    set_header(message.header, row, stamp_ns)
++    for name in (
++        "angle_min", "angle_max", "angle_increment", "time_increment", "scan_time",
++        "range_min", "range_max",
++    ):
++        setattr(message, name, parse_scalar(row[name]))
++    message.ranges = parse_array(row["ranges"])
++    message.intensities = parse_array(row["intensities"])
++    return message
++
++
++def odometry_from_row(row: dict[str, str], stamp_ns: int) -> Odometry:
++    message = Odometry()
++    set_header(message.header, row, stamp_ns)
++    message.child_frame_id = row["child_frame_id"]
++    pose = message.pose.pose
++    pose.position.x = parse_scalar(row["position_x"])
++    pose.position.y = parse_scalar(row["position_y"])
++    pose.position.z = parse_scalar(row["position_z"])
++    pose.orientation.x = parse_scalar(row["orientation_x"])
++    pose.orientation.y = parse_scalar(row["orientation_y"])
++    pose.orientation.z = parse_scalar(row["orientation_z"])
++    pose.orientation.w = parse_scalar(row["orientation_w"])
++    message.pose.covariance = parse_array(row["pose_covariance"], 36)
++    twist = message.twist.twist
++    twist.linear.x = parse_scalar(row["linear_x"])
++    twist.linear.y = parse_scalar(row["linear_y"])
++    twist.linear.z = parse_scalar(row["linear_z"])
++    twist.angular.x = parse_scalar(row["angular_x"])
++    twist.angular.y = parse_scalar(row["angular_y"])
++    twist.angular.z = parse_scalar(row["angular_z"])
++    message.twist.covariance = parse_array(row["twist_covariance"], 36)
++    return message
++
++
++ROW_CONVERTERS = {
++    "imu": imu_from_row,
++    "scan": scan_from_row,
++    "ground_truth": odometry_from_row,
++}
++
++
++def iter_records(recording_dir: Path, kind: str, priority: int) -> Iterator[ConvertedRecord]:
++    csv_path = recording_dir / {"imu": "imu.csv", "scan": "scan.csv", "ground_truth": "ground_truth.csv"}[kind]
++    expected_sequence = 0
++    previous_stamp = -1
++    converter = ROW_CONVERTERS[kind]
++    with csv_path.open("r", newline="", encoding="utf-8") as source:
++        for line_number, row in enumerate(csv.DictReader(source), start=2):
++            try:
++                sequence = int(row["seq"])
++                stamp_ns = int(row["stamp_ns"])
++                if sequence != expected_sequence:
++                    raise ValueError(f"sequence {sequence}, expected {expected_sequence}")
++                if stamp_ns < previous_stamp:
++                    raise ValueError(f"timestamp {stamp_ns} is before {previous_stamp}")
++                message = converter(row, stamp_ns)
++            except (KeyError, TypeError, ValueError) as error:
++                raise ValueError(f"{csv_path}:{line_number}: {error}") from error
++            expected_sequence += 1
++            previous_stamp = stamp_ns
++            yield ConvertedRecord(stamp_ns, priority, TOPICS[kind][0], message)
++
++
++def sha256(path: Path) -> str:
++    digest = hashlib.sha256()
++    with path.open("rb") as source:
++        for block in iter(lambda: source.read(1024 * 1024), b""):
++            digest.update(block)
++    return digest.hexdigest()
++
++
++def read_manifest(recording_dir: Path, allow_incomplete: bool) -> dict[str, Any]:
++    manifest_path = recording_dir / "manifest.json"
++    try:
++        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
++    except (OSError, json.JSONDecodeError) as error:
++        raise ValueError(f"cannot read {manifest_path}: {error}") from error
++    if manifest.get("schema_version") != 1:
++        raise ValueError(f"unsupported schema_version: {manifest.get('schema_version')}")
++    if not manifest.get("complete", False) and not allow_incomplete:
++        raise ValueError("recording manifest is incomplete; stop Unity cleanly or pass --allow-incomplete")
++    return manifest
++
++
++def convert(recording_dir: Path, output_bag: Path, allow_incomplete: bool) -> dict[str, Any]:
++    manifest = read_manifest(recording_dir, allow_incomplete)
++    if output_bag.exists():
++        raise ValueError(f"output path already exists: {output_bag}")
++    for name in ("imu.csv", "scan.csv", "ground_truth.csv"):
++        if not (recording_dir / name).is_file():
++            raise ValueError(f"missing recording file: {recording_dir / name}")
++
++    custom_data = {
++        "source": "unity_authoritative_sensor_csv",
++        "run_id": str(manifest.get("run_id", "")),
++        "manifest_sha256": sha256(recording_dir / "manifest.json"),
++    }
++    writer = rosbag2_py.SequentialWriter()
++    writer.open(
++        rosbag2_py.StorageOptions(uri=str(output_bag), storage_id="mcap", custom_data=custom_data),
++        rosbag2_py.ConverterOptions("cdr", "cdr"),
++    )
++    for topic_id, kind in enumerate(("imu", "scan", "ground_truth"), start=1):
++        topic_name, topic_type = TOPICS[kind]
++        writer.create_topic(rosbag2_py.TopicMetadata(topic_id, topic_name, topic_type, "cdr"))
++
++    heap: list[tuple[int, int, int, ConvertedRecord, Iterator[ConvertedRecord]]] = []
++    for priority, kind in enumerate(("imu", "ground_truth", "scan")):
++        iterator = iter_records(recording_dir, kind, priority)
++        try:
++            record = next(iterator)
++        except StopIteration:
++            continue
++        heapq.heappush(heap, (record.stamp_ns, record.priority, 0, record, iterator))
++
++    counts = {kind: 0 for kind in TOPICS}
++    previous_bag_stamp = -1
++    sequence_number = 0
++    while heap:
++        stamp_ns, _, _, record, iterator = heapq.heappop(heap)
++        if stamp_ns < previous_bag_stamp:
++            raise AssertionError("merged stream is not timestamp ordered")
++        writer.write(record.topic, serialize_message(record.message), stamp_ns)
++        counts[next(kind for kind, topic in TOPICS.items() if topic[0] == record.topic)] += 1
++        previous_bag_stamp = stamp_ns
++        try:
++            next_record = next(iterator)
++        except StopIteration:
++            continue
++        sequence_number += 1
++        heapq.heappush(heap, (next_record.stamp_ns, next_record.priority, sequence_number, next_record, iterator))
++    writer.close()
++
++    expected_counts = manifest.get("written_counts", {})
++    for kind, count in counts.items():
++        expected = expected_counts.get(kind)
++        if expected is not None and count != expected:
++            raise ValueError(f"{kind} row count {count} does not match manifest {expected}")
++
++    conversion_manifest = {
++        "schema_version": 1,
++        "source_recording": str(recording_dir.resolve()),
++        "source_manifest_sha256": custom_data["manifest_sha256"],
++        "bag_storage": "mcap",
++        "counts": counts,
++        "start_stamp_ns": None if previous_bag_stamp < 0 else min(
++            next(iter_records(recording_dir, kind, 0)).stamp_ns for kind in TOPICS if counts[kind]),
++        "end_stamp_ns": None if previous_bag_stamp < 0 else previous_bag_stamp,
++    }
++    (output_bag / "unity_csv_conversion.json").write_text(
++        json.dumps(conversion_manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
++    return conversion_manifest
++
++
++def main() -> None:
++    parser = argparse.ArgumentParser(
++        description="Convert Unity authoritative sensor CSV files to a rosbag2 MCAP directory.")
++    parser.add_argument("recording_dir", type=Path, help="Unity SensorRecordings/<run_id> directory")
++    parser.add_argument("output_bag", type=Path, help="new rosbag2 output directory")
++    parser.add_argument("--allow-incomplete", action="store_true",
++                        help="allow a recording whose Unity manifest was not finalized")
++    arguments = parser.parse_args()
++    try:
++        result = convert(arguments.recording_dir, arguments.output_bag, arguments.allow_incomplete)
++    except (OSError, ValueError, RuntimeError) as error:
++        parser.error(str(error))
++    print(json.dumps(result, indent=2, sort_keys=True))
++
++
++if __name__ == "__main__":
++    main()
+diff --git a/scripts/bag_component_isolation.sh b/scripts/bag_component_isolation.sh
+new file mode 100755
+index 0000000..7066721
+--- /dev/null
++++ b/scripts/bag_component_isolation.sh
+@@ -0,0 +1,122 @@
++#!/bin/bash
++# Replay the reproducible Unity bag with only selected non-core components.
++# Usage: bag_component_isolation.sh <tag> [--ball] [--endpoint]
++set -euo pipefail
++
++TAG="${1:?usage: bag_component_isolation.sh <tag> [--ball] [--endpoint]}"
++shift
++WITH_BALL=false
++WITH_ENDPOINT=false
++for option in "$@"; do
++  case "$option" in
++    --ball) WITH_BALL=true ;;
++    --endpoint) WITH_ENDPOINT=true ;;
++    *) echo "unknown option: $option" >&2; exit 2 ;;
++  esac
++done
++
++WS=/home/yukichi6105/ros2_ws
++OUT="$WS/src/lio_localization_sim/docs/stage4_runs/$TAG"
++BAG=/tmp/robocon_unity_88s_20260729.mcap
++CFG="$WS/src/lio_localization_sim/config/robocon2026_unity.yaml"
++EVAL_OUT="$OUT/evaluator_output"
++
++test -d "$BAG" || { echo "bag not found: $BAG" >&2; exit 2; }
++mkdir -p "$OUT" "$EVAL_OUT"
++cp "$CFG" "$OUT/robocon2026_unity.yaml"
++
++snapshot_repo() {
++  local name="$1"
++  local repo="$2"
++  git -C "$repo" rev-parse HEAD > "$OUT/${name}_commit.txt"
++  git -C "$repo" status --short > "$OUT/${name}_status.txt"
++  git -C "$repo" diff --binary HEAD > "$OUT/${name}_working_tree.patch"
++  git -C "$repo" ls-files --others --exclude-standard > "$OUT/${name}_untracked_files_all.txt"
++  : > "$OUT/${name}_untracked.patch"
++  : > "$OUT/${name}_untracked_files.txt"
++  while IFS= read -r file; do
++    [ -n "$file" ] || continue
++    case "$file" in
++      docs/stage4_runs/*|.claude/*) continue ;;
++    esac
++    printf '%s\n' "$file" >> "$OUT/${name}_untracked_files.txt"
++    git -C "$repo" diff --binary --no-index /dev/null "$file" >> "$OUT/${name}_untracked.patch" 2>/dev/null || true
++  done < "$OUT/${name}_untracked_files_all.txt"
++}
++
++snapshot_repo lio_localization "$WS/src/lio_localization"
++snapshot_repo lio_localization_sim "$WS/src/lio_localization_sim"
++cat > "$OUT/run_manifest.txt" <<EOF
++run_tag=$TAG
++mode=bag_component_isolation
++with_ball=$WITH_BALL
++with_endpoint=$WITH_ENDPOINT
++bag=$BAG
++started_at=$(date --iso-8601=seconds)
++EOF
++
++set +u
++source /opt/ros/lyrical/setup.bash
++source "$WS/install/setup.bash"
++set -u
++export ROS_LOG_DIR="$OUT/ros2_logs"
++mkdir -p "$ROS_LOG_DIR"
++
++PIDS=()
++start_node() {
++  local log="$1"
++  shift
++  "$@" > "$OUT/$log" 2>&1 &
++  PIDS+=("$!")
++}
++cleanup() {
++  if [ "${#PIDS[@]}" -gt 0 ]; then
++    kill -INT "${PIDS[@]}" 2>/dev/null || true
++    wait "${PIDS[@]}" 2>/dev/null || true
++  fi
++}
++trap cleanup EXIT
++
++start_node backend.log ros2 run lio_localization backend_optimizer_node --ros-args \
++  --params-file "$OUT/robocon2026_unity.yaml" -p use_sim_time:=true \
++  -p initial_x:=-2.419 -p initial_y:=1.354 -p initial_theta:=0.0 \
++  -p initial_vx:=0.0 -p initial_vy:=0.0
++start_node imu_preintegration.log ros2 run lio_localization imu_preintegration_node --ros-args \
++  --params-file "$OUT/robocon2026_unity.yaml" -p use_sim_time:=true
++start_node scan_matching.log ros2 run lio_localization laser_scan_matching_node --ros-args \
++  --params-file "$OUT/robocon2026_unity.yaml" -p use_sim_time:=true \
++  -p initial_x:=-2.419 -p initial_y:=1.354 -p initial_theta:=0.0
++start_node evaluator.log nice -n 10 ros2 run lio_localization realtime_evaluator_node --ros-args \
++  --params-file "$OUT/robocon2026_unity.yaml" -p use_sim_time:=true \
++  -p duration_sec:=60.0 -p settle_sec:=3.0 -p sim_start_time_sec:=0.0 \
++  -p output_dir:="$EVAL_OUT"
++
++if "$WITH_BALL"; then
++  start_node ball_tracking.log nice -n 10 ros2 run lio_localization ball_tracking_node --ros-args \
++    --params-file "$OUT/robocon2026_unity.yaml" -p use_sim_time:=true
++fi
++if "$WITH_ENDPOINT"; then
++  start_node endpoint.log ros2 run ros_tcp_endpoint default_server_endpoint --ros-args \
++    -p ROS_IP:=0.0.0.0 -p ROS_TCP_PORT:=10000
++fi
++
++sleep 3
++ros2 bag play "$BAG" --clock 250 --playback-duration 62 --disable-keyboard-controls \
++  --progress-bar-update-rate 0 > "$OUT/bag_play.log" 2>&1
++
++# Allow the C++ evaluator to flush its bounded CSV before signalling the
++# remaining nodes, whose orderly shutdown emits the backend diagnostics.
++for _ in $(seq 1 10); do
++  [ -f "$EVAL_OUT/sim_eval_report.txt" ] && break
++  sleep 1
++done
++cleanup
++trap - EXIT
++
++cp "$EVAL_OUT/sim_eval_report.txt" "$OUT/" 2>/dev/null || true
++cp "$EVAL_OUT/diag_raw_errors.csv" "$OUT/" 2>/dev/null || true
++if [ -f "$OUT/diag_raw_errors.csv" ]; then
++  python3 "$WS/src/lio_localization_sim/tools/render_eval_plot.py" \
++    "$OUT/diag_raw_errors.csv" "$OUT/sim_eval_plot.png"
++fi
++echo "DONE: $OUT"
+diff --git a/tools/render_eval_plot.py b/tools/render_eval_plot.py
+new file mode 100644
+index 0000000..f13bbd4
+--- /dev/null
++++ b/tools/render_eval_plot.py
+@@ -0,0 +1,55 @@
++#!/usr/bin/env python3
++"""Render an evaluator PNG after a ROS run has completed.
++
++The real-time evaluator deliberately writes only a compact report and CSV from
++C++.  Matplotlib stays out of the 1 kHz ROS callback path; this tool consumes
++that finished CSV afterwards.
++"""
++
++import argparse
++import csv
++import os
++from pathlib import Path
++
++
++def main() -> int:
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument('errors_csv', type=Path)
++    parser.add_argument('output_png', type=Path)
++    args = parser.parse_args()
++
++    times: list[float] = []
++    position_errors: list[float] = []
++    yaw_errors: list[float] = []
++    with args.errors_csv.open(encoding='utf-8', newline='') as file:
++        for row in csv.DictReader(file):
++            times.append(float(row['t']))
++            position_errors.append(float(row['pos_err_mm']))
++            yaw_errors.append(float(row['yaw_err_deg']))
++    if not times:
++        raise ValueError(f'No error samples in {args.errors_csv}')
++
++    args.output_png.parent.mkdir(parents=True, exist_ok=True)
++    # Do not create a user-home cache while the experiment artifacts are being
++    # produced in a sandboxed/CI environment.
++    os.environ.setdefault('MPLCONFIGDIR', str(args.output_png.parent / '.matplotlib'))
++    import matplotlib
++    matplotlib.use('Agg')
++    import matplotlib.pyplot as plt
++
++    fig, axes = plt.subplots(2, 1, figsize=(10, 7), sharex=True)
++    axes[0].plot(times, position_errors, linewidth=0.7, color='tab:red')
++    axes[0].axhline(10.0, color='green', linestyle='--', label='10 mm requirement')
++    axes[0].set_ylabel('position error [mm]')
++    axes[0].legend()
++    axes[0].grid(True)
++    axes[1].plot(times, yaw_errors, linewidth=0.7, color='tab:blue')
++    axes[1].set_xlabel('simulation time [s]')
++    axes[1].set_ylabel('yaw error [deg]')
++    axes[1].grid(True)
++    fig.tight_layout()
++    fig.savefig(args.output_png, dpi=120)
++
++
++if __name__ == '__main__':
++    main()
+diff --git a/unity/Robocon2026Sim/Assets/Robocon2026/Scripts/UnitySensorCsvRecorder.cs b/unity/Robocon2026Sim/Assets/Robocon2026/Scripts/UnitySensorCsvRecorder.cs
+new file mode 100644
+index 0000000..2606a2f
+--- /dev/null
++++ b/unity/Robocon2026Sim/Assets/Robocon2026/Scripts/UnitySensorCsvRecorder.cs
+@@ -0,0 +1,303 @@
++using System;
++using System.Collections.Concurrent;
++using System.Globalization;
++using System.IO;
++using System.Text;
++using System.Threading;
++using RosMessageTypes.BuiltinInterfaces;
++using RosMessageTypes.Nav;
++using RosMessageTypes.Sensor;
++using UnityEngine;
++
++namespace Robocon2026.Simulation
++{
++    /// <summary>
++    /// Records the messages generated by Unity before they enter ROS-TCP-Connector.
++    /// The writer is deliberately independent from ROS transport: a CSV row means that the
++    /// Unity sensor model produced that sample, not that a subscriber happened to receive it.
++    /// </summary>
++    internal sealed class UnitySensorCsvRecorder : IDisposable
++    {
++        private enum RecordKind { Imu, Scan, GroundTruth }
++
++        private struct PendingRecord
++        {
++            public RecordKind Kind;
++            public long Sequence;
++            public object Message;
++        }
++
++        private readonly BlockingCollection<PendingRecord> queue = new();
++        private readonly Thread writerThread;
++        private readonly string outputDirectory;
++        private readonly string manifestPath;
++        private readonly string runId;
++        private readonly double fixedDeltaTime;
++        private readonly string unityVersion;
++        private readonly StreamWriter imuWriter;
++        private readonly StreamWriter scanWriter;
++        private readonly StreamWriter groundTruthWriter;
++        private Exception writerFailure;
++        private int disposed;
++        private long imuWritten;
++        private long scanWritten;
++        private long groundTruthWritten;
++        private long queued;
++        private long maximumQueued;
++
++        public string OutputDirectory => outputDirectory;
++
++        public UnitySensorCsvRecorder(double fixedDeltaTime)
++        {
++            this.fixedDeltaTime = fixedDeltaTime;
++            unityVersion = Application.unityVersion;
++            runId = DateTime.UtcNow.ToString("yyyyMMdd_HHmmss_fff", CultureInfo.InvariantCulture)
++                + "_" + Guid.NewGuid().ToString("N").Substring(0, 8);
++            outputDirectory = Path.Combine(Application.dataPath, "..", "SensorRecordings", runId);
++            Directory.CreateDirectory(outputDirectory);
++            manifestPath = Path.Combine(outputDirectory, "manifest.json");
++
++            imuWriter = CreateWriter("imu.csv");
++            scanWriter = CreateWriter("scan.csv");
++            groundTruthWriter = CreateWriter("ground_truth.csv");
++            imuWriter.WriteLine("seq,stamp_ns,frame_id,orientation_x,orientation_y,orientation_z,orientation_w,orientation_covariance,angular_velocity_x,angular_velocity_y,angular_velocity_z,angular_velocity_covariance,linear_acceleration_x,linear_acceleration_y,linear_acceleration_z,linear_acceleration_covariance");
++            scanWriter.WriteLine("seq,stamp_ns,frame_id,angle_min,angle_max,angle_increment,time_increment,scan_time,range_min,range_max,ranges,intensities");
++            groundTruthWriter.WriteLine("seq,stamp_ns,frame_id,child_frame_id,position_x,position_y,position_z,orientation_x,orientation_y,orientation_z,orientation_w,pose_covariance,linear_x,linear_y,linear_z,angular_x,angular_y,angular_z,twist_covariance");
++            WriteManifest(false);
++
++            writerThread = new Thread(WriterLoop)
++            {
++                IsBackground = true,
++                Name = "UnitySensorCsvRecorder"
++            };
++            writerThread.Start();
++        }
++
++        public void RecordImu(ImuMsg message, long sequence) =>
++            Enqueue(RecordKind.Imu, sequence, message);
++
++        public void RecordScan(LaserScanMsg message, long sequence) =>
++            Enqueue(RecordKind.Scan, sequence, message);
++
++        public void RecordGroundTruth(OdometryMsg message, long sequence) =>
++            Enqueue(RecordKind.GroundTruth, sequence, message);
++
++        private StreamWriter CreateWriter(string name) => new(
++            new FileStream(Path.Combine(outputDirectory, name), FileMode.CreateNew, FileAccess.Write,
++                FileShare.Read, 1024 * 1024, FileOptions.SequentialScan),
++            new UTF8Encoding(false), 1024 * 1024);
++
++        private void Enqueue(RecordKind kind, long sequence, object message)
++        {
++            if (Volatile.Read(ref disposed) != 0)
++                throw new ObjectDisposedException(nameof(UnitySensorCsvRecorder));
++            if (writerFailure != null)
++                throw new InvalidOperationException("Sensor CSV writer failed.", writerFailure);
++
++            var pending = new PendingRecord { Kind = kind, Sequence = sequence, Message = message };
++            var current = Interlocked.Increment(ref queued);
++            try
++            {
++                queue.Add(pending);
++                while (current > Volatile.Read(ref maximumQueued))
++                {
++                    var observed = Volatile.Read(ref maximumQueued);
++                    if (observed >= current || Interlocked.CompareExchange(ref maximumQueued, current, observed) == observed)
++                        break;
++                }
++            }
++            catch
++            {
++                Interlocked.Decrement(ref queued);
++                throw;
++            }
++        }
++
++        private void WriterLoop()
++        {
++            try
++            {
++                foreach (var pending in queue.GetConsumingEnumerable())
++                {
++                    switch (pending.Kind)
++                    {
++                        case RecordKind.Imu:
++                            WriteImu((ImuMsg)pending.Message, pending.Sequence);
++                            imuWritten++;
++                            break;
++                        case RecordKind.Scan:
++                            WriteScan((LaserScanMsg)pending.Message, pending.Sequence);
++                            scanWritten++;
++                            break;
++                        case RecordKind.GroundTruth:
++                            WriteGroundTruth((OdometryMsg)pending.Message, pending.Sequence);
++                            groundTruthWritten++;
++                            break;
++                    }
++                    Interlocked.Decrement(ref queued);
++                }
++                imuWriter.Flush();
++                scanWriter.Flush();
++                groundTruthWriter.Flush();
++            }
++            catch (Exception exception)
++            {
++                writerFailure = exception;
++            }
++        }
++
++        private void WriteImu(ImuMsg message, long sequence)
++        {
++            var writer = imuWriter;
++            WritePrefix(writer, sequence, message.header.stamp, message.header.frame_id);
++            WriteNumber(writer, message.orientation.x); writer.Write(',');
++            WriteNumber(writer, message.orientation.y); writer.Write(',');
++            WriteNumber(writer, message.orientation.z); writer.Write(',');
++            WriteNumber(writer, message.orientation.w); writer.Write(',');
++            WriteArray(writer, message.orientation_covariance); writer.Write(',');
++            WriteNumber(writer, message.angular_velocity.x); writer.Write(',');
++            WriteNumber(writer, message.angular_velocity.y); writer.Write(',');
++            WriteNumber(writer, message.angular_velocity.z); writer.Write(',');
++            WriteArray(writer, message.angular_velocity_covariance); writer.Write(',');
++            WriteNumber(writer, message.linear_acceleration.x); writer.Write(',');
++            WriteNumber(writer, message.linear_acceleration.y); writer.Write(',');
++            WriteNumber(writer, message.linear_acceleration.z); writer.Write(',');
++            WriteArray(writer, message.linear_acceleration_covariance);
++            writer.WriteLine();
++        }
++
++        private void WriteScan(LaserScanMsg message, long sequence)
++        {
++            var writer = scanWriter;
++            WritePrefix(writer, sequence, message.header.stamp, message.header.frame_id);
++            WriteNumber(writer, message.angle_min); writer.Write(',');
++            WriteNumber(writer, message.angle_max); writer.Write(',');
++            WriteNumber(writer, message.angle_increment); writer.Write(',');
++            WriteNumber(writer, message.time_increment); writer.Write(',');
++            WriteNumber(writer, message.scan_time); writer.Write(',');
++            WriteNumber(writer, message.range_min); writer.Write(',');
++            WriteNumber(writer, message.range_max); writer.Write(',');
++            WriteArray(writer, message.ranges); writer.Write(',');
++            WriteArray(writer, message.intensities);
++            writer.WriteLine();
++        }
++
++        private void WriteGroundTruth(OdometryMsg message, long sequence)
++        {
++            var writer = groundTruthWriter;
++            WritePrefix(writer, sequence, message.header.stamp, message.header.frame_id);
++            WriteCsvString(writer, message.child_frame_id); writer.Write(',');
++            var pose = message.pose.pose;
++            WriteNumber(writer, pose.position.x); writer.Write(',');
++            WriteNumber(writer, pose.position.y); writer.Write(',');
++            WriteNumber(writer, pose.position.z); writer.Write(',');
++            WriteNumber(writer, pose.orientation.x); writer.Write(',');
++            WriteNumber(writer, pose.orientation.y); writer.Write(',');
++            WriteNumber(writer, pose.orientation.z); writer.Write(',');
++            WriteNumber(writer, pose.orientation.w); writer.Write(',');
++            WriteArray(writer, message.pose.covariance); writer.Write(',');
++            var twist = message.twist.twist;
++            WriteNumber(writer, twist.linear.x); writer.Write(',');
++            WriteNumber(writer, twist.linear.y); writer.Write(',');
++            WriteNumber(writer, twist.linear.z); writer.Write(',');
++            WriteNumber(writer, twist.angular.x); writer.Write(',');
++            WriteNumber(writer, twist.angular.y); writer.Write(',');
++            WriteNumber(writer, twist.angular.z); writer.Write(',');
++            WriteArray(writer, message.twist.covariance);
++            writer.WriteLine();
++        }
++
++        private static void WritePrefix(StreamWriter writer, long sequence, TimeMsg stamp, string frameId)
++        {
++            writer.Write(sequence.ToString(CultureInfo.InvariantCulture));
++            writer.Write(',');
++            writer.Write(ToNanoseconds(stamp).ToString(CultureInfo.InvariantCulture));
++            writer.Write(',');
++            WriteCsvString(writer, frameId);
++            writer.Write(',');
++        }
++
++        private static long ToNanoseconds(TimeMsg stamp) =>
++            checked(Convert.ToInt64(stamp.sec, CultureInfo.InvariantCulture) * 1_000_000_000L
++                + Convert.ToInt64(stamp.nanosec, CultureInfo.InvariantCulture));
++
++        private static void WriteCsvString(StreamWriter writer, string value)
++        {
++            writer.Write('"');
++            writer.Write((value ?? string.Empty).Replace("\"", "\"\""));
++            writer.Write('"');
++        }
++
++        private static void WriteArray(StreamWriter writer, double[] values)
++        {
++            writer.Write('"');
++            for (var i = 0; i < values.Length; i++)
++            {
++                if (i != 0) writer.Write(';');
++                WriteNumber(writer, values[i]);
++            }
++            writer.Write('"');
++        }
++
++        private static void WriteArray(StreamWriter writer, float[] values)
++        {
++            writer.Write('"');
++            for (var i = 0; i < values.Length; i++)
++            {
++                if (i != 0) writer.Write(';');
++                WriteNumber(writer, values[i]);
++            }
++            writer.Write('"');
++        }
++
++        private static void WriteNumber(StreamWriter writer, double value)
++        {
++            if (double.IsPositiveInfinity(value)) writer.Write("inf");
++            else if (double.IsNegativeInfinity(value)) writer.Write("-inf");
++            else if (double.IsNaN(value)) writer.Write("nan");
++            else writer.Write(value.ToString("R", CultureInfo.InvariantCulture));
++        }
++
++        private static void WriteNumber(StreamWriter writer, float value)
++        {
++            if (float.IsPositiveInfinity(value)) writer.Write("inf");
++            else if (float.IsNegativeInfinity(value)) writer.Write("-inf");
++            else if (float.IsNaN(value)) writer.Write("nan");
++            else writer.Write(value.ToString("R", CultureInfo.InvariantCulture));
++        }
++
++        private void WriteManifest(bool complete)
++        {
++            var json = "{\n"
++                + "  \"schema_version\": 1,\n"
++                + "  \"run_id\": \"" + EscapeJson(runId) + "\",\n"
++                + "  \"created_utc\": \"" + DateTime.UtcNow.ToString("O", CultureInfo.InvariantCulture) + "\",\n"
++                + "  \"unity_version\": \"" + EscapeJson(unityVersion) + "\",\n"
++                + "  \"fixed_delta_time_sec\": " + fixedDeltaTime.ToString("R", CultureInfo.InvariantCulture) + ",\n"
++                + "  \"topics\": {\"/imu/data\": \"sensor_msgs/msg/Imu\", \"/scan\": \"sensor_msgs/msg/LaserScan\", \"/ground_truth_pose\": \"nav_msgs/msg/Odometry\"},\n"
++                + "  \"complete\": " + (complete ? "true" : "false") + ",\n"
++                + "  \"written_counts\": {\"imu\": " + imuWritten + ", \"scan\": " + scanWritten + ", \"ground_truth\": " + groundTruthWritten + "},\n"
++                + "  \"maximum_pending_records\": " + maximumQueued + "\n"
++                + "}\n";
++            File.WriteAllText(manifestPath, json, new UTF8Encoding(false));
++        }
++
++        private static string EscapeJson(string value) => (value ?? string.Empty)
++            .Replace("\\", "\\\\").Replace("\"", "\\\"");
++
++        public void Dispose()
++        {
++            if (Interlocked.Exchange(ref disposed, 1) != 0) return;
++            queue.CompleteAdding();
++            if (!writerThread.Join(TimeSpan.FromSeconds(30)))
++                throw new TimeoutException("Timed out while flushing Unity sensor CSV records.");
++            imuWriter.Dispose();
++            scanWriter.Dispose();
++            groundTruthWriter.Dispose();
++            queue.Dispose();
++            WriteManifest(writerFailure == null);
++            if (writerFailure != null)
++                throw new InvalidOperationException("Sensor CSV writer failed.", writerFailure);
++        }
++    }
++}
+diff --git a/unity/Robocon2026Sim/Assets/Robocon2026/Scripts/UnitySensorCsvRecorder.cs.meta b/unity/Robocon2026Sim/Assets/Robocon2026/Scripts/UnitySensorCsvRecorder.cs.meta
+new file mode 100755
+index 0000000..89faa74
+--- /dev/null
++++ b/unity/Robocon2026Sim/Assets/Robocon2026/Scripts/UnitySensorCsvRecorder.cs.meta
+@@ -0,0 +1,2 @@
++fileFormatVersion: 2
++guid: 6f80b8e8c138146438ebdfec1a7a885c
+\ No newline at end of file

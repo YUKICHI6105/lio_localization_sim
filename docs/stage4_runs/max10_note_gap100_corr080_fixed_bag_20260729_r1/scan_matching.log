@@ -1,0 +1,3 @@
+terminate called after throwing an instance of 'rclcpp::exceptions::UnknownROSArgsError'
+  what():  found unknown ROS arguments: 'planar_correspondence_distance:=0.08'
+[ros2run]: Aborted

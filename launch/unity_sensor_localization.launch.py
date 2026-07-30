@@ -38,9 +38,15 @@ def generate_launch_description():
             name='laser_scan_matching_node', parameters=[config, initial_pose], output='screen'),
         Node(
             package='lio_localization', executable='ball_tracking_node',
-            name='ball_tracking_node', parameters=common, output='screen'),
+            name='ball_tracking_node', parameters=common, output='screen',
+            # Ball tracking is not on the self-localization safety path. Give
+            # IMU/backend callbacks precedence during a host CPU burst.
+            prefix='nice -n 10'),
         Node(
-            package='lio_localization_sim', executable='evaluator_node',
+            # /odom_fast is 1 kHz.  Keep its real-time comparison path in C++ so
+            # Python allocation/GC cannot contend with the localization nodes.
+            # The Python evaluator remains available for offline plotting only.
+            package='lio_localization', executable='realtime_evaluator_node',
             name='unity_evaluator_node',
             parameters=[config, {
                 'use_sim_time': True,
@@ -55,12 +61,12 @@ def generate_launch_description():
                 'duration_sec': 60.0,
                 'settle_sec': 3.0,
                 'sim_start_time_sec': 0.0,
-                'trajectory_pattern': 4,
-                'field_width': 5.638,
-                'field_height': 3.376,
                 'output_dir': '/tmp',
             }],
-            output='screen'),
+            output='screen',
+            # The evaluator is experiment instrumentation. It must never win
+            # CPU time over the 1 kHz backend IMU callback it is observing.
+            prefix='nice -n 10'),
     ]
 
     evaluator = localization_nodes[-1]

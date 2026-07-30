@@ -1,0 +1,12 @@
+run_tag=max8_ray_to_wall_icm42688_white_noise_20260729_r1
+mode=bag_component_isolation
+with_ball=false
+with_endpoint=false
+with_stage_record=false
+play_rate=1.0
+post_play_wait=10
+scan_yaw_bias_rad=0.0
+laser_params=-p wall_cov_range_sigma:=0.030
+backend_params=
+bag=/tmp/robocon_openloop_no_notes_icm42688_white_20260729.mcap
+started_at=2026-07-29T20:55:26+09:00

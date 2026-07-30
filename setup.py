@@ -32,6 +32,7 @@ setup(
             'lidar_sim_node = lio_localization_sim.lidar_sim_node:main',
             'evaluator_node = lio_localization_sim.evaluator_node:main',
             'gazebo_driver_node = lio_localization_sim.gazebo_driver_node:main',
+            'unity_csv_to_rosbag2 = lio_localization_sim.unity_csv_to_rosbag2:main',
         ],
     },
 )

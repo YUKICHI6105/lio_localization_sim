@@ -1,0 +1,4 @@
+run_tag=max8_physical_notes_present_live_20260729_diag1
+started_at=2026-07-29T18:34:51+09:00
+probe_mode=
+ros_distro=lyrical

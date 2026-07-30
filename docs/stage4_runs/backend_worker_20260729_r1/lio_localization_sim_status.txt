@@ -1,0 +1,6 @@
+ M docs/requirements/backend_estimator_architecture_2026-07-28.md
+ M docs/setup/RESTORE.md
+ M scripts/stage4_mcp_run.sh
+ M scripts/unity_mcp.py
+?? docs/setup/UNITY_MCP_BENCHMARK_GUIDE.md
+?? docs/stage4_runs/backend_worker_20260729_r1/

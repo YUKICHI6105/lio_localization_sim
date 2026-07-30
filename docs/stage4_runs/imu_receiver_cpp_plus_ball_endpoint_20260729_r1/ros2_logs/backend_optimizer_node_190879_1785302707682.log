@@ -1,0 +1,3 @@
+[INFO] [1785302707.793535692] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[INFO] [1785302707.793880104] [backend_optimizer_node]: backend_optimizer_node started (0 cylinders registered)
+[INFO] [1785302773.364388067] [rclcpp]: signal_handler(signum=2)

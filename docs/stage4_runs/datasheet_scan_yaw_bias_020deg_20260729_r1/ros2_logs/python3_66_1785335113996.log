@@ -1,0 +1,2 @@
+[INFO] [1785335114.264756012] [scan_noise_injector]: scan noise injector: yaw_bias=0.003491rad range_bias=0.0000m scale=1.000000 range_sigma=0.0000m dropout=0.0000 seed=20260729
+[INFO] [1785335181.503231733] [scan_noise_injector]: forwarded 2480 scans

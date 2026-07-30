@@ -1,0 +1,3 @@
+[INFO] [1785335316.842561553] [imu_preintegration_node]: imu_preintegration_node started (waiting for first /state_estimate)
+[ros2run]: Received signal:  Interrupt
+[INFO] [1785335384.935122484] [rclcpp]: signal_handler(signum=2)

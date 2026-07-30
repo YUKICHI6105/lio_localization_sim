@@ -1,0 +1,245 @@
+[INFO] [launch]: All log files can be found below /home/yukichi6105/ros2_ws/src/lio_localization_sim/docs/stage4_runs/unity_direct_coverage_drop_20260730_r1/ros2_logs/2026-07-30-15-37-30-904583-fuku-pc-59
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [default_server_endpoint-1]: process started with pid [84]
+[default_server_endpoint-1] /opt/ros/lyrical/lib/python3.14/site-packages/rclpy/executors.py:1073: UserWarning: MultiThreadedExecutor is used with a single thread.
+[default_server_endpoint-1] Use the SingleThreadedExecutor instead.
+[default_server_endpoint-1]   warnings.warn(
+[default_server_endpoint-1] [INFO] [1785393452.213862379] [unity_endpoint]: Starting server on 0.0.0.0:10000
+[INFO] [imu_preintegration_node-2]: process started with pid [257]
+[INFO] [backend_optimizer_node-3]: process started with pid [258]
+[INFO] [laser_scan_matching_node-4]: process started with pid [259]
+[INFO] [nice-5]: process started with pid [260]
+[INFO] [nice-6]: process started with pid [261]
+[nice-6] [INFO] [1785393456.397892953] [unity_evaluator_node]: C++ realtime evaluator started: measuring 60.0s from first ground truth
+[laser_scan_matching_node-4] [INFO] [1785393456.418804469] [laser_scan_matching_node]: laser_scan_matching_node started (0 cylinders, 9 internal walls, field 5.572x3.310m, initial seed=(-2.419, 1.354, 0.000))
+[nice-5] [INFO] [1785393456.432541028] [ball_tracking_node]: ball_tracking_node started
+[backend_optimizer_node-3] [INFO] [1785393456.436198871] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[backend_optimizer_node-3] [INFO] [1785393456.437433302] [backend_optimizer_node]: backend_optimizer_node started (0 cylinders registered)
+[imu_preintegration_node-2] [INFO] [1785393456.505645401] [imu_preintegration_node]: imu_preintegration_node started (waiting for first /state_estimate)
+[default_server_endpoint-1] [INFO] [1785393497.038628043] [unity_endpoint]: Connection from 127.0.0.1
+[default_server_endpoint-1] [WARN] [1785393497.146003370] [rcl.logging_rosout]: Publisher already registered for node name: 'unity_endpoint'. If this is due to multiple nodes with the same name then all logs for the logger named 'unity_endpoint' will go out over the existing publisher. As soon as any node with that name is destructed it will unregister the publisher, preventing any further logs for that name from being published on the rosout topic.
+[default_server_endpoint-1] [INFO] [1785393497.988851836] [unity_endpoint]: RegisterSubscriber(/odom_fast, <class 'nav_msgs.msg._odometry.Odometry'>) OK
+[default_server_endpoint-1] [WARN] [1785393498.004854002] [rcl.logging_rosout]: Publisher already registered for node name: 'unity_endpoint'. If this is due to multiple nodes with the same name then all logs for the logger named 'unity_endpoint' will go out over the existing publisher. As soon as any node with that name is destructed it will unregister the publisher, preventing any further logs for that name from being published on the rosout topic.
+[default_server_endpoint-1] [INFO] [1785393498.081805818] [unity_endpoint]: RegisterSubscriber(/tf, <class 'tf2_msgs.msg._tf_message.TFMessage'>) OK
+[default_server_endpoint-1] [WARN] [1785393498.082228078] [rcl.logging_rosout]: Publisher already registered for node name: 'unity_endpoint'. If this is due to multiple nodes with the same name then all logs for the logger named 'unity_endpoint' will go out over the existing publisher. As soon as any node with that name is destructed it will unregister the publisher, preventing any further logs for that name from being published on the rosout topic.
+[default_server_endpoint-1] [INFO] [1785393498.157449265] [unity_endpoint]: RegisterPublisher(/clock, <class 'rosgraph_msgs.msg._clock.Clock'>) OK
+[default_server_endpoint-1] [WARN] [1785393498.555817133] [rcl.logging_rosout]: Publisher already registered for node name: 'unity_endpoint'. If this is due to multiple nodes with the same name then all logs for the logger named 'unity_endpoint' will go out over the existing publisher. As soon as any node with that name is destructed it will unregister the publisher, preventing any further logs for that name from being published on the rosout topic.
+[default_server_endpoint-1] [INFO] [1785393498.632819260] [unity_endpoint]: RegisterPublisher(/scan, <class 'sensor_msgs.msg._laser_scan.LaserScan'>) OK
+[default_server_endpoint-1] [WARN] [1785393498.634448192] [rcl.logging_rosout]: Publisher already registered for node name: 'unity_endpoint'. If this is due to multiple nodes with the same name then all logs for the logger named 'unity_endpoint' will go out over the existing publisher. As soon as any node with that name is destructed it will unregister the publisher, preventing any further logs for that name from being published on the rosout topic.
+[default_server_endpoint-1] [INFO] [1785393498.747613366] [unity_endpoint]: RegisterPublisher(/ground_truth_pose, <class 'nav_msgs.msg._odometry.Odometry'>) OK
+[default_server_endpoint-1] [WARN] [1785393498.748400526] [rcl.logging_rosout]: Publisher already registered for node name: 'unity_endpoint'. If this is due to multiple nodes with the same name then all logs for the logger named 'unity_endpoint' will go out over the existing publisher. As soon as any node with that name is destructed it will unregister the publisher, preventing any further logs for that name from being published on the rosout topic.
+[default_server_endpoint-1] [INFO] [1785393498.832399309] [unity_endpoint]: RegisterPublisher(/unity_sensor_publish_counts, <class 'std_msgs.msg._string.String'>) OK
+[default_server_endpoint-1] [WARN] [1785393498.834458013] [rcl.logging_rosout]: Publisher already registered for node name: 'unity_endpoint'. If this is due to multiple nodes with the same name then all logs for the logger named 'unity_endpoint' will go out over the existing publisher. As soon as any node with that name is destructed it will unregister the publisher, preventing any further logs for that name from being published on the rosout topic.
+[default_server_endpoint-1] [INFO] [1785393499.073326301] [unity_endpoint]: RegisterPublisher(/imu/data, <class 'sensor_msgs.msg._imu.Imu'>) OK
+[nice-6] [INFO] [1785393499.081929826] [unity_evaluator_node]: first ground truth received; measurement window started
+[default_server_endpoint-1] [WARN] [1785393499.088265234] [rcl.logging_rosout]: Publisher already registered for node name: 'unity_endpoint'. If this is due to multiple nodes with the same name then all logs for the logger named 'unity_endpoint' will go out over the existing publisher. As soon as any node with that name is destructed it will unregister the publisher, preventing any further logs for that name from being published on the rosout topic.
+[default_server_endpoint-1] [INFO] [1785393499.203839924] [unity_endpoint]: RegisterPublisher(/clock, <class 'rosgraph_msgs.msg._clock.Clock'>) OK
+[default_server_endpoint-1] [INFO] [1785393499.281993709] [unity_endpoint]: RegisterPublisher(/scan, <class 'sensor_msgs.msg._laser_scan.LaserScan'>) OK
+[default_server_endpoint-1] [INFO] [1785393499.398514993] [unity_endpoint]: RegisterPublisher(/ground_truth_pose, <class 'nav_msgs.msg._odometry.Odometry'>) OK
+[default_server_endpoint-1] [INFO] [1785393499.526571985] [unity_endpoint]: RegisterPublisher(/unity_sensor_publish_counts, <class 'std_msgs.msg._string.String'>) OK
+[default_server_endpoint-1] [INFO] [1785393499.645505187] [unity_endpoint]: RegisterPublisher(/imu/data, <class 'sensor_msgs.msg._imu.Imu'>) OK
+[backend_optimizer_node-3] [WARN] [1785393500.374194176] [backend_optimizer_node]: slow smoother update: 118.8ms (index 13)
+[laser_scan_matching_node-4] [WARN] [1785393500.490180975] [laser_scan_matching_node]: dropping scan: /odom_fast did not cover scan end after 0.050s (coverage-drop streak=1; IMU prediction continues)
+[backend_optimizer_node-3] [WARN] [1785393501.755480867] [backend_optimizer_node]: slow smoother update: 28.8ms (index 52)
+[backend_optimizer_node-3] [INFO] [1785393502.078109870] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0129, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[laser_scan_matching_node-4] [WARN] [1785393502.394744738] [laser_scan_matching_node]: dropping scan: /odom_fast did not cover scan end after 0.050s (coverage-drop streak=1; IMU prediction continues)
+[backend_optimizer_node-3] [WARN] [1785393502.669945063] [backend_optimizer_node]: slow smoother update: 34.6ms (index 78)
+[laser_scan_matching_node-4] [WARN] [1785393503.433742514] [laser_scan_matching_node]: dropping scan: /odom_fast did not cover scan end after 0.050s (coverage-drop streak=1; IMU prediction continues)
+[backend_optimizer_node-3] [WARN] [1785393503.673356108] [backend_optimizer_node]: slow smoother update: 27.7ms (index 102)
+[backend_optimizer_node-3] [INFO] [1785393503.774652286] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0129, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[backend_optimizer_node-3] [WARN] [1785393503.933400229] [backend_optimizer_node]: slow smoother update: 45.0ms (index 110)
+[backend_optimizer_node-3] [WARN] [1785393504.119800115] [backend_optimizer_node]: slow smoother update: 30.9ms (index 117)
+[backend_optimizer_node-3] [WARN] [1785393504.605831180] [backend_optimizer_node]: slow smoother update: 26.0ms (index 127)
+[laser_scan_matching_node-4] [WARN] [1785393504.731115056] [laser_scan_matching_node]: dropping scan: /odom_fast did not cover scan end after 0.050s (coverage-drop streak=1; IMU prediction continues)
+[laser_scan_matching_node-4] [INFO] [1785393505.102371958] [laser_scan_matching_node]: note rejection: 0/541 returns unexplained, 0 clusters -> 0 accepted, 0 points dropped (last extent=-1.0000m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[nice-6] [INFO] [1785393505.110188322] [unity_evaluator_node]: t=5.0s  recent 5s: pos_err mean=0.40mm max=1.24mm samples=4165 balls=0
+[laser_scan_matching_node-4] [WARN] [1785393505.809983729] [laser_scan_matching_node]: dropping scan: /odom_fast did not cover scan end after 0.050s (coverage-drop streak=3; IMU prediction continues)
+[backend_optimizer_node-3] [INFO] [1785393505.992039106] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0129, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[backend_optimizer_node-3] [WARN] [1785393506.152744017] [backend_optimizer_node]: slow smoother update: 34.9ms (index 173)
+[backend_optimizer_node-3] [WARN] [1785393506.537341275] [backend_optimizer_node]: slow smoother update: 65.4ms (index 186)
+[laser_scan_matching_node-4] [WARN] [1785393506.942932830] [laser_scan_matching_node]: dropping scan: /odom_fast did not cover scan end after 0.050s (coverage-drop streak=1; IMU prediction continues)
+[backend_optimizer_node-3] [INFO] [1785393507.804540612] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0129, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[laser_scan_matching_node-4] [WARN] [1785393507.923542839] [laser_scan_matching_node]: dropping scan: /odom_fast did not cover scan end after 0.050s (coverage-drop streak=1; IMU prediction continues)
+[backend_optimizer_node-3] [WARN] [1785393508.285407226] [backend_optimizer_node]: slow smoother update: 32.8ms (index 247)
+[backend_optimizer_node-3] [WARN] [1785393508.377420472] [backend_optimizer_node]: slow smoother update: 21.5ms (index 250)
+[laser_scan_matching_node-4] [WARN] [1785393509.035356693] [laser_scan_matching_node]: dropping scan: /odom_fast did not cover scan end after 0.050s (coverage-drop streak=1; IMU prediction continues)
+[nice-6] [INFO] [1785393509.967843180] [unity_evaluator_node]: t=10.0s  recent 5s: pos_err mean=0.60mm max=1.55mm samples=8311 balls=0
+[laser_scan_matching_node-4] [INFO] [1785393509.989512804] [laser_scan_matching_node]: note rejection: 0/541 returns unexplained, 0 clusters -> 0 accepted, 0 points dropped (last extent=-1.0000m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[backend_optimizer_node-3] [INFO] [1785393510.095873811] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0129, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[laser_scan_matching_node-4] [WARN] [1785393510.310227327] [laser_scan_matching_node]: dropping scan: /odom_fast did not cover scan end after 0.050s (coverage-drop streak=1; IMU prediction continues)
+[backend_optimizer_node-3] [WARN] [1785393511.288777475] [backend_optimizer_node]: slow smoother update: 50.1ms (index 310)
+[laser_scan_matching_node-4] [WARN] [1785393511.342780815] [laser_scan_matching_node]: dropping scan: /odom_fast did not cover scan end after 0.050s (coverage-drop streak=1; IMU prediction continues)
+[backend_optimizer_node-3] [INFO] [1785393511.800067053] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0131, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[laser_scan_matching_node-4] [WARN] [1785393512.800038941] [laser_scan_matching_node]: dropping scan: /odom_fast did not cover scan end after 0.050s (coverage-drop streak=1; IMU prediction continues)
+[backend_optimizer_node-3] [WARN] [1785393512.816289372] [backend_optimizer_node]: slow smoother update: 20.2ms (index 352)
+[laser_scan_matching_node-4] [WARN] [1785393514.159545477] [laser_scan_matching_node]: dropping scan: /odom_fast did not cover scan end after 0.050s (coverage-drop streak=1; IMU prediction continues)
+[backend_optimizer_node-3] [WARN] [1785393514.160196540] [backend_optimizer_node]: slow smoother update: 28.2ms (index 381)
+[backend_optimizer_node-3] [INFO] [1785393514.501508974] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0129, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[laser_scan_matching_node-4] [WARN] [1785393515.108194752] [laser_scan_matching_node]: dropping scan: /odom_fast did not cover scan end after 0.050s (coverage-drop streak=1; IMU prediction continues)
+[laser_scan_matching_node-4] [INFO] [1785393515.177312897] [laser_scan_matching_node]: note rejection: 29/541 returns unexplained, 6 clusters -> 6 accepted, 29 points dropped (last extent=0.0670m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[nice-6] [INFO] [1785393515.277780933] [unity_evaluator_node]: t=15.1s  recent 5s: pos_err mean=3.38mm max=105.95mm samples=12349 balls=0
+[backend_optimizer_node-3] [INFO] [1785393516.375599708] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0133, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[laser_scan_matching_node-4] [WARN] [1785393516.463981735] [laser_scan_matching_node]: dropping scan: /odom_fast did not cover scan end after 0.050s (coverage-drop streak=1; IMU prediction continues)
+[laser_scan_matching_node-4] [WARN] [1785393517.476644349] [laser_scan_matching_node]: dropping scan: /odom_fast did not cover scan end after 0.050s (coverage-drop streak=1; IMU prediction continues)
+[backend_optimizer_node-3] [INFO] [1785393518.777489814] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0131, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[laser_scan_matching_node-4] [WARN] [1785393518.943878926] [laser_scan_matching_node]: dropping scan: /odom_fast did not cover scan end after 0.050s (coverage-drop streak=1; IMU prediction continues)
+[backend_optimizer_node-3] [WARN] [1785393519.715633631] [backend_optimizer_node]: slow smoother update: 33.5ms (index 529)
+[laser_scan_matching_node-4] [WARN] [1785393520.123009186] [laser_scan_matching_node]: dropping scan: /odom_fast did not cover scan end after 0.050s (coverage-drop streak=1; IMU prediction continues)
+[backend_optimizer_node-3] [WARN] [1785393520.293914388] [backend_optimizer_node]: slow smoother update: 58.6ms (index 544)
+[nice-6] [INFO] [1785393520.583076994] [unity_evaluator_node]: t=20.0s  recent 5s: pos_err mean=2.25mm max=47.87mm samples=16611 balls=0
+[laser_scan_matching_node-4] [INFO] [1785393520.640410271] [laser_scan_matching_node]: note rejection: 38/541 returns unexplained, 5 clusters -> 5 accepted, 35 points dropped (last extent=0.0767m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[backend_optimizer_node-3] [INFO] [1785393520.731837965] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0134, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[backend_optimizer_node-3] [WARN] [1785393520.853595200] [backend_optimizer_node]: slow smoother update: 26.2ms (index 561)
+[laser_scan_matching_node-4] [WARN] [1785393520.908522750] [laser_scan_matching_node]: dropping scan: /odom_fast did not cover scan end after 0.050s (coverage-drop streak=1; IMU prediction continues)
+[backend_optimizer_node-3] [WARN] [1785393520.924275694] [backend_optimizer_node]: slow smoother update: 26.7ms (index 563)
+[laser_scan_matching_node-4] [WARN] [1785393521.946966689] [laser_scan_matching_node]: dropping scan: /odom_fast did not cover scan end after 0.050s (coverage-drop streak=1; IMU prediction continues)
+[backend_optimizer_node-3] [WARN] [1785393522.032352603] [backend_optimizer_node]: slow smoother update: 20.8ms (index 593)
+[backend_optimizer_node-3] [WARN] [1785393522.468387236] [backend_optimizer_node]: slow smoother update: 22.3ms (index 607)
+[backend_optimizer_node-3] [INFO] [1785393522.950216006] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0135, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[laser_scan_matching_node-4] [WARN] [1785393523.511566814] [laser_scan_matching_node]: dropping scan: /odom_fast did not cover scan end after 0.050s (coverage-drop streak=1; IMU prediction continues)
+[backend_optimizer_node-3] [WARN] [1785393523.679789945] [backend_optimizer_node]: slow smoother update: 23.1ms (index 640)
+[backend_optimizer_node-3] [WARN] [1785393524.440499415] [backend_optimizer_node]: slow smoother update: 20.6ms (index 664)
+[laser_scan_matching_node-4] [WARN] [1785393524.591179273] [laser_scan_matching_node]: dropping scan: /odom_fast did not cover scan end after 0.050s (coverage-drop streak=1; IMU prediction continues)
+[backend_optimizer_node-3] [WARN] [1785393524.674717854] [backend_optimizer_node]: slow smoother update: 28.6ms (index 669)
+[backend_optimizer_node-3] [WARN] [1785393524.701428424] [backend_optimizer_node]: slow smoother update: 23.3ms (index 671)
+[backend_optimizer_node-3] [INFO] [1785393525.167223023] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0131, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[nice-6] [INFO] [1785393525.967483832] [unity_evaluator_node]: t=25.0s  recent 5s: pos_err mean=1.41mm max=31.81mm samples=21426 balls=0
+[laser_scan_matching_node-4] [INFO] [1785393526.041777530] [laser_scan_matching_node]: note rejection: 65/541 returns unexplained, 5 clusters -> 5 accepted, 65 points dropped (last extent=0.0719m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[laser_scan_matching_node-4] [WARN] [1785393526.431621834] [laser_scan_matching_node]: dropping scan: /odom_fast did not cover scan end after 0.050s (coverage-drop streak=1; IMU prediction continues)
+[backend_optimizer_node-3] [INFO] [1785393527.650519512] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0136, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[laser_scan_matching_node-4] [WARN] [1785393527.930559010] [laser_scan_matching_node]: dropping scan: /odom_fast did not cover scan end after 0.050s (coverage-drop streak=1; IMU prediction continues)
+[backend_optimizer_node-3] [WARN] [1785393528.100513117] [backend_optimizer_node]: slow smoother update: 22.8ms (index 758)
+[backend_optimizer_node-3] [WARN] [1785393528.780081341] [backend_optimizer_node]: slow smoother update: 31.4ms (index 777)
+[laser_scan_matching_node-4] [WARN] [1785393529.235764189] [laser_scan_matching_node]: dropping scan: /odom_fast did not cover scan end after 0.050s (coverage-drop streak=1; IMU prediction continues)
+[backend_optimizer_node-3] [WARN] [1785393529.418709548] [backend_optimizer_node]: slow smoother update: 23.2ms (index 796)
+[backend_optimizer_node-3] [INFO] [1785393529.521922158] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0136, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[laser_scan_matching_node-4] [WARN] [1785393530.261024107] [laser_scan_matching_node]: dropping scan: /odom_fast did not cover scan end after 0.050s (coverage-drop streak=1; IMU prediction continues)
+[backend_optimizer_node-3] [WARN] [1785393531.011009954] [backend_optimizer_node]: slow smoother update: 22.9ms (index 849)
+[nice-6] [INFO] [1785393531.410825655] [unity_evaluator_node]: t=30.0s  recent 5s: pos_err mean=0.91mm max=4.33mm samples=26029 balls=0
+[laser_scan_matching_node-4] [INFO] [1785393531.642023237] [laser_scan_matching_node]: note rejection: 69/541 returns unexplained, 5 clusters -> 5 accepted, 69 points dropped (last extent=0.0653m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[backend_optimizer_node-3] [WARN] [1785393531.702227912] [backend_optimizer_node]: slow smoother update: 27.4ms (index 866)
+[backend_optimizer_node-3] [INFO] [1785393531.849553395] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0143, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[laser_scan_matching_node-4] [WARN] [1785393532.165620990] [laser_scan_matching_node]: dropping scan: /odom_fast did not cover scan end after 0.050s (coverage-drop streak=1; IMU prediction continues)
+[laser_scan_matching_node-4] [WARN] [1785393533.495859587] [laser_scan_matching_node]: dropping scan: /odom_fast did not cover scan end after 0.050s (coverage-drop streak=1; IMU prediction continues)
+[backend_optimizer_node-3] [INFO] [1785393534.011757851] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0134, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[laser_scan_matching_node-4] [WARN] [1785393534.760239715] [laser_scan_matching_node]: dropping scan: /odom_fast did not cover scan end after 0.050s (coverage-drop streak=1; IMU prediction continues)
+[backend_optimizer_node-3] [WARN] [1785393535.112029409] [backend_optimizer_node]: slow smoother update: 28.4ms (index 952)
+[backend_optimizer_node-3] [WARN] [1785393535.167370340] [backend_optimizer_node]: slow smoother update: 24.5ms (index 954)
+[laser_scan_matching_node-4] [WARN] [1785393535.823959308] [laser_scan_matching_node]: dropping scan: /odom_fast did not cover scan end after 0.050s (coverage-drop streak=1; IMU prediction continues)
+[backend_optimizer_node-3] [INFO] [1785393536.329177722] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0137, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[backend_optimizer_node-3] [WARN] [1785393536.760561119] [backend_optimizer_node]: slow smoother update: 29.0ms (index 995)
+[nice-6] [INFO] [1785393536.931910040] [unity_evaluator_node]: t=35.0s  recent 5s: pos_err mean=1.18mm max=10.88mm samples=30809 balls=0
+[laser_scan_matching_node-4] [WARN] [1785393537.001184472] [laser_scan_matching_node]: dropping scan: /odom_fast did not cover scan end after 0.050s (coverage-drop streak=1; IMU prediction continues)
+[laser_scan_matching_node-4] [INFO] [1785393537.025098468] [laser_scan_matching_node]: note rejection: 21/541 returns unexplained, 2 clusters -> 2 accepted, 21 points dropped (last extent=0.0656m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[backend_optimizer_node-3] [WARN] [1785393537.860112297] [backend_optimizer_node]: slow smoother update: 119.1ms (index 1027)
+[laser_scan_matching_node-4] [WARN] [1785393538.168185878] [laser_scan_matching_node]: dropping scan: /odom_fast did not cover scan end after 0.050s (coverage-drop streak=1; IMU prediction continues)
+[backend_optimizer_node-3] [INFO] [1785393538.438762981] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0130, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[laser_scan_matching_node-4] [WARN] [1785393539.518366365] [laser_scan_matching_node]: dropping scan: /odom_fast did not cover scan end after 0.050s (coverage-drop streak=1; IMU prediction continues)
+[backend_optimizer_node-3] [WARN] [1785393539.730545407] [backend_optimizer_node]: slow smoother update: 35.7ms (index 1077)
+[laser_scan_matching_node-4] [WARN] [1785393540.827699266] [laser_scan_matching_node]: dropping scan: /odom_fast did not cover scan end after 0.050s (coverage-drop streak=1; IMU prediction continues)
+[backend_optimizer_node-3] [INFO] [1785393540.853717778] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0136, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[backend_optimizer_node-3] [WARN] [1785393540.968100451] [backend_optimizer_node]: slow smoother update: 23.4ms (index 1111)
+[backend_optimizer_node-3] [WARN] [1785393542.342595008] [backend_optimizer_node]: slow smoother update: 21.0ms (index 1142)
+[laser_scan_matching_node-4] [WARN] [1785393542.470455213] [laser_scan_matching_node]: dropping scan: /odom_fast did not cover scan end after 0.050s (coverage-drop streak=1; IMU prediction continues)
+[backend_optimizer_node-3] [WARN] [1785393542.776632494] [backend_optimizer_node]: slow smoother update: 20.1ms (index 1155)
+[backend_optimizer_node-3] [WARN] [1785393542.801986542] [backend_optimizer_node]: slow smoother update: 23.4ms (index 1156)
+[nice-6] [INFO] [1785393542.804979595] [unity_evaluator_node]: t=40.0s  recent 5s: pos_err mean=1.08mm max=9.05mm samples=35440 balls=0
+[laser_scan_matching_node-4] [INFO] [1785393542.943829461] [laser_scan_matching_node]: note rejection: 164/541 returns unexplained, 4 clusters -> 4 accepted, 162 points dropped (last extent=0.0794m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[backend_optimizer_node-3] [INFO] [1785393543.221414488] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0136, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[laser_scan_matching_node-4] [WARN] [1785393543.434714906] [laser_scan_matching_node]: dropping scan: /odom_fast did not cover scan end after 0.050s (coverage-drop streak=1; IMU prediction continues)
+[backend_optimizer_node-3] [WARN] [1785393543.591640047] [backend_optimizer_node]: slow smoother update: 25.5ms (index 1179)
+[backend_optimizer_node-3] [WARN] [1785393544.461783432] [backend_optimizer_node]: slow smoother update: 28.0ms (index 1206)
+[laser_scan_matching_node-4] [WARN] [1785393545.560875962] [laser_scan_matching_node]: dropping scan: /odom_fast did not cover scan end after 0.050s (coverage-drop streak=1; IMU prediction continues)
+[backend_optimizer_node-3] [INFO] [1785393545.594782290] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0134, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[backend_optimizer_node-3] [WARN] [1785393545.698873890] [backend_optimizer_node]: slow smoother update: 31.5ms (index 1245)
+[backend_optimizer_node-3] [WARN] [1785393546.261469357] [backend_optimizer_node]: slow smoother update: 56.7ms (index 1263)
+[laser_scan_matching_node-4] [WARN] [1785393547.312080784] [laser_scan_matching_node]: dropping scan: /odom_fast did not cover scan end after 0.050s (coverage-drop streak=1; IMU prediction continues)
+[backend_optimizer_node-3] [INFO] [1785393547.837618490] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0135, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[nice-6] [INFO] [1785393548.298827497] [unity_evaluator_node]: t=45.0s  recent 5s: pos_err mean=0.84mm max=5.84mm samples=39934 balls=0
+[backend_optimizer_node-3] [WARN] [1785393548.305225906] [backend_optimizer_node]: slow smoother update: 29.5ms (index 1329)
+[laser_scan_matching_node-4] [INFO] [1785393548.560310301] [laser_scan_matching_node]: note rejection: 38/541 returns unexplained, 3 clusters -> 3 accepted, 38 points dropped (last extent=0.0661m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[laser_scan_matching_node-4] [WARN] [1785393549.321422556] [laser_scan_matching_node]: dropping scan: /odom_fast did not cover scan end after 0.050s (coverage-drop streak=1; IMU prediction continues)
+[backend_optimizer_node-3] [INFO] [1785393550.445153032] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0137, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[laser_scan_matching_node-4] [WARN] [1785393550.751323296] [laser_scan_matching_node]: dropping scan: /odom_fast did not cover scan end after 0.050s (coverage-drop streak=1; IMU prediction continues)
+[backend_optimizer_node-3] [WARN] [1785393551.406134004] [backend_optimizer_node]: slow smoother update: 30.5ms (index 1423)
+[laser_scan_matching_node-4] [WARN] [1785393551.818953054] [laser_scan_matching_node]: dropping scan: /odom_fast did not cover scan end after 0.050s (coverage-drop streak=1; IMU prediction continues)
+[backend_optimizer_node-3] [INFO] [1785393552.735688493] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0136, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[laser_scan_matching_node-4] [WARN] [1785393553.198164067] [laser_scan_matching_node]: dropping scan: /odom_fast did not cover scan end after 0.050s (coverage-drop streak=1; IMU prediction continues)
+[nice-6] [INFO] [1785393553.966280689] [unity_evaluator_node]: t=49.9s  recent 5s: pos_err mean=0.84mm max=39.92mm samples=44648 balls=0
+[laser_scan_matching_node-4] [INFO] [1785393554.306808895] [laser_scan_matching_node]: note rejection: 91/541 returns unexplained, 6 clusters -> 6 accepted, 91 points dropped (last extent=0.0542m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[laser_scan_matching_node-4] [WARN] [1785393554.351524336] [laser_scan_matching_node]: dropping scan: /odom_fast did not cover scan end after 0.050s (coverage-drop streak=1; IMU prediction continues)
+[backend_optimizer_node-3] [INFO] [1785393554.903988262] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0133, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[backend_optimizer_node-3] [WARN] [1785393555.469054712] [backend_optimizer_node]: slow smoother update: 64.3ms (index 1546)
+[laser_scan_matching_node-4] [WARN] [1785393556.005911056] [laser_scan_matching_node]: dropping scan: /odom_fast did not cover scan end after 0.050s (coverage-drop streak=1; IMU prediction continues)
+[backend_optimizer_node-3] [WARN] [1785393556.009116602] [backend_optimizer_node]: slow smoother update: 28.4ms (index 1558)
+[laser_scan_matching_node-4] [WARN] [1785393556.843641411] [laser_scan_matching_node]: dropping scan: /odom_fast did not cover scan end after 0.050s (coverage-drop streak=1; IMU prediction continues)
+[backend_optimizer_node-3] [INFO] [1785393556.984545948] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0135, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[laser_scan_matching_node-4] [WARN] [1785393559.381079477] [laser_scan_matching_node]: dropping scan: /odom_fast did not cover scan end after 0.050s (coverage-drop streak=1; IMU prediction continues)
+[backend_optimizer_node-3] [INFO] [1785393559.423083569] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0136, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[nice-6] [INFO] [1785393559.724645685] [unity_evaluator_node]: t=55.0s  recent 5s: pos_err mean=0.92mm max=37.21mm samples=49529 balls=0
+[laser_scan_matching_node-4] [INFO] [1785393560.087205679] [laser_scan_matching_node]: note rejection: 52/541 returns unexplained, 4 clusters -> 4 accepted, 52 points dropped (last extent=0.0688m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[laser_scan_matching_node-4] [WARN] [1785393561.451084386] [laser_scan_matching_node]: dropping scan: /odom_fast did not cover scan end after 0.050s (coverage-drop streak=1; IMU prediction continues)
+[backend_optimizer_node-3] [INFO] [1785393561.719778214] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0132, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[laser_scan_matching_node-4] [WARN] [1785393562.646178343] [laser_scan_matching_node]: dropping scan: /odom_fast did not cover scan end after 0.050s (coverage-drop streak=1; IMU prediction continues)
+[backend_optimizer_node-3] [INFO] [1785393563.902491257] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0129, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[laser_scan_matching_node-4] [WARN] [1785393563.990826174] [laser_scan_matching_node]: dropping scan: /odom_fast did not cover scan end after 0.050s (coverage-drop streak=1; IMU prediction continues)
+[backend_optimizer_node-3] [WARN] [1785393564.738587816] [backend_optimizer_node]: slow smoother update: 30.8ms (index 1832)
+[nice-6] [INFO] [1785393565.195711685] [unity_evaluator_node]: t=60.0s  recent 5s: pos_err mean=1.04mm max=14.83mm samples=54141 balls=0
+[laser_scan_matching_node-4] [WARN] [1785393565.197812563] [laser_scan_matching_node]: dropping scan: /odom_fast did not cover scan end after 0.050s (coverage-drop streak=1; IMU prediction continues)
+[nice-6] [INFO] [1785393565.228230151] [unity_evaluator_node]: 
+[nice-6] ============================================================
+[nice-6] main.md 6-A-1 シミュレーション評価レポート (C++ realtime evaluator)
+[nice-6] ============================================================
+[nice-6] 総サンプル数: 54141  (定常区間 t>=3.0s: 51855)
+[nice-6] 真値未着のまま評価できなかったサンプル: 0
+[nice-6] 
+[nice-6] --- 全体（要件A: 定常RMSE<=10mm, 最大位置誤差<=10mm） ---
+[nice-6]   位置誤差: mean=1.26mm  RMSE=3.79mm  max=105.95mm
+[nice-6]   ヨー誤差: mean=0.030deg  RMSE=0.036deg  max=0.089deg
+[nice-6]   判定: 定常誤差(RMSE<=10mm) PASS / 最大位置誤差(<=10mm) FAIL
+[nice-6] 
+[nice-6] --- 高G旋回スピンバースト中 ---
+[nice-6]   位置誤差: mean=nanmm  RMSE=nanmm  max=nanmm
+[nice-6] 
+[nice-6] --- ボール横切り中 vs 非横切り中 ---
+[nice-6]   横切り中   : mean=nanmm  RMSE=nanmm  max=nanmm
+[nice-6]   非横切り中 : mean=nanmm  RMSE=nanmm  max=nanmm
+[nice-6]   判定: ボール横切りによる自己位置無影響 PASS
+[nice-6]   (参考) 横切り中の検出ボール数(最新): 0
+[nice-6] ============================================================
+[nice-6] 
+[laser_scan_matching_node-4] [INFO] [1785393565.591310939] [laser_scan_matching_node]: note rejection: 0/541 returns unexplained, 0 clusters -> 0 accepted, 0 points dropped (last extent=-1.0000m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[nice-6] [INFO] [1785393565.609960520] [unity_evaluator_node]: Saved report and raw error CSV in /tmp
+[INFO] [nice-6]: process has finished cleanly [pid 261]
+[INFO] [nice-5]: sending signal 'SIGINT' to process[nice-5]
+[INFO] [laser_scan_matching_node-4]: sending signal 'SIGINT' to process[laser_scan_matching_node-4]
+[INFO] [backend_optimizer_node-3]: sending signal 'SIGINT' to process[backend_optimizer_node-3]
+[INFO] [imu_preintegration_node-2]: sending signal 'SIGINT' to process[imu_preintegration_node-2]
+[INFO] [default_server_endpoint-1]: sending signal 'SIGINT' to process[default_server_endpoint-1]
+[nice-5] [INFO] [1785393565.943270714] [rclcpp]: signal_handler(signum=2)
+[laser_scan_matching_node-4] [INFO] [1785393565.951503008] [rclcpp]: signal_handler(signum=2)
+[laser_scan_matching_node-4] [INFO] [1785393565.956579824] [laser_scan_matching_node]: scan pipeline stats: received=2425 processed=1873 pending_overwrite=0 pending_queue_overflow=0 imu_coverage_timeout_drop=551 max_consecutive_coverage_drop=21; unity_audit reports=243 source_scan_last=2420 receiver_at_last_report=2419 final_receiver=2425
+[backend_optimizer_node-3] [INFO] [1785393565.952173906] [rclcpp]: signal_handler(signum=2)
+[backend_optimizer_node-3] [INFO] [1785393565.954133968] [backend_optimizer_node]: backend concurrency stats: imu_callbacks=60642, during_worker=8216 (13.5%), during_smoother=5414 (8.9%), callback_gap_max=556.375ms, gaps>2ms=4975, gaps>10ms=2413; stamp_gap_max=1.000ms, gaps>1ms=0; ring_enqueue_max=1.956ms, enqueues>2ms=0; callback_duration_max=92.143ms, durations>2ms=108; worker_jobs=1873 mean/max=5.252/134.579ms; smoother_updates=1872 mean/max=3.091/119.113ms; unity_audit reports=243 source_imu_last=60501 receiver_at_last_report=60551 final_receiver=60642
+[imu_preintegration_node-2] [INFO] [1785393565.971607730] [rclcpp]: signal_handler(signum=2)
+[default_server_endpoint-1] [INFO] [1785393566.121386620] [unity_endpoint]: Disconnected from 127.0.0.1
+[default_server_endpoint-1] Exception in thread Thread-2:
+[default_server_endpoint-1] Traceback (most recent call last):
+[default_server_endpoint-1]   File "/usr/lib/python3.14/threading.py", line 1082, in _bootstrap_inner
+[default_server_endpoint-1]     self._context.run(self.run)
+[default_server_endpoint-1]     ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+[default_server_endpoint-1]   File "/home/yukichi6105/ros2_ws/build/ros_tcp_endpoint/ros_tcp_endpoint/client.py", line 216, in run
+[default_server_endpoint-1]     ros_communicator.send(data)
+[default_server_endpoint-1]     ~~~~~~~~~~~~~~~~~~~~~^^^^^^
+[default_server_endpoint-1]   File "/home/yukichi6105/ros2_ws/build/ros_tcp_endpoint/ros_tcp_endpoint/publisher.py", line 57, in send
+[default_server_endpoint-1]     self.pub.publish(data)
+[default_server_endpoint-1]     ~~~~~~~~~~~~~~~~^^^^^^
+[default_server_endpoint-1]   File "/opt/ros/lyrical/lib/python3.14/site-packages/rclpy/publisher.py", line 69, in publish
+[default_server_endpoint-1]     self.__publisher.publish_raw(msg)
+[default_server_endpoint-1]     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+[default_server_endpoint-1] rclpy._rclpy_pybind11.RCLError: Failed to publish: publisher's context is invalid, at ./src/rcl/publisher.c:427
+[INFO] [imu_preintegration_node-2]: process has finished cleanly [pid 257]
+[INFO] [backend_optimizer_node-3]: process has finished cleanly [pid 258]
+[INFO] [laser_scan_matching_node-4]: process has finished cleanly [pid 259]
+[INFO] [nice-5]: process has finished cleanly [pid 260]
+[ERROR] [default_server_endpoint-1]: process has died [pid 84, exit code -11, cmd '/home/yukichi6105/ros2_ws/install/ros_tcp_endpoint/lib/ros_tcp_endpoint/default_server_endpoint --ros-args -r __node:=unity_endpoint --params-file /tmp/launch_params_pi8qkfs9'].

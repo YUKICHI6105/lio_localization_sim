@@ -1,0 +1,8 @@
+1785297034.6186242 [INFO] [launch]: All log files can be found below /home/yukichi6105/ros2_ws/src/lio_localization_sim/docs/stage4_runs/bag_replay_88s_cpp_evaluator_20260729_r1/ros2_logs/2026-07-29-12-50-34-614503-fuku-pc-47
+1785297034.6189458 [INFO] [launch]: Default logging verbosity is set to INFO
+1785297034.8094578 [INFO] [default_server_endpoint-1]: process started with pid [72]
+1785297039.8668687 [INFO] [imu_preintegration_node-2]: process started with pid [129]
+1785297039.8672326 [INFO] [backend_optimizer_node-3]: process started with pid [130]
+1785297039.8674090 [INFO] [laser_scan_matching_node-4]: process started with pid [131]
+1785297039.8675148 [INFO] [ball_tracking_node-5]: process started with pid [132]
+1785297039.8676045 [INFO] [evaluator_node-6]: process started with pid [133]

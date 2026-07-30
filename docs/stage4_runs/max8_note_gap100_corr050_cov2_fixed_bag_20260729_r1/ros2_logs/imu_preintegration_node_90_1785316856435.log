@@ -1,0 +1,2 @@
+[INFO] [1785316856.471552583] [imu_preintegration_node]: imu_preintegration_node started (waiting for first /state_estimate)
+[INFO] [1785316921.640924191] [rclcpp]: signal_handler(signum=2)

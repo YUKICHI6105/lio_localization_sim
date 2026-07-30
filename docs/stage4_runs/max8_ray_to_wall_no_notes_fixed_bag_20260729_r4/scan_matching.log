@@ -1,0 +1,3 @@
+[INFO] [1785324977.438804473] [laser_scan_matching_node]: laser_scan_matching_node started (0 cylinders, 9 internal walls, field 5.572x3.310m, initial seed=(-2.419, 1.354, 0.000))
+[ros2run]: Received signal:  Interrupt
+[INFO] [1785325042.562747077] [rclcpp]: signal_handler(signum=2)

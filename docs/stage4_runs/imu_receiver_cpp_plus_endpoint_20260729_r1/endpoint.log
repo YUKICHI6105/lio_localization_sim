@@ -1,0 +1,5 @@
+/opt/ros/lyrical/lib/python3.14/site-packages/rclpy/executors.py:1073: UserWarning: MultiThreadedExecutor is used with a single thread.
+Use the SingleThreadedExecutor instead.
+  warnings.warn(
+[INFO] [1785302616.122171419] [UnityEndpoint]: Starting server on 0.0.0.0:10000
+[ros2run]: Received signal:  Interrupt

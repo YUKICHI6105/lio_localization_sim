@@ -1,0 +1,8 @@
+docs/experiment_history/09_backend_worker_evaluation_2026-07-29.md
+docs/setup/UNITY_MCP_BENCHMARK_GUIDE.md
+docs/setup/UNITY_SENSOR_CSV_ROSBAG_GUIDE.md
+lio_localization_sim/unity_csv_to_rosbag2.py
+scripts/bag_component_isolation.sh
+tools/render_eval_plot.py
+unity/Robocon2026Sim/Assets/Robocon2026/Scripts/UnitySensorCsvRecorder.cs
+unity/Robocon2026Sim/Assets/Robocon2026/Scripts/UnitySensorCsvRecorder.cs.meta

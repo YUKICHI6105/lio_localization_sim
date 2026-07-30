@@ -1,0 +1,5 @@
+[INFO] [1785290288.467438125] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[INFO] [1785290288.468027224] [backend_optimizer_node]: backend_optimizer_node started (0 cylinders registered)
+[WARN] [1785290366.318163114] [backend_optimizer_node]: slow smoother update: 25.9ms (index 1)
+[ERROR] [1785290384.817990788] [backend_optimizer_node]: IMU signal LOST (no IMU for 2.01s > 2.00s). Self-localization is the dead-reckoning backbone and cannot continue without it: entering FAIL-SAFE HALT (freezing estimate, no further graph updates).
+[INFO] [1785290390.937627328] [rclcpp]: signal_handler(signum=2)

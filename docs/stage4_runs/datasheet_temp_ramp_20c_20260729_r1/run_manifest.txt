@@ -1,0 +1,12 @@
+run_tag=datasheet_temp_ramp_20c_20260729_r1
+mode=bag_component_isolation
+with_ball=false
+with_endpoint=false
+with_stage_record=true
+play_rate=1.0
+post_play_wait=15
+scan_yaw_bias_rad=0.0
+laser_params=
+backend_params=
+bag=/tmp/robocon_icm42688_temp_ramp_20c_65s_20260729.mcap
+started_at=2026-07-29T23:28:34+09:00

@@ -1,0 +1,4 @@
+run_tag=backend_worker_20260729_r4
+started_at=2026-07-29T03:22:27+09:00
+probe_mode=
+ros_distro=lyrical

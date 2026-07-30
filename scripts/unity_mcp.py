@@ -13,7 +13,7 @@ Usage:
 Examples:
     unity_mcp.py --list
     unity_mcp.py Unity_GetConsoleLogs '{"count": 50}'
-    unity_mcp.py Unity_RunCommand '{"script": "Debug.Log(\"hi\");"}'
+    unity_mcp.py Unity_RunCommand '{"code": "Debug.Log(\"hi\");"}'
 """
 import json
 import subprocess

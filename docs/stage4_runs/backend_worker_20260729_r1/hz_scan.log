@@ -1,0 +1,138 @@
+03:14:42 average rate: 134.744
+03:14:42 	min: 0.000s max: 0.061s std dev: 0.01179s window: 50
+03:14:43 average rate: 47.116
+03:14:43 	min: 0.000s max: 0.114s std dev: 0.02854s window: 50
+03:14:44 average rate: 42.294
+03:14:44 	min: 0.000s max: 0.113s std dev: 0.02507s window: 50
+03:14:45 average rate: 39.196
+03:14:45 	min: 0.000s max: 0.092s std dev: 0.02251s window: 50
+03:14:46 average rate: 39.284
+03:14:46 	min: 0.000s max: 0.121s std dev: 0.02402s window: 50
+03:14:47 average rate: 39.230
+03:14:47 	min: 0.000s max: 0.071s std dev: 0.02183s window: 50
+03:14:48 average rate: 38.391
+03:14:48 	min: 0.000s max: 0.071s std dev: 0.01981s window: 50
+03:14:51 average rate: 12.445
+03:14:51 	min: 0.000s max: 2.656s std dev: 0.36854s window: 50
+03:14:52 average rate: 38.615
+03:14:52 	min: 0.000s max: 0.103s std dev: 0.02410s window: 50
+03:14:53 average rate: 39.616
+03:14:53 	min: 0.000s max: 0.111s std dev: 0.02529s window: 50
+03:14:54 average rate: 40.195
+03:14:54 	min: 0.000s max: 0.064s std dev: 0.01675s window: 50
+03:14:55 average rate: 38.969
+03:14:55 	min: 0.000s max: 0.089s std dev: 0.01815s window: 50
+03:14:56 average rate: 36.757
+03:14:56 	min: 0.000s max: 0.089s std dev: 0.02364s window: 50
+03:14:57 average rate: 40.625
+03:14:57 	min: 0.000s max: 0.138s std dev: 0.02591s window: 50
+03:14:58 average rate: 43.198
+03:14:58 	min: 0.000s max: 0.091s std dev: 0.02056s window: 50
+03:14:59 average rate: 39.214
+03:14:59 	min: 0.000s max: 0.069s std dev: 0.01912s window: 50
+03:15:00 average rate: 40.364
+03:15:00 	min: 0.000s max: 0.069s std dev: 0.02178s window: 50
+03:15:01 average rate: 39.972
+03:15:01 	min: 0.000s max: 0.064s std dev: 0.01815s window: 50
+03:15:02 average rate: 37.815
+03:15:02 	min: 0.001s max: 0.064s std dev: 0.01593s window: 50
+03:15:03 average rate: 40.713
+03:15:03 	min: 0.000s max: 0.090s std dev: 0.02198s window: 50
+03:15:04 average rate: 38.241
+03:15:04 	min: 0.000s max: 0.150s std dev: 0.02641s window: 50
+03:15:05 average rate: 34.543
+03:15:05 	min: 0.000s max: 0.150s std dev: 0.03091s window: 50
+03:15:06 average rate: 36.643
+03:15:06 	min: 0.000s max: 0.089s std dev: 0.02351s window: 50
+03:15:07 average rate: 40.371
+03:15:07 	min: 0.000s max: 0.075s std dev: 0.02103s window: 50
+03:15:08 average rate: 40.654
+03:15:08 	min: 0.000s max: 0.062s std dev: 0.01755s window: 50
+03:15:09 average rate: 38.314
+03:15:09 	min: 0.000s max: 0.098s std dev: 0.02075s window: 50
+03:15:10 average rate: 40.169
+03:15:10 	min: 0.001s max: 0.068s std dev: 0.01639s window: 50
+03:15:11 average rate: 38.287
+03:15:11 	min: 0.000s max: 0.074s std dev: 0.01911s window: 50
+03:15:12 average rate: 39.022
+03:15:12 	min: 0.000s max: 0.076s std dev: 0.01999s window: 50
+03:15:13 average rate: 39.619
+03:15:13 	min: 0.000s max: 0.079s std dev: 0.02043s window: 50
+03:15:14 average rate: 37.119
+03:15:14 	min: 0.000s max: 0.074s std dev: 0.02155s window: 50
+03:15:15 average rate: 35.857
+03:15:15 	min: 0.000s max: 0.091s std dev: 0.02491s window: 50
+03:15:16 average rate: 39.125
+03:15:16 	min: 0.000s max: 0.096s std dev: 0.02506s window: 50
+03:15:17 average rate: 37.011
+03:15:17 	min: 0.000s max: 0.116s std dev: 0.02887s window: 50
+03:15:18 average rate: 38.413
+03:15:18 	min: 0.000s max: 0.101s std dev: 0.02451s window: 50
+03:15:19 average rate: 40.674
+03:15:19 	min: 0.000s max: 0.100s std dev: 0.02307s window: 50
+03:15:20 average rate: 41.305
+03:15:20 	min: 0.000s max: 0.078s std dev: 0.02154s window: 50
+03:15:21 average rate: 41.921
+03:15:21 	min: 0.000s max: 0.065s std dev: 0.02029s window: 50
+03:15:22 average rate: 38.087
+03:15:22 	min: 0.000s max: 0.108s std dev: 0.02396s window: 50
+03:15:23 average rate: 38.245
+03:15:23 	min: 0.000s max: 0.089s std dev: 0.02331s window: 50
+03:15:24 average rate: 40.297
+03:15:24 	min: 0.000s max: 0.089s std dev: 0.02366s window: 50
+03:15:25 average rate: 40.068
+03:15:25 	min: 0.000s max: 0.110s std dev: 0.02463s window: 50
+03:15:26 average rate: 39.793
+03:15:26 	min: 0.000s max: 0.093s std dev: 0.02295s window: 50
+03:15:27 average rate: 40.977
+03:15:27 	min: 0.000s max: 0.072s std dev: 0.02026s window: 50
+03:15:28 average rate: 42.429
+03:15:28 	min: 0.000s max: 0.091s std dev: 0.02607s window: 50
+03:15:29 average rate: 36.192
+03:15:29 	min: 0.002s max: 0.069s std dev: 0.01767s window: 50
+03:15:30 average rate: 38.566
+03:15:30 	min: 0.000s max: 0.080s std dev: 0.02116s window: 50
+03:15:31 average rate: 39.107
+03:15:31 	min: 0.000s max: 0.083s std dev: 0.02147s window: 50
+03:15:32 average rate: 40.263
+03:15:32 	min: 0.001s max: 0.083s std dev: 0.01882s window: 50
+03:15:33 average rate: 31.613
+03:15:33 	min: 0.000s max: 0.102s std dev: 0.02406s window: 50
+03:15:34 average rate: 30.789
+03:15:34 	min: 0.000s max: 0.102s std dev: 0.03122s window: 50
+03:15:35 average rate: 39.505
+03:15:35 	min: 0.000s max: 0.106s std dev: 0.02759s window: 50
+03:15:36 average rate: 41.607
+03:15:36 	min: 0.000s max: 0.198s std dev: 0.03481s window: 50
+03:15:37 average rate: 39.368
+03:15:37 	min: 0.000s max: 0.083s std dev: 0.02222s window: 50
+03:15:38 average rate: 37.260
+03:15:38 	min: 0.000s max: 0.081s std dev: 0.02060s window: 50
+03:15:39 average rate: 38.497
+03:15:39 	min: 0.000s max: 0.078s std dev: 0.02036s window: 50
+03:15:40 average rate: 40.353
+03:15:40 	min: 0.000s max: 0.080s std dev: 0.01924s window: 50
+03:15:41 average rate: 37.520
+03:15:41 	min: 0.000s max: 0.074s std dev: 0.02185s window: 50
+03:15:42 average rate: 39.694
+03:15:42 	min: 0.000s max: 0.102s std dev: 0.02282s window: 50
+03:15:43 average rate: 38.969
+03:15:43 	min: 0.000s max: 0.120s std dev: 0.02420s window: 50
+03:15:44 average rate: 36.920
+03:15:44 	min: 0.000s max: 0.090s std dev: 0.02327s window: 50
+03:15:45 average rate: 40.081
+03:15:45 	min: 0.000s max: 0.113s std dev: 0.02775s window: 50
+03:15:46 average rate: 36.237
+03:15:46 	min: 0.000s max: 0.156s std dev: 0.03253s window: 50
+03:15:47 average rate: 38.601
+03:15:47 	min: 0.000s max: 0.156s std dev: 0.02917s window: 50
+03:15:48 average rate: 40.682
+03:15:48 	min: 0.000s max: 0.103s std dev: 0.02559s window: 50
+03:15:49 average rate: 41.649
+03:15:49 	min: 0.000s max: 0.095s std dev: 0.01879s window: 50
+03:15:50 average rate: 40.097
+03:15:50 	min: 0.000s max: 0.074s std dev: 0.01785s window: 50
+03:15:51 average rate: 39.876
+03:15:51 	min: 0.000s max: 0.073s std dev: 0.01647s window: 50
+03:15:52 average rate: 38.980
+03:15:52 	min: 0.000s max: 0.133s std dev: 0.02259s window: 50

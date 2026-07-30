@@ -1,0 +1,76 @@
+ M config/robocon2026_unity.yaml
+ M docs/requirements/backend_estimator_architecture_2026-07-28.md
+ M docs/setup/RESTORE.md
+ M launch/unity_sensor_localization.launch.py
+ M package.xml
+ M scripts/stage4_mcp_run.sh
+ M scripts/unity_mcp.py
+ M setup.py
+ M unity/Robocon2026Sim/Assets/Robocon2026/Scripts/RoboconFieldBuilder.cs
+ M unity/Robocon2026Sim/Assets/Robocon2026/Scripts/UnityRosSensorPublisher.cs
+?? docs/experiment_history/09_backend_worker_evaluation_2026-07-29.md
+?? docs/experiment_history/10_callback_delay_component_isolation_2026-07-29.md
+?? docs/experiment_history/11_maximum_10mm_root_cause_investigation_2026-07-29.md
+?? docs/setup/UNITY_MCP_BENCHMARK_GUIDE.md
+?? docs/setup/UNITY_SENSOR_CSV_ROSBAG_GUIDE.md
+?? docs/stage4_runs/backend_worker_20260729_r1/
+?? docs/stage4_runs/backend_worker_20260729_r2/
+?? docs/stage4_runs/backend_worker_20260729_r3/
+?? docs/stage4_runs/backend_worker_20260729_r4/
+?? docs/stage4_runs/backend_worker_quant_20260729_r1/
+?? docs/stage4_runs/backend_worker_quant_20260729_r2/
+?? docs/stage4_runs/backend_worker_quant_20260729_r3/
+?? docs/stage4_runs/bag_replay_88s_20260729_r1/
+?? docs/stage4_runs/bag_replay_88s_cpp_evaluator_20260729_r1/
+?? docs/stage4_runs/bag_replay_88s_cpp_full_retest_20260729_r1/
+?? docs/stage4_runs/bag_replay_88s_cpp_nice10_20260729_r1/
+?? docs/stage4_runs/bag_replay_88s_cpp_nice10_20260729_r2/
+?? docs/stage4_runs/bag_replay_88s_dedicated_imu_executor_20260729_r1/
+?? docs/stage4_runs/bag_replay_88s_imu_diag_20260729_r1/
+?? docs/stage4_runs/bag_replay_88s_imu_group_20260729_r1/
+?? docs/stage4_runs/bag_replay_88s_lockfree_imu_ring_20260729_r1/
+?? docs/stage4_runs/bag_replay_88s_lockfree_imu_ring_20260729_r2/
+?? docs/stage4_runs/bag_replay_88s_lockfree_imu_ring_20260729_r3/
+?? docs/stage4_runs/bag_replay_88s_noprobes_20260729_r1/
+?? docs/stage4_runs/imu_receiver_cpp_plus_ball_20260729_r1/
+?? docs/stage4_runs/imu_receiver_cpp_plus_ball_endpoint_20260729_r1/
+?? docs/stage4_runs/imu_receiver_cpp_plus_endpoint_20260729_r1/
+?? docs/stage4_runs/imu_receiver_isolation_20260729_r1/
+?? docs/stage4_runs/imu_receiver_minimal_lio_20260729_r1/
+?? docs/stage4_runs/imu_receiver_with_cpp_evaluator_20260729_r1/
+?? docs/stage4_runs/imu_receiver_with_cpp_evaluator_20260729_r2/
+?? docs/stage4_runs/imu_receiver_with_evaluator_20260729_r1/
+?? docs/stage4_runs/imu_receiver_with_preintegration_20260729_r1/
+?? docs/stage4_runs/max10_cause_stage_record_20260729_r1/
+?? docs/stage4_runs/max10_corr080_cov065_fixed_bag_20260729_r1/
+?? docs/stage4_runs/max10_corr080_fixed_bag_20260729_r1/
+?? docs/stage4_runs/max10_corr100_fixed_bag_20260729_r1/
+?? docs/stage4_runs/max10_corr100_huber015_fixed_bag_20260729_r1/
+?? docs/stage4_runs/max10_note_gap100_corr080_cov2_fixed_bag_20260729_r1/
+?? docs/stage4_runs/max10_note_gap100_corr080_fixed_bag_20260729_r1/
+?? docs/stage4_runs/max10_note_gap100_corr080_fixed_bag_20260729_r2/
+?? docs/stage4_runs/max10_note_gap100_corr080_stage_fixed_bag_20260729_r1/
+?? docs/stage4_runs/max10_note_spatial_gap100_fixed_bag_20260729_r1/
+?? docs/stage4_runs/max10_note_spatial_gap100_fixed_bag_20260729_r2/
+?? docs/stage4_runs/max8_note_gap100_corr050_cov2_fixed_bag_20260729_r1/
+?? docs/stage4_runs/max8_note_gap100_corr080_cov4_fixed_bag_20260729_r1/
+?? docs/stage4_runs/max8_note_gap100_corr080_ls_cov4_fixed_bag_20260729_r1/
+?? docs/stage4_runs/max8_openloop_no_notes_fixed_bag_20260729_r1/
+?? docs/stage4_runs/max8_openloop_no_notes_stage_fixed_bag_20260729_r1/
+?? docs/stage4_runs/max8_openloop_notes_present_fixed_bag_20260729_r1/
+?? docs/stage4_runs/max8_physical_no_notes_fixed_bag_20260729_r1/
+?? docs/stage4_runs/max8_physical_no_notes_live_20260729_diag1/
+?? docs/stage4_runs/max8_physical_notes_present_fixed_bag_20260729_r1/
+?? docs/stage4_runs/max8_physical_notes_present_live_20260729_diag1/
+?? docs/stage4_runs/max8_ray_to_wall_no_notes_fixed_bag_20260729_r1/
+?? docs/stage4_runs/max8_ray_to_wall_no_notes_fixed_bag_20260729_r3/
+?? docs/stage4_runs/max8_ray_to_wall_no_notes_fixed_bag_20260729_r4/
+?? docs/stage4_runs/max8_ray_to_wall_no_notes_fixed_bag_20260729_r5/
+?? docs/stage4_runs/max8_ray_to_wall_scan_yaw_bias_020deg_20260729_r1/
+?? lio_localization_sim/unity_csv_to_rosbag2.py
+?? scripts/bag_component_isolation.sh
+?? tools/planar_truth_seeded_acf.py
+?? tools/render_eval_plot.py
+?? tools/sensor_noise_injector.py
+?? unity/Robocon2026Sim/Assets/Robocon2026/Scripts/UnitySensorCsvRecorder.cs
+?? unity/Robocon2026Sim/Assets/Robocon2026/Scripts/UnitySensorCsvRecorder.cs.meta

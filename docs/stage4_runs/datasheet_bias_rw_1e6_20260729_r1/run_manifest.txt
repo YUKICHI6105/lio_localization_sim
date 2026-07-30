@@ -1,0 +1,12 @@
+run_tag=datasheet_bias_rw_1e6_20260729_r1
+mode=bag_component_isolation
+with_ball=false
+with_endpoint=false
+with_stage_record=true
+play_rate=1.0
+post_play_wait=20
+scan_yaw_bias_rad=0.0
+laser_params=
+backend_params=-p bias_acc_random_walk_sigma:=0.000001 -p bias_gyro_random_walk_sigma:=0.000001
+bag=/tmp/robocon_icm42688_utm30lx_bias_rw_1e6_65s_20260729.mcap
+started_at=2026-07-29T22:34:31+09:00

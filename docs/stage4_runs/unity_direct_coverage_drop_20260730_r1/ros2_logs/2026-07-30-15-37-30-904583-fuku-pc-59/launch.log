@@ -1,0 +1,19 @@
+1785393450.9084291 [INFO] [launch]: All log files can be found below /home/yukichi6105/ros2_ws/src/lio_localization_sim/docs/stage4_runs/unity_direct_coverage_drop_20260730_r1/ros2_logs/2026-07-30-15-37-30-904583-fuku-pc-59
+1785393450.9090164 [INFO] [launch]: Default logging verbosity is set to INFO
+1785393451.1351948 [INFO] [default_server_endpoint-1]: process started with pid [84]
+1785393456.1893442 [INFO] [imu_preintegration_node-2]: process started with pid [257]
+1785393456.1898053 [INFO] [backend_optimizer_node-3]: process started with pid [258]
+1785393456.1899850 [INFO] [laser_scan_matching_node-4]: process started with pid [259]
+1785393456.1982625 [INFO] [nice-5]: process started with pid [260]
+1785393456.1986856 [INFO] [nice-6]: process started with pid [261]
+1785393565.9239411 [INFO] [nice-6]: process has finished cleanly [pid 261]
+1785393565.9409218 [INFO] [nice-5]: sending signal 'SIGINT' to process[nice-5]
+1785393565.9429483 [INFO] [laser_scan_matching_node-4]: sending signal 'SIGINT' to process[laser_scan_matching_node-4]
+1785393565.9455431 [INFO] [backend_optimizer_node-3]: sending signal 'SIGINT' to process[backend_optimizer_node-3]
+1785393565.9564328 [INFO] [imu_preintegration_node-2]: sending signal 'SIGINT' to process[imu_preintegration_node-2]
+1785393565.9691210 [INFO] [default_server_endpoint-1]: sending signal 'SIGINT' to process[default_server_endpoint-1]
+1785393566.2593195 [INFO] [imu_preintegration_node-2]: process has finished cleanly [pid 257]
+1785393566.2960939 [INFO] [backend_optimizer_node-3]: process has finished cleanly [pid 258]
+1785393566.3086491 [INFO] [laser_scan_matching_node-4]: process has finished cleanly [pid 259]
+1785393566.3643551 [INFO] [nice-5]: process has finished cleanly [pid 260]
+1785393566.7387056 [ERROR] [default_server_endpoint-1]: process has died [pid 84, exit code -11, cmd '/home/yukichi6105/ros2_ws/install/ros_tcp_endpoint/lib/ros_tcp_endpoint/default_server_endpoint --ros-args -r __node:=unity_endpoint --params-file /tmp/launch_params_pi8qkfs9'].

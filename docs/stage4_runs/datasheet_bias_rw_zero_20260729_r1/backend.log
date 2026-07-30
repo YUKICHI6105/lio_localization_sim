@@ -1,0 +1,1374 @@
+[INFO] [1785331816.547185848] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[INFO] [1785331816.547523187] [backend_optimizer_node]: backend_optimizer_node started (0 cylinders registered)
+[ERROR] [1785331822.513195513] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937728 (Symbol: b0).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331822.988625075] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331822.989185114] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331823.017410761] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937730 (Symbol: b2).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331823.490405761] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331823.492560093] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331823.518054029] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937732 (Symbol: b4).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331823.989736448] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331823.990110413] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331824.016127957] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937734 (Symbol: b6).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331824.488625204] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331824.488961683] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[INFO] [1785331824.516927154] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0129, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[ERROR] [1785331824.517362968] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937736 (Symbol: b8).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331824.990077043] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331824.990374137] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331825.016008349] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937738 (Symbol: b10).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331825.488641138] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331825.489072395] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331825.517599820] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937740 (Symbol: b12).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331825.989451650] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331825.989745498] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331826.016716358] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937742 (Symbol: b14).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331826.489552208] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331826.489918685] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331826.517262349] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937744 (Symbol: b16).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331826.990074943] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331826.990420613] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[INFO] [1785331827.015982356] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0129, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[ERROR] [1785331827.016439088] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937746 (Symbol: b18).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331827.489127670] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331827.489425316] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331827.519442707] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937748 (Symbol: b20).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331827.990462857] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331827.990805370] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331828.016764368] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937750 (Symbol: b22).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331828.489017272] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331828.489359971] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331828.517957475] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937752 (Symbol: b24).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331828.989358968] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331828.989703577] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331829.016816249] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937754 (Symbol: b26).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331829.489469178] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331829.489807244] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[INFO] [1785331829.517166051] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0129, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[ERROR] [1785331829.517573275] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937756 (Symbol: b28).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331829.989213748] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331829.989453004] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331830.015893192] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937758 (Symbol: b30).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331830.489588731] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331830.489868874] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331830.515926153] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937760 (Symbol: b32).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331830.989631908] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331830.989914115] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331831.016440686] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937762 (Symbol: b34).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331831.489666483] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331831.489961015] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[INFO] [1785331831.514708118] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0129, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[ERROR] [1785331831.515025577] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937764 (Symbol: b36).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331831.988962274] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331831.989306134] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331832.016470787] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937766 (Symbol: b38).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331832.490454337] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331832.500080018] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331832.517336473] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937768 (Symbol: b40).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331832.990770788] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331832.991213676] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331833.019515267] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937770 (Symbol: b42).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331833.494168416] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331833.494610927] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331833.522838488] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937772 (Symbol: b44).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331833.994889789] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331833.995217076] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331834.020117731] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937774 (Symbol: b46).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331834.493856826] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331834.494464586] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331834.519576519] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937776 (Symbol: b48).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331834.998077080] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331834.998406483] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331835.022708848] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937778 (Symbol: b50).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331835.493381460] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331835.493783276] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331835.520861057] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937780 (Symbol: b52).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331835.994414293] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331835.994745119] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331836.020816948] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937782 (Symbol: b54).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331836.494247151] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331836.494744361] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331836.522237167] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937784 (Symbol: b56).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331836.994336664] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331836.994625949] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331837.021670329] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937786 (Symbol: b58).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331837.499068954] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331837.502719922] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331837.524289238] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937788 (Symbol: b60).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331838.005916580] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331838.006344725] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331838.026575305] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937790 (Symbol: b62).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331838.496796531] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331838.497127861] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331838.521724471] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937792 (Symbol: b64).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331838.994678954] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331838.995002464] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331839.021203771] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937794 (Symbol: b66).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331839.494971076] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331839.495504129] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331839.520618283] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937796 (Symbol: b68).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331839.994876958] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331839.995123358] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331840.020732909] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937798 (Symbol: b70).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331840.495463141] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331840.495899481] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331840.520527685] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937800 (Symbol: b72).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331840.994968374] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331840.995290556] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331841.020650577] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937802 (Symbol: b74).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331841.495674004] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331841.495977488] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331841.520480303] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937804 (Symbol: b76).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331841.994498664] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331841.994787417] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331842.019478650] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937806 (Symbol: b78).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331842.494227507] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331842.495934302] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331842.537370978] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937808 (Symbol: b80).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331842.997117292] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331842.997433893] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331843.023204687] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937810 (Symbol: b82).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331843.501844181] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331843.502282096] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331843.521545324] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937812 (Symbol: b84).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331843.995838712] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331843.996167293] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331844.022318825] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937814 (Symbol: b86).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331844.494902888] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331844.495243857] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331844.520802326] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937816 (Symbol: b88).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331844.995653752] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331844.995960161] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331845.020410708] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937818 (Symbol: b90).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331845.494147581] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331845.494471232] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331845.519617671] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937820 (Symbol: b92).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331845.992914340] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331845.993259268] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331846.019331681] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937822 (Symbol: b94).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331846.493952721] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331846.494410080] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331846.520863702] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937824 (Symbol: b96).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331846.993177772] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331846.993501620] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[INFO] [1785331847.018533239] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0129, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[ERROR] [1785331847.018922769] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937826 (Symbol: b98).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331847.491589076] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331847.491966100] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331847.518658790] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937828 (Symbol: b100).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331847.998274518] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331847.998633034] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331848.018847856] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937830 (Symbol: b102).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331848.493313782] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331848.493655730] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331848.521354615] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937832 (Symbol: b104).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331848.995482081] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331848.995843427] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331849.021920833] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937834 (Symbol: b106).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331849.494449238] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331849.494741872] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331849.517460440] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937836 (Symbol: b108).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331849.992695096] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331849.992990382] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331850.018929812] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937838 (Symbol: b110).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331850.493762255] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331850.494165860] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331850.517410127] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937840 (Symbol: b112).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331850.993106381] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331850.993378624] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331851.020166686] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937842 (Symbol: b114).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331851.494516902] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331851.494792800] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331851.519658008] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937844 (Symbol: b116).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331851.993290766] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331851.993641859] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331852.021129585] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937846 (Symbol: b118).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331852.502685184] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331852.503017386] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331852.526653423] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937848 (Symbol: b120).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331852.997354033] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331852.997695820] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331853.023538590] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937850 (Symbol: b122).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331853.496270122] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331853.496628084] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331853.525014558] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937852 (Symbol: b124).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331853.995017651] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331853.995372056] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331854.025688379] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937854 (Symbol: b126).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331854.494939241] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331854.495295431] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331854.522136923] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937856 (Symbol: b128).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331854.994115991] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331854.994426974] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331855.021474306] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937858 (Symbol: b130).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331855.494623505] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331855.494973403] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331855.521903771] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937860 (Symbol: b132).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331855.994169304] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331855.994498675] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331856.020837423] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937862 (Symbol: b134).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331856.494261172] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331856.494560940] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331856.521581635] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937864 (Symbol: b136).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331856.996033237] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331856.996367970] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331857.028944606] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937866 (Symbol: b138).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331857.498223067] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331857.498601058] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331857.539260458] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937868 (Symbol: b140).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331857.999613609] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331858.000013361] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331858.041807688] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937870 (Symbol: b142).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331858.497790477] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331858.498195850] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331858.527648779] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937872 (Symbol: b144).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331858.993435393] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331858.993721309] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331859.022994124] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937874 (Symbol: b146).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331859.493508075] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331859.493771135] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331859.519956400] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937876 (Symbol: b148).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331859.993665617] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331859.994003728] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331860.018722460] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937878 (Symbol: b150).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331860.491407630] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331860.491655303] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331860.519048956] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937880 (Symbol: b152).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331860.991680277] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331860.992000321] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331861.019208020] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937882 (Symbol: b154).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331861.492560878] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331861.492866540] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331861.517899242] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937884 (Symbol: b156).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331861.991876899] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331861.992166569] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[INFO] [1785331862.017077056] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0129, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[ERROR] [1785331862.017421842] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937886 (Symbol: b158).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331862.493649160] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331862.493999494] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331862.518571830] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937888 (Symbol: b160).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331862.995475964] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331862.995842700] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331863.016840856] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937890 (Symbol: b162).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331863.490220397] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331863.490511801] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331863.519740068] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937892 (Symbol: b164).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331863.992524786] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331863.992840256] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331864.022176264] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937894 (Symbol: b166).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331864.492692304] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331864.492970716] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331864.521140480] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937896 (Symbol: b168).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331864.993363422] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331864.993699308] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331865.025877020] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937898 (Symbol: b170).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331865.493447454] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331865.493769413] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331865.522666049] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937900 (Symbol: b172).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331865.994959940] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331865.995321156] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331866.020875640] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937902 (Symbol: b174).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331866.494298322] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331866.494802097] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331866.522654094] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937904 (Symbol: b176).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331866.993880616] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331866.994218876] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331867.021369492] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937906 (Symbol: b178).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331867.508031469] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331867.508461758] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331867.530871446] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937908 (Symbol: b180).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331868.004325839] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331868.004693082] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331868.030812460] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937910 (Symbol: b182).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331868.494326071] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331868.494700689] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331868.521530836] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937912 (Symbol: b184).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331868.993745914] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331868.994142157] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331869.022879896] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937914 (Symbol: b186).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331869.492454869] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331869.492735471] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331869.521784390] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937916 (Symbol: b188).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331869.992933337] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331869.993419048] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331870.020799214] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937918 (Symbol: b190).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331870.493569267] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331870.493869371] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331870.521642703] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937920 (Symbol: b192).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331870.993890751] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331870.994277568] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331871.020785895] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937922 (Symbol: b194).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331871.491709286] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331871.491960880] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331871.520853710] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937924 (Symbol: b196).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331871.992986254] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331871.993272355] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331872.021232181] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937926 (Symbol: b198).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331872.494890042] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331872.495255554] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331872.522700929] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937928 (Symbol: b200).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331872.995852993] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331872.996237192] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331873.022945798] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937930 (Symbol: b202).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331873.495849214] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331873.496202549] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331873.525218814] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937932 (Symbol: b204).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331873.993594258] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331873.993915476] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331874.021886236] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937934 (Symbol: b206).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331874.494152812] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331874.494424701] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331874.520512484] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937936 (Symbol: b208).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331874.991747937] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331874.991984411] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331875.020159494] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937938 (Symbol: b210).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331875.493894045] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331875.494230142] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331875.520781891] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937940 (Symbol: b212).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331875.991502764] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331875.991827682] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331876.020561234] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937942 (Symbol: b214).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331876.492542845] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331876.492891819] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331876.520270209] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937944 (Symbol: b216).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331876.992936600] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331876.993233292] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331877.019992101] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937946 (Symbol: b218).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331877.493809482] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331877.494259253] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[INFO] [1785331877.518526978] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0129, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[ERROR] [1785331877.518977548] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937948 (Symbol: b220).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331877.995563639] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331877.995927778] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331878.020505111] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937950 (Symbol: b222).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331878.490578473] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331878.490859694] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331878.518040240] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937952 (Symbol: b224).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331878.991437416] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331878.991735478] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331879.020948787] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937954 (Symbol: b226).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331879.493121889] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331879.493366859] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331879.519860886] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937956 (Symbol: b228).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331879.993222102] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331879.993458246] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331880.020282951] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937958 (Symbol: b230).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331880.492154968] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331880.492438679] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331880.520208105] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937960 (Symbol: b232).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331880.992331170] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331880.992587824] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331881.021764880] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937962 (Symbol: b234).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331881.493119171] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331881.493480866] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331881.521462011] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937964 (Symbol: b236).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331881.993103530] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331881.993360467] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331882.020715230] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937966 (Symbol: b238).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331882.500846633] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331882.501140806] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331882.532409122] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937968 (Symbol: b240).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331882.995546197] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331882.998512539] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331883.020943062] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937970 (Symbol: b242).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331883.493686261] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331883.494050042] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331883.525618940] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937972 (Symbol: b244).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ERROR] [1785331883.994020731] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785331883.994308481] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[ERROR] [1785331884.019594741] [backend_optimizer_node]: exception in smoother update: 
+Indeterminant linear system detected while working near variable
+7061644215716937974 (Symbol: b246).
+
+Thrown when a linear system is ill-posed.  The most common cause for this
+error is having underconstrained variables.  Mathematically, the system is
+underdetermined.  See the GTSAM Doxygen documentation at
+http://borg.cc.gatech.edu/ on gtsam::IndeterminantLinearSystemException for
+more information.
+[ros2run]: Received signal:  Interrupt
+[INFO] [1785331884.695543302] [rclcpp]: signal_handler(signum=2)
+[INFO] [1785331884.696613266] [backend_optimizer_node]: backend concurrency stats: imu_callbacks=62001, during_worker=376 (0.6%), during_smoother=26 (0.0%), callback_gap_max=35.308ms, gaps>2ms=591, gaps>10ms=25; stamp_gap_max=1.000ms, gaps>1ms=0; ring_enqueue_max=1.025ms, enqueues>2ms=0; callback_duration_max=5.633ms, durations>2ms=8; worker_jobs=2480 mean/max=0.155/17.375ms; smoother_updates=0 mean/max=0.000/0.000ms

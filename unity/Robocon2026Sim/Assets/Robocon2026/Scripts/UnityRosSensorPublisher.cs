@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using RosMessageTypes.BuiltinInterfaces;
 using RosMessageTypes.Geometry;
 using RosMessageTypes.Nav;
@@ -24,6 +25,11 @@ namespace Robocon2026.Simulation
         private const string ScanTopic = "/scan";
         private const string GroundTruthTopic = "/ground_truth_pose";
         private const string OdomFastTopic = "/odom_fast";
+        // Transport audit, independent of the estimator.  This reports Unity's
+        // authoritative cumulative *publish attempts* on the same TCP connection
+        // every 250 ms.  ROS receivers compare it with their own counters, so a
+        // rate probe can never be mistaken for an upstream sensor loss.
+        private const string SensorCountTopic = "/unity_sensor_publish_counts";
 
         // Closed-loop control feedback: the localisation stack's own estimate (node ①'s
         // /odom_fast), consumed by StartToBingoValidation instead of the ground-truth
@@ -39,6 +45,7 @@ namespace Robocon2026.Simulation
         // authoritative send count against the receive count rather than inferred from a rate.
         public static long ImuPublishCount;
         public static long ScanPublishCount;
+        public static long GroundTruthPublishCount;
         private const int LidarSamples = 1081;
         private const float LidarFovRadians = 270f * Mathf.Deg2Rad;
         // A 270 deg sensor has a 90 deg blind sector; where it points is a mounting choice.
@@ -49,6 +56,11 @@ namespace Robocon2026.Simulation
         private const float LidarBlindCentreRadians = -90f * Mathf.Deg2Rad;
         private const float LidarRangeMin = 0.05f;
         private const float LidarRangeMax = 30f;
+        // Hokuyo UTM-30LX official specification, indoor / white Kent sheet:
+        // repeat accuracy is sigma < 10 mm for 0.1--10 m.  The separate
+        // +/-30 mm figure is an accuracy bound, not a Gaussian sigma.
+        private const float LidarRangeNoiseSigma = 0.010f;
+        private const double DefaultLidarRangeBias = 0.0;
         // /clock drives ROS simulation time, not the physical IMU. Publishing it at every
         // 1 kHz physics step made every ROS node process 1,000 redundant clock updates/s and
         // competed with the actual 1 kHz IMU over the Unity TCP bridge. A 250 Hz clock still
@@ -57,6 +69,24 @@ namespace Robocon2026.Simulation
         private const float ClockPeriod = 0.004f;
         private const float LidarPeriod = 0.025f;
         private const float GroundTruthPeriod = 0.010f;
+        private const float SensorCountPeriod = 0.250f;
+        // TDK InvenSense ICM-42688-P data sheet (DS-000347): accel noise
+        // density is 65 µg/sqrt(Hz) on X/Y and 70 on Z; gyro rate-noise
+        // density is 2.8 mdps/sqrt(Hz).  Use the conservative Z-axis accel
+        // value for all axes until the board orientation is fixed.
+        private const double StandardGravity = 9.80665;
+        private const double Icm42688AccelNoiseDensity = 70e-6 * StandardGravity;
+        private const double Icm42688GyroNoiseDensity = 2.8e-3 * Math.PI / 180.0;
+        // These defaults are the stationary-calibration result used by the normal scenario.
+        // Command-line overrides make a sensor-offset experiment explicit in its Unity CSV
+        // provenance; the ROS configuration deliberately remains the nominal calibration.
+        private const double DefaultAccelBiasX = 0.05;
+        private const double DefaultAccelBiasY = -0.03;
+        private const double DefaultAccelBiasZ = 0.0;
+        private const double DefaultGyroBiasX = 0.0;
+        private const double DefaultGyroBiasY = 0.0;
+        private const double DefaultGyroBiasZ = 0.005;
+        private const double DefaultBiasRandomWalkSigma = 0.0001;
 
         private readonly RaycastHit[] rayHits = new RaycastHit[32];
         private readonly HashSet<Collider> robotSelfColliders = new();
@@ -67,8 +97,10 @@ namespace Robocon2026.Simulation
         private double nextClockTime;
         private double nextScanTime;
         private double nextGroundTruthTime;
+        private double nextSensorCountTime;
         private double previousImuSampleTime;
         private bool initializedVelocity;
+        private UnitySensorCsvRecorder csvRecorder;
 
         // Real IMU bias is not a fixed offset: it drifts slowly over the run (temperature,
         // mechanical settling, 1/f noise). A constant offset only exercises the estimator's
@@ -79,7 +111,12 @@ namespace Robocon2026.Simulation
         // add directly, and nudged by a small random walk each sample (see PublishImu).
         private double accelBiasX;
         private double accelBiasY;
+        private double accelBiasZ;
+        private double gyroBiasX;
+        private double gyroBiasY;
         private double gyroBiasZ;
+        private double biasRandomWalkSigma;
+        private double lidarRangeBias;
 
         // Epoch for every timestamp this publisher sends (/clock and all message headers),
         // recorded once at Start(). Time.timeAsDouble is normally 0 at the start of a fresh
@@ -97,6 +134,16 @@ namespace Robocon2026.Simulation
             sessionStartTime = Time.timeAsDouble;
             ImuPublishCount = 0;
             ScanPublishCount = 0;
+            GroundTruthPublishCount = 0;
+            try
+            {
+                csvRecorder = new UnitySensorCsvRecorder(Time.fixedDeltaTime);
+                Debug.Log($"[Unity ROS Sensors] Authoritative sensor CSV recording: {csvRecorder.OutputDirectory}");
+            }
+            catch (Exception exception)
+            {
+                Debug.LogError("[Unity ROS Sensors] Failed to start authoritative sensor CSV recording: " + exception);
+            }
             body = GetComponent<Rigidbody>();
             foreach (var selfCollider in GetComponentsInChildren<Collider>())
                 robotSelfColliders.Add(selfCollider);
@@ -129,6 +176,7 @@ namespace Robocon2026.Simulation
             ros.RegisterPublisher<ClockMsg>(ClockTopic, 500);
             ros.RegisterPublisher<LaserScanMsg>(ScanTopic, 80);
             ros.RegisterPublisher<OdometryMsg>(GroundTruthTopic, 200);
+            ros.RegisterPublisher<StringMsg>(SensorCountTopic, 20);
             // Register IMU last. Registering the larger message types can briefly block the
             // endpoint; publishing IMU before that makes the ROS watchdog see a false outage.
             ros.RegisterPublisher<ImuMsg>(ImuTopic, 2000);
@@ -142,17 +190,27 @@ namespace Robocon2026.Simulation
             nextClockTime = 0.0;
             nextScanTime = 0.0;
             nextGroundTruthTime = 0.0;
+            nextSensorCountTime = 0.0;
             previousImuSampleTime = 0.0;
             // Seed the evolving bias at the same values PublishImu used to add as fixed
             // constants, so the starting behaviour is unchanged; only the drift over time is new.
             // (2026-07-28: bias/random-walk/sensor-noise isolation tests confirmed the
             // deceleration-linked spikes are independent of all three; reverted to adopted values.)
-            accelBiasX = 0.05;
-            accelBiasY = -0.03;
-            gyroBiasZ = 0.005;
+            accelBiasX = ReadCommandLineDouble("-roboconInitialAccelBiasX", DefaultAccelBiasX);
+            accelBiasY = ReadCommandLineDouble("-roboconInitialAccelBiasY", DefaultAccelBiasY);
+            accelBiasZ = ReadCommandLineDouble("-roboconInitialAccelBiasZ", DefaultAccelBiasZ);
+            gyroBiasX = ReadCommandLineDouble("-roboconInitialGyroBiasX", DefaultGyroBiasX);
+            gyroBiasY = ReadCommandLineDouble("-roboconInitialGyroBiasY", DefaultGyroBiasY);
+            gyroBiasZ = ReadCommandLineDouble("-roboconInitialGyroBiasZ", DefaultGyroBiasZ);
+            biasRandomWalkSigma = ReadCommandLineDouble("-roboconBiasRandomWalkSigma",
+                DefaultBiasRandomWalkSigma);
+            lidarRangeBias = ReadCommandLineDouble("-roboconLidarRangeBias", DefaultLidarRangeBias);
             Debug.Log("[Unity ROS Sensors] Unity physics publishers ready: " +
                 $"/imu/data 1kHz, /clock 250Hz, /scan 40Hz, /ground_truth_pose 100Hz; " +
-                $"ROS={ros.RosIPAddress}:{ros.RosPort}.");
+                $"ROS={ros.RosIPAddress}:{ros.RosPort}; initial bias accel=({accelBiasX:F6}," +
+                $"{accelBiasY:F6},{accelBiasZ:F6})m/s^2 gyro=({gyroBiasX:F6}," +
+                $"{gyroBiasY:F6},{gyroBiasZ:F6})rad/s rw={biasRandomWalkSigma:E3} " +
+                $"lidar_range_bias={lidarRangeBias:F3}m.");
         }
 
         private void OnDestroy()
@@ -166,6 +224,20 @@ namespace Robocon2026.Simulation
             // sends silently failing partway through a run). Disconnecting here on the
             // GameObject's destruction -- which Play Mode Stop does trigger -- closes the
             // connection every time regardless of why the session is ending.
+            if (csvRecorder != null)
+            {
+                try
+                {
+                    csvRecorder.Dispose();
+                    Debug.Log("[Unity ROS Sensors] Authoritative sensor CSV recording finalized: "
+                        + csvRecorder.OutputDirectory);
+                }
+                catch (Exception exception)
+                {
+                    Debug.LogError("[Unity ROS Sensors] Sensor CSV recording did not finalize cleanly: " + exception);
+                }
+                csvRecorder = null;
+            }
             if (ros != null) ros.Disconnect();
         }
 
@@ -232,6 +304,24 @@ namespace Robocon2026.Simulation
                 PublishScan(stamp);
                 nextScanTime += LidarPeriod;
             }
+            if (simulationTime + 1e-9 >= nextSensorCountTime)
+            {
+                PublishSensorCounts(simulationTime);
+                nextSensorCountTime += SensorCountPeriod;
+            }
+        }
+
+        private void PublishSensorCounts(double simulationTime)
+        {
+            // Semicolon-delimited numeric payload deliberately uses only standard
+            // std_msgs/String, avoiding a custom Unity-generated message dependency.
+            // Counts are accumulated before this publication, so each report is an
+            // exact source-side checkpoint for all messages emitted up to this time.
+            var payload = string.Format(CultureInfo.InvariantCulture,
+                "v=1;stamp_ns={0};imu={1};scan={2};ground_truth={3}",
+                (long)Math.Round(simulationTime * 1_000_000_000.0),
+                ImuPublishCount, ScanPublishCount, GroundTruthPublishCount);
+            ros.Publish(SensorCountTopic, new StringMsg(payload));
         }
 
         private void PublishImu(TimeMsg stamp, double simulationTime)
@@ -256,13 +346,11 @@ namespace Robocon2026.Simulation
             var accelerationRos = UnityVectorToRos(specificForceLocalUnity);
             var angularVelocityRos = UnityVectorToRos(angularVelocityLocalUnity);
 
-            // Provisional real-sensor model from main.md.  Replace these constants with
-            // the selected IMU data-sheet values once its exact model number is fixed.
-            // TEMP DIAG (2026-07-28, revert after use): Gaussian noise fully disabled so the
-            // raw published accel/gyro values around a deceleration-linked error spike can be
-            // inspected without random per-sample jitter obscuring the underlying signal.
-            const double accelNoiseSigma = 0.0;
-            const double gyroNoiseSigma = 0.0;
+            // Convert the ICM-42688-P continuous-time noise densities to independent
+            // 1/dt sample noise.  The estimator receives the same density in its
+            // PreintegratedImuMeasurements configuration.
+            var accelNoiseSigma = Icm42688AccelNoiseDensity / Math.Sqrt(dt);
+            var gyroNoiseSigma = Icm42688GyroNoiseDensity / Math.Sqrt(dt);
             // A real IMU's bias is not a fixed offset: it wanders slowly over time (continuous-
             // time random walk), which is exactly what the estimator's bias_acc/gyro_random_walk_
             // sigma parameters (backend_optimizer_node) model and are meant to track. A constant
@@ -276,16 +364,15 @@ namespace Robocon2026.Simulation
             // 2026-07-28: bias/random-walk isolation tests confirmed the deceleration-linked
             // error spikes are bias-independent (same magnitude with random walk on, fixed
             // bias, and zero bias). Reverted to the adopted value.
-            const double biasRandomWalkSigma = 0.0001;
             var biasWalkStep = biasRandomWalkSigma * Math.Sqrt(dt);
             accelBiasX += Gaussian(biasWalkStep);
             accelBiasY += Gaussian(biasWalkStep);
             gyroBiasZ += Gaussian(biasWalkStep);
             accelerationRos.x += accelBiasX + Gaussian(accelNoiseSigma);
             accelerationRos.y += accelBiasY + Gaussian(accelNoiseSigma);
-            accelerationRos.z += Gaussian(accelNoiseSigma);
-            angularVelocityRos.x += Gaussian(gyroNoiseSigma);
-            angularVelocityRos.y += Gaussian(gyroNoiseSigma);
+            accelerationRos.z += accelBiasZ + Gaussian(accelNoiseSigma);
+            angularVelocityRos.x += gyroBiasX + Gaussian(gyroNoiseSigma);
+            angularVelocityRos.y += gyroBiasY + Gaussian(gyroNoiseSigma);
             angularVelocityRos.z += gyroBiasZ + Gaussian(gyroNoiseSigma);
 
             var msg = new ImuMsg
@@ -298,6 +385,7 @@ namespace Robocon2026.Simulation
                 linear_acceleration = accelerationRos,
                 linear_acceleration_covariance = DiagonalCovariance3(accelNoiseSigma * accelNoiseSigma)
             };
+            csvRecorder?.RecordImu(msg, ImuPublishCount);
             ros.Publish(ImuTopic, msg);
             ImuPublishCount++;
         }
@@ -332,7 +420,9 @@ namespace Robocon2026.Simulation
                         localAngularRos),
                     new double[36])
             };
+            csvRecorder?.RecordGroundTruth(msg, GroundTruthPublishCount);
             ros.Publish(GroundTruthTopic, msg);
+            GroundTruthPublishCount++;
         }
 
         private void PublishScan(TimeMsg stamp)
@@ -368,9 +458,7 @@ namespace Robocon2026.Simulation
                 }
                 if (float.IsFinite(nearest))
                 {
-                    // UTM-30LX catalogue accuracy is +/-30 mm within 10 m.  The
-                    // established project sensor model treats this as sigma=30 mm.
-                    nearest += (float)Gaussian(0.03);
+                    nearest += (float)(lidarRangeBias + Gaussian(LidarRangeNoiseSigma));
                     ranges[i] = Mathf.Clamp(nearest, LidarRangeMin, LidarRangeMax);
                 }
                 else
@@ -390,6 +478,7 @@ namespace Robocon2026.Simulation
                 LidarRangeMax,
                 ranges,
                 Array.Empty<float>());
+            csvRecorder?.RecordScan(msg, ScanPublishCount);
             ros.Publish(ScanTopic, msg);
             ScanPublishCount++;
         }
@@ -458,6 +547,23 @@ namespace Robocon2026.Simulation
             0.0, 0.0, variance
         };
 
+        private static double ReadCommandLineDouble(string option, double fallback)
+        {
+            var args = Environment.GetCommandLineArgs();
+            for (var i = 0; i < args.Length - 1; ++i)
+            {
+                if (!string.Equals(args[i], option, StringComparison.Ordinal)) continue;
+                if (double.TryParse(args[i + 1], NumberStyles.Float,
+                        CultureInfo.InvariantCulture, out var value) && double.IsFinite(value))
+                {
+                    return value;
+                }
+                Debug.LogWarning($"[Unity ROS Sensors] invalid {option} value '{args[i + 1]}'; " +
+                                 $"using {fallback.ToString(CultureInfo.InvariantCulture)}.");
+                break;
+            }
+            return fallback;
+        }
 
         private double Gaussian(double sigma)
         {

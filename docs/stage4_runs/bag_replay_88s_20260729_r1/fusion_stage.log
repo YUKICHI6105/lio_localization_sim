@@ -1,0 +1,178 @@
+[INFO] [1785293661.113729342] [fusion_stage_diag]: fusion_stage_diag started (settle=0.0s)
+[INFO] [1785293680.300940719] [fusion_stage_diag]: ==============================================================================
+[INFO] [1785293680.305563712] [fusion_stage_diag]: --- stage vs ground truth (signed, settled samples only) ---
+[INFO] [1785293680.322707963] [fusion_stage_diag]: scan_match wall.corrected_pose: n=215 dx=+4.04+-1.90mm dy=+0.10+-1.66mm |bias|=4.04mm dyaw=-0.1213+-0.1101deg
+[INFO] [1785293680.330253905] [fusion_stage_diag]: state_estimate (fused)      : n=248 dx=+4.05+-0.72mm dy=+0.14+-0.41mm |bias|=4.05mm dyaw=-0.1617+-0.0449deg
+[INFO] [1785293680.333102900] [fusion_stage_diag]: odom_fast (evaluated)       : n=2531 dx=+4.18+-1.17mm dy=+0.17+-0.47mm |bias|=4.18mm dyaw=-0.1612+-0.0491deg
+[INFO] [1785293680.333838582] [fusion_stage_diag]: --- matcher error split by speed (along = direction of travel) ---
+[INFO] [1785293680.334625086] [fusion_stage_diag]:   speed     still m/s: n=18    mean_speed=0.000 |err| rms=  4.87mm max=  9.05mm  along= +0.00 cross= +0.00mm lag=  +nanms
+[INFO] [1785293680.339817582] [fusion_stage_diag]: --- error by |accel|: scan_match vs fused vs odom (collision test) ---
+[INFO] [1785293680.340862292] [fusion_stage_diag]:        accel m/s^2      n  scan mean/max  fused mean/max  odom mean/max
+[INFO] [1785293680.348513895] [fusion_stage_diag]:                0-2   1698            -        5.1/  5.9      4.3/ 11.6
+[INFO] [1785293680.349403221] [fusion_stage_diag]: --- odom error in/out of collision-imminent windows (0 windows, judged on ground truth) ---
+[INFO] [1785293680.350291326] [fusion_stage_diag]:     inside: (none)
+[INFO] [1785293680.351636941] [fusion_stage_diag]:    outside: n=2531   mean=  4.21mm p95=  6.15mm max= 11.63mm
+[INFO] [1785293680.352628390] [fusion_stage_diag]: --- stamp regularity ---
+[INFO] [1785293680.363185081] [fusion_stage_diag]: imu  stamp dt: n=2825 mean=1.770ms (nominal 1.000) sd=4.826ms min=1.000 max=87.000
+[INFO] [1785293680.365288107] [fusion_stage_diag]: scan stamp dt: n=395 mean=25.256ms (nominal 25.000) sd=3.970ms min=25.000 max=100.000
+[INFO] [1785293680.366732346] [fusion_stage_diag]: scan stamp - newest imu stamp: n=396 mean=+2928.505ms min=+0.000 max=+4998.000
+[INFO] [1785293680.368506177] [fusion_stage_diag]: estimated bias: gyro_z mean=+0.005845rad/s (last=+0.004994)  |accel_xy| mean=0.059956m/s^2
+[INFO] [1785293690.277075563] [fusion_stage_diag]: ==============================================================================
+[INFO] [1785293690.278251333] [fusion_stage_diag]: --- stage vs ground truth (signed, settled samples only) ---
+[INFO] [1785293690.280142059] [fusion_stage_diag]: scan_match wall.corrected_pose: n=440 dx=+2.43+-4.74mm dy=-1.75+-3.32mm |bias|=2.99mm dyaw=+0.0399+-0.2349deg
+[INFO] [1785293690.281729699] [fusion_stage_diag]: state_estimate (fused)      : n=495 dx=+2.56+-4.70mm dy=-1.74+-2.80mm |bias|=3.09mm dyaw=-0.0189+-0.1990deg
+[INFO] [1785293690.312348873] [fusion_stage_diag]: odom_fast (evaluated)       : n=5016 dx=+3.15+-4.47mm dy=-1.91+-3.01mm |bias|=3.69mm dyaw=-0.0251+-0.1887deg
+[INFO] [1785293690.312994573] [fusion_stage_diag]: --- matcher error split by speed (along = direction of travel) ---
+[INFO] [1785293690.316085224] [fusion_stage_diag]:   speed     still m/s: n=22    mean_speed=0.001 |err| rms=  4.68mm max=  9.05mm  along= -0.45 cross= -0.34mm lag=  +nanms
+[INFO] [1785293690.316959513] [fusion_stage_diag]:   speed   0.0-0.2 m/s: n=2     mean_speed=0.099 |err| rms= 11.52mm max= 16.18mm  along= +8.81 cross= -1.16mm lag=+88.92ms
+[INFO] [1785293690.317588273] [fusion_stage_diag]:   speed   0.2-0.4 m/s: n=2     mean_speed=0.316 |err| rms= 13.18mm max= 14.19mm  along=+13.00 cross= +0.69mm lag=+41.17ms
+[INFO] [1785293690.337448326] [fusion_stage_diag]:   speed   0.6-0.8 m/s: n=1     mean_speed=0.690 |err| rms=  3.27mm max=  3.27mm  along= -1.18 cross= +3.05mm lag= -1.71ms
+[INFO] [1785293690.338381450] [fusion_stage_diag]:   speed   1.0-1.2 m/s: n=3     mean_speed=1.082 |err| rms=  4.93mm max=  6.20mm  along= +0.89 cross= -1.29mm lag= +0.82ms
+[INFO] [1785293690.369657382] [fusion_stage_diag]:   speed   1.2-1.4 m/s: n=4     mean_speed=1.306 |err| rms=  5.99mm max= 10.84mm  along= -3.39 cross= -0.60mm lag= -2.59ms
+[INFO] [1785293690.370733744] [fusion_stage_diag]:   speed   1.4-1.6 m/s: n=4     mean_speed=1.515 |err| rms=  3.35mm max=  4.63mm  along= -0.18 cross= -0.54mm lag= -0.12ms
+[INFO] [1785293690.385848301] [fusion_stage_diag]:   speed   2.2-2.4 m/s: n=1     mean_speed=2.224 |err| rms=  1.10mm max=  1.10mm  along= -1.06 cross= +0.29mm lag= -0.48ms
+[INFO] [1785293690.400803748] [fusion_stage_diag]: --- error by |accel|: scan_match vs fused vs odom (collision test) ---
+[INFO] [1785293690.401665106] [fusion_stage_diag]:        accel m/s^2      n  scan mean/max  fused mean/max  odom mean/max
+[INFO] [1785293690.402944276] [fusion_stage_diag]:                0-2   2144      1.9/  1.9      4.7/  5.9      5.0/ 11.6
+[INFO] [1785293690.407726863] [fusion_stage_diag]:                2-4    611      1.7/  2.2            -        7.9/ 12.1
+[INFO] [1785293690.412208625] [fusion_stage_diag]:                4-6    492            -        3.7/  3.7      7.8/ 11.8
+[INFO] [1785293690.419555969] [fusion_stage_diag]:         5-10(coll)     40            -              -        1.5/  1.8
+[INFO] [1785293690.422176123] [fusion_stage_diag]: --- odom error in/out of collision-imminent windows (0 windows, judged on ground truth) ---
+[INFO] [1785293690.440629695] [fusion_stage_diag]:     inside: (none)
+[INFO] [1785293690.457253794] [fusion_stage_diag]:    outside: n=5016   mean=  5.85mm p95= 11.25mm max= 12.10mm
+[INFO] [1785293690.458903393] [fusion_stage_diag]: --- stamp regularity ---
+[INFO] [1785293690.476671053] [fusion_stage_diag]: imu  stamp dt: n=5663 mean=2.643ms (nominal 1.000) sd=5.835ms min=1.000 max=105.000
+[INFO] [1785293690.488248555] [fusion_stage_diag]: scan stamp dt: n=794 mean=25.159ms (nominal 25.000) sd=2.938ms min=25.000 max=100.000
+[INFO] [1785293690.491256985] [fusion_stage_diag]: scan stamp - newest imu stamp: n=795 mean=+3962.516ms min=+0.000 max=+5031.000
+[INFO] [1785293690.493585498] [fusion_stage_diag]: estimated bias: gyro_z mean=+0.005224rad/s (last=+0.004583)  |accel_xy| mean=0.059258m/s^2
+[INFO] [1785293700.295741044] [fusion_stage_diag]: ==============================================================================
+[INFO] [1785293700.307495699] [fusion_stage_diag]: --- stage vs ground truth (signed, settled samples only) ---
+[INFO] [1785293700.316333081] [fusion_stage_diag]: scan_match wall.corrected_pose: n=502 dx=+2.23+-13.96mm dy=-1.79+-3.32mm |bias|=2.86mm dyaw=+0.0331+-0.2320deg
+[INFO] [1785293700.318245092] [fusion_stage_diag]: state_estimate (fused)      : n=577 dx=+3.04+-4.59mm dy=-1.83+-2.88mm |bias|=3.55mm dyaw=+0.0009+-0.2013deg
+[INFO] [1785293700.360589555] [fusion_stage_diag]: odom_fast (evaluated)       : n=5591 dx=+3.46+-4.41mm dy=-1.96+-3.06mm |bias|=3.97mm dyaw=-0.0138+-0.1901deg
+[INFO] [1785293700.361393145] [fusion_stage_diag]: --- matcher error split by speed (along = direction of travel) ---
+[INFO] [1785293700.362113667] [fusion_stage_diag]:   speed     still m/s: n=25    mean_speed=0.001 |err| rms=  4.52mm max=  9.05mm  along= -0.29 cross= -0.21mm lag=  +nanms
+[INFO] [1785293700.362667828] [fusion_stage_diag]:   speed   0.0-0.2 m/s: n=4     mean_speed=0.137 |err| rms=  9.60mm max= 16.18mm  along= +1.79 cross= -1.44mm lag=+13.04ms
+[INFO] [1785293700.363900300] [fusion_stage_diag]:   speed   0.2-0.4 m/s: n=4     mean_speed=0.299 |err| rms= 10.30mm max= 14.19mm  along= +4.08 cross= -1.23mm lag=+13.62ms
+[INFO] [1785293700.364566193] [fusion_stage_diag]:   speed   0.6-0.8 m/s: n=2     mean_speed=0.659 |err| rms=  7.64mm max= 10.29mm  along= -4.60 cross= -1.70mm lag= -6.98ms
+[INFO] [1785293700.365216267] [fusion_stage_diag]:   speed   1.0-1.2 m/s: n=7     mean_speed=1.084 |err| rms=  8.67mm max= 13.46mm  along= -4.39 cross= -0.79mm lag= -4.05ms
+[INFO] [1785293700.366019153] [fusion_stage_diag]:   speed   1.2-1.4 m/s: n=8     mean_speed=1.307 |err| rms=  5.72mm max= 10.84mm  along= -2.40 cross= +0.10mm lag= -1.84ms
+[INFO] [1785293700.376829762] [fusion_stage_diag]:   speed   1.4-1.6 m/s: n=6     mean_speed=1.493 |err| rms=  5.63mm max= 10.92mm  along= -2.61 cross= -1.33mm lag= -1.75ms
+[INFO] [1785293700.379568959] [fusion_stage_diag]:   speed   1.8-2.0 m/s: n=2     mean_speed=1.921 |err| rms=  7.81mm max=  9.49mm  along= +3.94 cross= -1.93mm lag= +2.05ms
+[INFO] [1785293700.380810089] [fusion_stage_diag]:   speed   2.2-2.4 m/s: n=1     mean_speed=2.224 |err| rms=  1.10mm max=  1.10mm  along= -1.06 cross= +0.29mm lag= -0.48ms
+[INFO] [1785293700.381870396] [fusion_stage_diag]: --- error by |accel|: scan_match vs fused vs odom (collision test) ---
+[INFO] [1785293700.382833684] [fusion_stage_diag]:        accel m/s^2      n  scan mean/max  fused mean/max  odom mean/max
+[INFO] [1785293700.383903633] [fusion_stage_diag]:                0-2   2182      4.7/  9.5      5.4/ 10.3      5.0/ 11.9
+[INFO] [1785293700.395001449] [fusion_stage_diag]:                2-4    707      1.7/  2.2            -        7.9/ 14.4
+[INFO] [1785293700.396122748] [fusion_stage_diag]:                4-6    560      6.8/  6.8      6.0/  7.7      7.9/ 16.5
+[INFO] [1785293700.397194281] [fusion_stage_diag]:         5-10(coll)     40            -              -        1.5/  1.8
+[INFO] [1785293700.398195095] [fusion_stage_diag]: --- odom error in/out of collision-imminent windows (0 windows, judged on ground truth) ---
+[INFO] [1785293700.399780379] [fusion_stage_diag]:     inside: (none)
+[INFO] [1785293700.411741033] [fusion_stage_diag]:    outside: n=5591   mean=  5.97mm p95= 11.50mm max= 18.07mm
+[INFO] [1785293700.412662212] [fusion_stage_diag]: --- stamp regularity ---
+[INFO] [1785293700.426887979] [fusion_stage_diag]: imu  stamp dt: n=6870 mean=3.635ms (nominal 1.000) sd=8.188ms min=1.000 max=231.000
+[INFO] [1785293700.428536002] [fusion_stage_diag]: scan stamp dt: n=1187 mean=25.275ms (nominal 25.000) sd=4.523ms min=25.000 max=150.000
+[INFO] [1785293700.430681766] [fusion_stage_diag]: scan stamp - newest imu stamp: n=1188 mean=+4306.495ms min=+0.000 max=+5049.000
+[INFO] [1785293700.432229971] [fusion_stage_diag]: estimated bias: gyro_z mean=+0.005026rad/s (last=+0.004144)  |accel_xy| mean=0.059019m/s^2
+[INFO] [1785293710.285087827] [fusion_stage_diag]: ==============================================================================
+[INFO] [1785293710.286054581] [fusion_stage_diag]: --- stage vs ground truth (signed, settled samples only) ---
+[INFO] [1785293710.287280266] [fusion_stage_diag]: scan_match wall.corrected_pose: n=719 dx=+1.96+-12.14mm dy=-2.24+-3.42mm |bias|=2.98mm dyaw=+0.0816+-0.2460deg
+[INFO] [1785293710.288807733] [fusion_stage_diag]: state_estimate (fused)      : n=821 dx=+2.42+-5.25mm dy=-2.26+-2.93mm |bias|=3.31mm dyaw=+0.0674+-0.2057deg
+[INFO] [1785293710.297882066] [fusion_stage_diag]: odom_fast (evaluated)       : n=7698 dx=+2.71+-5.22mm dy=-2.35+-3.06mm |bias|=3.58mm dyaw=+0.0512+-0.2010deg
+[INFO] [1785293710.298641591] [fusion_stage_diag]: --- matcher error split by speed (along = direction of travel) ---
+[INFO] [1785293710.299371481] [fusion_stage_diag]:   speed     still m/s: n=25    mean_speed=0.001 |err| rms=  4.52mm max=  9.05mm  along= -0.29 cross= -0.21mm lag=  +nanms
+[INFO] [1785293710.299980347] [fusion_stage_diag]:   speed   0.0-0.2 m/s: n=7     mean_speed=0.120 |err| rms=  7.94mm max= 16.18mm  along= +0.56 cross= +0.16mm lag= +4.69ms
+[INFO] [1785293710.300709840] [fusion_stage_diag]:   speed   0.2-0.4 m/s: n=7     mean_speed=0.310 |err| rms=  9.21mm max= 14.19mm  along= +1.59 cross= -1.79mm lag= +5.11ms
+[INFO] [1785293710.302068190] [fusion_stage_diag]:   speed   0.4-0.6 m/s: n=1     mean_speed=0.493 |err| rms=  6.28mm max=  6.28mm  along= -3.50 cross= -5.22mm lag= -7.09ms
+[INFO] [1785293710.302920731] [fusion_stage_diag]:   speed   0.6-0.8 m/s: n=4     mean_speed=0.684 |err| rms=  8.46mm max= 10.60mm  along= -6.38 cross= +1.00mm lag= -9.32ms
+[INFO] [1785293710.303592309] [fusion_stage_diag]:   speed   0.8-1.0 m/s: n=1     mean_speed=0.987 |err| rms=  6.39mm max=  6.39mm  along= -3.27 cross= -5.49mm lag= -3.31ms
+[INFO] [1785293710.304672868] [fusion_stage_diag]:   speed   1.0-1.2 m/s: n=10    mean_speed=1.102 |err| rms=  8.61mm max= 13.46mm  along= -3.48 cross= +0.96mm lag= -3.16ms
+[INFO] [1785293710.305629524] [fusion_stage_diag]:   speed   1.2-1.4 m/s: n=15    mean_speed=1.311 |err| rms=  7.67mm max= 15.07mm  along= -0.89 cross= +1.86mm lag= -0.68ms
+[INFO] [1785293710.308528814] [fusion_stage_diag]:   speed   1.4-1.6 m/s: n=10    mean_speed=1.472 |err| rms=  5.47mm max= 10.92mm  along= -2.63 cross= -2.23mm lag= -1.79ms
+[INFO] [1785293710.309739445] [fusion_stage_diag]:   speed   1.6-1.8 m/s: n=1     mean_speed=1.635 |err| rms=  5.72mm max=  5.72mm  along= -4.94 cross= -2.88mm lag= -3.02ms
+[INFO] [1785293710.311364752] [fusion_stage_diag]:   speed   1.8-2.0 m/s: n=2     mean_speed=1.921 |err| rms=  7.81mm max=  9.49mm  along= +3.94 cross= -1.93mm lag= +2.05ms
+[INFO] [1785293710.312166366] [fusion_stage_diag]:   speed   2.0-2.2 m/s: n=2     mean_speed=2.076 |err| rms=  4.28mm max=  4.41mm  along= -0.23 cross= +0.18mm lag= -0.11ms
+[INFO] [1785293710.312913902] [fusion_stage_diag]:   speed   2.2-2.4 m/s: n=1     mean_speed=2.224 |err| rms=  1.10mm max=  1.10mm  along= -1.06 cross= +0.29mm lag= -0.48ms
+[INFO] [1785293710.313541207] [fusion_stage_diag]:   speed   2.4-2.6 m/s: n=2     mean_speed=2.470 |err| rms=  4.18mm max=  4.71mm  along= -3.60 cross= +1.21mm lag= -1.46ms
+[INFO] [1785293710.314225337] [fusion_stage_diag]: --- error by |accel|: scan_match vs fused vs odom (collision test) ---
+[INFO] [1785293710.314872419] [fusion_stage_diag]:        accel m/s^2      n  scan mean/max  fused mean/max  odom mean/max
+[INFO] [1785293710.315714534] [fusion_stage_diag]:                0-2   2393      6.0/  9.8      5.9/ 11.9      5.2/ 12.5
+[INFO] [1785293710.316492285] [fusion_stage_diag]:                2-4   1265      1.7/  2.2      8.7/  8.7      7.7/ 14.4
+[INFO] [1785293710.317574962] [fusion_stage_diag]:                4-6    928      6.2/  6.8      6.7/  9.5      7.7/ 16.5
+[INFO] [1785293710.318665429] [fusion_stage_diag]:         5-10(coll)     40            -              -        1.5/  1.8
+[INFO] [1785293710.319819372] [fusion_stage_diag]: --- odom error in/out of collision-imminent windows (0 windows, judged on ground truth) ---
+[INFO] [1785293710.320727864] [fusion_stage_diag]:     inside: (none)
+[INFO] [1785293710.323039116] [fusion_stage_diag]:    outside: n=7698   mean=  6.34mm p95= 11.64mm max= 18.07mm
+[INFO] [1785293710.323882805] [fusion_stage_diag]: --- stamp regularity ---
+[INFO] [1785293710.331923872] [fusion_stage_diag]: imu  stamp dt: n=9240 mean=3.790ms (nominal 1.000) sd=8.112ms min=1.000 max=231.000
+[INFO] [1785293710.333614945] [fusion_stage_diag]: scan stamp dt: n=1583 mean=25.269ms (nominal 25.000) sd=4.390ms min=25.000 max=150.000
+[INFO] [1785293710.334908756] [fusion_stage_diag]: scan stamp - newest imu stamp: n=1584 mean=+4477.513ms min=+0.000 max=+5049.000
+[INFO] [1785293710.336270592] [fusion_stage_diag]: estimated bias: gyro_z mean=+0.004778rad/s (last=+0.004320)  |accel_xy| mean=0.058811m/s^2
+[INFO] [1785293720.286292233] [fusion_stage_diag]: ==============================================================================
+[INFO] [1785293720.287056377] [fusion_stage_diag]: --- stage vs ground truth (signed, settled samples only) ---
+[INFO] [1785293720.289485308] [fusion_stage_diag]: scan_match wall.corrected_pose: n=994 dx=+1.65+-10.69mm dy=-2.38+-3.46mm |bias|=2.89mm dyaw=+0.1009+-0.2396deg
+[INFO] [1785293720.293075438] [fusion_stage_diag]: state_estimate (fused)      : n=1153 dx=+1.95+-5.33mm dy=-2.38+-2.95mm |bias|=3.07mm dyaw=+0.0803+-0.1922deg
+[INFO] [1785293720.312284994] [fusion_stage_diag]: odom_fast (evaluated)       : n=10278 dx=+2.25+-5.28mm dy=-2.39+-3.06mm |bias|=3.28mm dyaw=+0.0644+-0.1896deg
+[INFO] [1785293720.313759379] [fusion_stage_diag]: --- matcher error split by speed (along = direction of travel) ---
+[INFO] [1785293720.314749763] [fusion_stage_diag]:   speed     still m/s: n=30    mean_speed=0.001 |err| rms=  4.93mm max=  9.51mm  along= -0.52 cross= -0.44mm lag=  +nanms
+[INFO] [1785293720.315945756] [fusion_stage_diag]:   speed   0.0-0.2 m/s: n=17    mean_speed=0.105 |err| rms=  9.09mm max= 16.18mm  along= -2.78 cross= -0.56mm lag=-26.32ms
+[INFO] [1785293720.316791005] [fusion_stage_diag]:   speed   0.2-0.4 m/s: n=11    mean_speed=0.314 |err| rms=  8.38mm max= 14.19mm  along= +1.28 cross= -2.62mm lag= +4.07ms
+[INFO] [1785293720.318436921] [fusion_stage_diag]:   speed   0.4-0.6 m/s: n=6     mean_speed=0.496 |err| rms=  6.18mm max=  8.34mm  along= -0.50 cross= -3.31mm lag= -1.01ms
+[INFO] [1785293720.319313680] [fusion_stage_diag]:   speed   0.6-0.8 m/s: n=6     mean_speed=0.690 |err| rms=  8.05mm max= 10.60mm  along= -2.13 cross= +0.34mm lag= -3.08ms
+[INFO] [1785293720.319965374] [fusion_stage_diag]:   speed   0.8-1.0 m/s: n=3     mean_speed=0.919 |err| rms= 10.91mm max= 13.96mm  along= -1.84 cross= -8.28mm lag= -2.00ms
+[INFO] [1785293720.320684050] [fusion_stage_diag]:   speed   1.0-1.2 m/s: n=11    mean_speed=1.109 |err| rms=  8.40mm max= 13.46mm  along= -3.13 cross= +0.33mm lag= -2.82ms
+[INFO] [1785293720.321376987] [fusion_stage_diag]:   speed   1.2-1.4 m/s: n=18    mean_speed=1.308 |err| rms=  7.75mm max= 15.07mm  along= -1.85 cross= +0.88mm lag= -1.41ms
+[INFO] [1785293720.321961542] [fusion_stage_diag]:   speed   1.4-1.6 m/s: n=12    mean_speed=1.474 |err| rms=  5.01mm max= 10.92mm  along= -2.30 cross= -1.82mm lag= -1.56ms
+[INFO] [1785293720.322488604] [fusion_stage_diag]:   speed   1.6-1.8 m/s: n=4     mean_speed=1.684 |err| rms=  5.06mm max=  5.87mm  along= -3.03 cross= +1.37mm lag= -1.80ms
+[INFO] [1785293720.322976061] [fusion_stage_diag]:   speed   1.8-2.0 m/s: n=2     mean_speed=1.921 |err| rms=  7.81mm max=  9.49mm  along= +3.94 cross= -1.93mm lag= +2.05ms
+[INFO] [1785293720.323628184] [fusion_stage_diag]:   speed   2.0-2.2 m/s: n=2     mean_speed=2.076 |err| rms=  4.28mm max=  4.41mm  along= -0.23 cross= +0.18mm lag= -0.11ms
+[INFO] [1785293720.326463355] [fusion_stage_diag]:   speed   2.2-2.4 m/s: n=1     mean_speed=2.224 |err| rms=  1.10mm max=  1.10mm  along= -1.06 cross= +0.29mm lag= -0.48ms
+[INFO] [1785293720.327821731] [fusion_stage_diag]:   speed   2.4-2.6 m/s: n=5     mean_speed=2.484 |err| rms=  3.00mm max=  4.71mm  along= -1.51 cross= +0.40mm lag= -0.61ms
+[INFO] [1785293720.328959843] [fusion_stage_diag]: --- error by |accel|: scan_match vs fused vs odom (collision test) ---
+[INFO] [1785293720.329965217] [fusion_stage_diag]:        accel m/s^2      n  scan mean/max  fused mean/max  odom mean/max
+[INFO] [1785293720.335172245] [fusion_stage_diag]:                0-2   3037      6.3/ 10.8      5.8/ 11.9      5.2/ 12.5
+[INFO] [1785293720.336566052] [fusion_stage_diag]:                2-4   1739      1.7/  2.2      6.4/  9.9      7.3/ 14.4
+[INFO] [1785293720.338088995] [fusion_stage_diag]:                4-6   1231      6.1/  6.8      5.8/  9.5      7.5/ 16.5
+[INFO] [1785293720.338908140] [fusion_stage_diag]:         5-10(coll)     52            -              -        1.8/  3.3
+[INFO] [1785293720.340106652] [fusion_stage_diag]: --- odom error in/out of collision-imminent windows (0 windows, judged on ground truth) ---
+[INFO] [1785293720.341716029] [fusion_stage_diag]:     inside: (none)
+[INFO] [1785293720.347132493] [fusion_stage_diag]:    outside: n=10278  mean=  6.22mm p95= 11.46mm max= 18.07mm
+[INFO] [1785293720.348370149] [fusion_stage_diag]: --- stamp regularity ---
+[INFO] [1785293720.354626318] [fusion_stage_diag]: imu  stamp dt: n=11879 mean=3.788ms (nominal 1.000) sd=7.629ms min=1.000 max=231.000
+[INFO] [1785293720.357000848] [fusion_stage_diag]: scan stamp dt: n=1982 mean=25.215ms (nominal 25.000) sd=3.925ms min=25.000 max=150.000
+[INFO] [1785293720.358341441] [fusion_stage_diag]: scan stamp - newest imu stamp: n=1983 mean=+4580.309ms min=+0.000 max=+5049.000
+[INFO] [1785293720.359570237] [fusion_stage_diag]: estimated bias: gyro_z mean=+0.004623rad/s (last=+0.004043)  |accel_xy| mean=0.058647m/s^2
+[INFO] [1785293730.347940545] [fusion_stage_diag]: ==============================================================================
+[INFO] [1785293730.348873824] [fusion_stage_diag]: --- stage vs ground truth (signed, settled samples only) ---
+[INFO] [1785293730.350932007] [fusion_stage_diag]: scan_match wall.corrected_pose: n=1255 dx=+2.14+-9.82mm dy=-2.67+-3.56mm |bias|=3.43mm dyaw=+0.1096+-0.2390deg
+[INFO] [1785293730.352570043] [fusion_stage_diag]: state_estimate (fused)      : n=1447 dx=+2.33+-5.28mm dy=-2.59+-2.96mm |bias|=3.48mm dyaw=+0.0862+-0.1850deg
+[INFO] [1785293730.399056251] [fusion_stage_diag]: odom_fast (evaluated)       : n=12296 dx=+2.59+-5.24mm dy=-2.54+-3.06mm |bias|=3.62mm dyaw=+0.0719+-0.1843deg
+[INFO] [1785293730.399810306] [fusion_stage_diag]: --- matcher error split by speed (along = direction of travel) ---
+[INFO] [1785293730.400576731] [fusion_stage_diag]:   speed     still m/s: n=37    mean_speed=0.002 |err| rms=  5.58mm max= 12.23mm  along= -1.04 cross= -0.74mm lag=  +nanms
+[INFO] [1785293730.401191176] [fusion_stage_diag]:   speed   0.0-0.2 m/s: n=32    mean_speed=0.104 |err| rms=  8.22mm max= 16.18mm  along= -1.76 cross= -0.90mm lag=-16.99ms
+[INFO] [1785293730.401785743] [fusion_stage_diag]:   speed   0.2-0.4 m/s: n=16    mean_speed=0.318 |err| rms=  8.25mm max= 14.19mm  along= +1.71 cross= -2.07mm lag= +5.38ms
+[INFO] [1785293730.402504099] [fusion_stage_diag]:   speed   0.4-0.6 m/s: n=8     mean_speed=0.508 |err| rms=  7.39mm max= 13.36mm  along= +1.48 cross= -3.79mm lag= +2.92ms
+[INFO] [1785293730.403567792] [fusion_stage_diag]:   speed   0.6-0.8 m/s: n=7     mean_speed=0.698 |err| rms=  9.05mm max= 13.59mm  along= +0.06 cross= -0.19mm lag= +0.09ms
+[INFO] [1785293730.414723697] [fusion_stage_diag]:   speed   0.8-1.0 m/s: n=5     mean_speed=0.885 |err| rms=  9.11mm max= 13.96mm  along= -1.58 cross= -4.86mm lag= -1.79ms
+[INFO] [1785293730.415606029] [fusion_stage_diag]:   speed   1.0-1.2 m/s: n=11    mean_speed=1.109 |err| rms=  8.40mm max= 13.46mm  along= -3.13 cross= +0.33mm lag= -2.82ms
+[INFO] [1785293730.416304374] [fusion_stage_diag]:   speed   1.2-1.4 m/s: n=22    mean_speed=1.309 |err| rms=  8.34mm max= 15.07mm  along= +0.12 cross= +1.54mm lag= +0.10ms
+[INFO] [1785293730.416912266] [fusion_stage_diag]:   speed   1.4-1.6 m/s: n=14    mean_speed=1.465 |err| rms=  5.32mm max= 10.92mm  along= -1.79 cross= -1.06mm lag= -1.22ms
+[INFO] [1785293730.417563327] [fusion_stage_diag]:   speed   1.6-1.8 m/s: n=6     mean_speed=1.710 |err| rms=  5.90mm max=  9.74mm  along= -0.54 cross= +0.54mm lag= -0.32ms
+[INFO] [1785293730.418572868] [fusion_stage_diag]:   speed   1.8-2.0 m/s: n=5     mean_speed=1.878 |err| rms=  7.39mm max= 11.45mm  along= +3.59 cross= -1.54mm lag= +1.91ms
+[INFO] [1785293730.431733186] [fusion_stage_diag]:   speed   2.0-2.2 m/s: n=4     mean_speed=2.053 |err| rms=  7.34mm max= 10.89mm  along= +3.15 cross= -2.99mm lag= +1.54ms
+[INFO] [1785293730.432620353] [fusion_stage_diag]:   speed   2.2-2.4 m/s: n=1     mean_speed=2.224 |err| rms=  1.10mm max=  1.10mm  along= -1.06 cross= +0.29mm lag= -0.48ms
+[INFO] [1785293730.433382590] [fusion_stage_diag]:   speed   2.4-2.6 m/s: n=5     mean_speed=2.484 |err| rms=  3.00mm max=  4.71mm  along= -1.51 cross= +0.40mm lag= -0.61ms
+[INFO] [1785293730.433908685] [fusion_stage_diag]: --- error by |accel|: scan_match vs fused vs odom (collision test) ---
+[INFO] [1785293730.434442110] [fusion_stage_diag]:        accel m/s^2      n  scan mean/max  fused mean/max  odom mean/max
+[INFO] [1785293730.446607017] [fusion_stage_diag]:                0-2   3482      6.1/ 10.8      6.1/ 11.9      5.4/ 12.5
+[INFO] [1785293730.447802042] [fusion_stage_diag]:                2-4   2091      3.0/  8.4      6.3/ 10.7      7.3/ 14.4
+[INFO] [1785293730.448650653] [fusion_stage_diag]:                4-6   1482      5.8/  6.8      5.9/  9.5      7.6/ 16.5
+[INFO] [1785293730.449245938] [fusion_stage_diag]:         5-10(coll)     52            -              -        1.8/  3.3
+[INFO] [1785293730.450003448] [fusion_stage_diag]: --- odom error in/out of collision-imminent windows (0 windows, judged on ground truth) ---
+[INFO] [1785293730.451047189] [fusion_stage_diag]:     inside: (none)
+[INFO] [1785293730.479449876] [fusion_stage_diag]:    outside: n=12296  mean=  6.38mm p95= 11.36mm max= 18.07mm
+[INFO] [1785293730.480758812] [fusion_stage_diag]: --- stamp regularity ---
+[INFO] [1785293730.498507830] [fusion_stage_diag]: imu  stamp dt: n=14161 mean=3.886ms (nominal 1.000) sd=7.568ms min=1.000 max=231.000
+[INFO] [1785293730.513218757] [fusion_stage_diag]: scan stamp dt: n=2377 mean=25.242ms (nominal 25.000) sd=3.998ms min=25.000 max=150.000
+[INFO] [1785293730.528925567] [fusion_stage_diag]: scan stamp - newest imu stamp: n=2378 mean=+4653.341ms min=+0.000 max=+5073.000
+[INFO] [1785293730.543117068] [fusion_stage_diag]: estimated bias: gyro_z mean=+0.004527rad/s (last=+0.003893)  |accel_xy| mean=0.058500m/s^2

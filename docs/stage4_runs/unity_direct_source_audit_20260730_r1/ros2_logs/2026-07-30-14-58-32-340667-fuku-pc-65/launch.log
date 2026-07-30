@@ -1,0 +1,19 @@
+1785391112.3421502 [INFO] [launch]: All log files can be found below /home/yukichi6105/ros2_ws/src/lio_localization_sim/docs/stage4_runs/unity_direct_source_audit_20260730_r1/ros2_logs/2026-07-30-14-58-32-340667-fuku-pc-65
+1785391112.3423171 [INFO] [launch]: Default logging verbosity is set to INFO
+1785391112.4426522 [INFO] [default_server_endpoint-1]: process started with pid [87]
+1785391117.4613049 [INFO] [imu_preintegration_node-2]: process started with pid [126]
+1785391117.4615972 [INFO] [backend_optimizer_node-3]: process started with pid [127]
+1785391117.4617460 [INFO] [laser_scan_matching_node-4]: process started with pid [128]
+1785391117.4618549 [INFO] [nice-5]: process started with pid [129]
+1785391117.4619966 [INFO] [nice-6]: process started with pid [130]
+1785391244.1798961 [INFO] [nice-6]: process has finished cleanly [pid 130]
+1785391244.2215998 [INFO] [nice-5]: sending signal 'SIGINT' to process[nice-5]
+1785391244.2245986 [INFO] [laser_scan_matching_node-4]: sending signal 'SIGINT' to process[laser_scan_matching_node-4]
+1785391244.2282879 [INFO] [backend_optimizer_node-3]: sending signal 'SIGINT' to process[backend_optimizer_node-3]
+1785391244.2381289 [INFO] [imu_preintegration_node-2]: sending signal 'SIGINT' to process[imu_preintegration_node-2]
+1785391244.2559202 [INFO] [default_server_endpoint-1]: sending signal 'SIGINT' to process[default_server_endpoint-1]
+1785391244.4804835 [INFO] [nice-5]: process has finished cleanly [pid 129]
+1785391244.5710161 [INFO] [imu_preintegration_node-2]: process has finished cleanly [pid 126]
+1785391244.5836554 [INFO] [backend_optimizer_node-3]: process has finished cleanly [pid 127]
+1785391244.6044643 [INFO] [laser_scan_matching_node-4]: process has finished cleanly [pid 128]
+1785391245.2800043 [ERROR] [default_server_endpoint-1]: process has died [pid 87, exit code 1, cmd '/home/yukichi6105/ros2_ws/install/ros_tcp_endpoint/lib/ros_tcp_endpoint/default_server_endpoint --ros-args -r __node:=unity_endpoint --params-file /tmp/launch_params_5dovkoae'].

@@ -1,0 +1,15 @@
+[INFO] [1785313653.929816977] [realtime_evaluator_node]: C++ realtime evaluator started: measuring 60.0s from first ground truth
+[INFO] [1785313656.805483646] [realtime_evaluator_node]: first ground truth received; measurement window started
+[WARN] [1785313661.805400526] [realtime_evaluator_node]: no /odom_fast samples matched to ground truth yet
+[WARN] [1785313666.805415390] [realtime_evaluator_node]: no /odom_fast samples matched to ground truth yet
+[WARN] [1785313671.805449700] [realtime_evaluator_node]: no /odom_fast samples matched to ground truth yet
+[WARN] [1785313676.805456300] [realtime_evaluator_node]: no /odom_fast samples matched to ground truth yet
+[WARN] [1785313681.805442006] [realtime_evaluator_node]: no /odom_fast samples matched to ground truth yet
+[WARN] [1785313686.805788213] [realtime_evaluator_node]: no /odom_fast samples matched to ground truth yet
+[WARN] [1785313691.805420913] [realtime_evaluator_node]: no /odom_fast samples matched to ground truth yet
+[WARN] [1785313696.805403585] [realtime_evaluator_node]: no /odom_fast samples matched to ground truth yet
+[WARN] [1785313701.805457166] [realtime_evaluator_node]: no /odom_fast samples matched to ground truth yet
+[WARN] [1785313706.805445092] [realtime_evaluator_node]: no /odom_fast samples matched to ground truth yet
+[WARN] [1785313711.805380802] [realtime_evaluator_node]: no /odom_fast samples matched to ground truth yet
+[WARN] [1785313716.805416503] [realtime_evaluator_node]: no /odom_fast samples matched to ground truth yet
+[ERROR] [1785313716.805549134] [realtime_evaluator_node]: No /odom_fast samples were matched to ground truth

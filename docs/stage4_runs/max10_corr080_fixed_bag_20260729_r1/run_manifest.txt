@@ -1,0 +1,4 @@
+run_tag=max10_corr080_fixed_bag_20260729_r1
+started_at=2026-07-29T16:16:41+09:00
+probe_mode=
+ros_distro=lyrical

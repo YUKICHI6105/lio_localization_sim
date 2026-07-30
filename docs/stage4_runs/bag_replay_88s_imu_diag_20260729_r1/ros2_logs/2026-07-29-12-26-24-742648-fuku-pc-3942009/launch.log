@@ -1,0 +1,21 @@
+1785295584.7468984 [INFO] [launch]: All log files can be found below /home/yukichi6105/ros2_ws/src/lio_localization_sim/docs/stage4_runs/bag_replay_88s_imu_diag_20260729_r1/ros2_logs/2026-07-29-12-26-24-742648-fuku-pc-3942009
+1785295584.7473147 [INFO] [launch]: Default logging verbosity is set to INFO
+1785295584.9900429 [INFO] [default_server_endpoint-1]: process started with pid [3942144]
+1785295590.0335481 [INFO] [imu_preintegration_node-2]: process started with pid [3942440]
+1785295590.0340114 [INFO] [backend_optimizer_node-3]: process started with pid [3942441]
+1785295590.0342045 [INFO] [laser_scan_matching_node-4]: process started with pid [3942442]
+1785295590.0343449 [INFO] [ball_tracking_node-5]: process started with pid [3942443]
+1785295590.0344794 [INFO] [evaluator_node-6]: process started with pid [3942444]
+1785295660.5494173 [INFO] [evaluator_node-6]: process has finished cleanly [pid 3942444]
+1785295660.5556731 [INFO] [ball_tracking_node-5]: sending signal 'SIGINT' to process[ball_tracking_node-5]
+1785295660.5568933 [INFO] [laser_scan_matching_node-4]: sending signal 'SIGINT' to process[laser_scan_matching_node-4]
+1785295660.5680153 [INFO] [backend_optimizer_node-3]: sending signal 'SIGINT' to process[backend_optimizer_node-3]
+1785295660.5697618 [INFO] [imu_preintegration_node-2]: sending signal 'SIGINT' to process[imu_preintegration_node-2]
+1785295660.5709507 [INFO] [default_server_endpoint-1]: sending signal 'SIGINT' to process[default_server_endpoint-1]
+1785295660.7262573 [INFO] [backend_optimizer_node-3]: process has finished cleanly [pid 3942441]
+1785295660.7301443 [INFO] [laser_scan_matching_node-4]: process has finished cleanly [pid 3942442]
+1785295660.7447515 [INFO] [ball_tracking_node-5]: process has finished cleanly [pid 3942443]
+1785295660.7864027 [INFO] [imu_preintegration_node-2]: process has finished cleanly [pid 3942440]
+1785295665.5621278 [ERROR] [default_server_endpoint-1]: process[default_server_endpoint-1] failed to terminate '5' seconds after receiving 'SIGINT', escalating to 'SIGTERM'
+1785295665.5639386 [INFO] [default_server_endpoint-1]: sending signal 'SIGTERM' to process[default_server_endpoint-1]
+1785295665.7242780 [INFO] [default_server_endpoint-1]: process has finished cleanly [pid 3942144]

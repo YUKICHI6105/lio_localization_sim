@@ -1,0 +1,4 @@
+run_tag=unity_direct_closed_loop_20260730_r1
+started_at=2026-07-30T02:12:31+09:00
+probe_mode=--probes
+ros_distro=lyrical

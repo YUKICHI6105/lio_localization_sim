@@ -1,0 +1,4 @@
+run_tag=unity_direct_coverage_drop_20260730_r1
+started_at=2026-07-30T15:37:26+09:00
+probe_mode=--probes
+ros_distro=lyrical

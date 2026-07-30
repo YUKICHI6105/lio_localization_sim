@@ -1,0 +1,4 @@
+run_tag=bag_replay_88s_lockfree_imu_ring_20260729_r1
+started_at=2026-07-29T15:44:12+09:00
+probe_mode=
+ros_distro=lyrical

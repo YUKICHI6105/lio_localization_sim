@@ -1,0 +1,685 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index e539fb9..c885ca2 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -100,11 +100,18 @@ target_link_libraries(ball_tracking_node
+   "${cpp_typesupport_target}"
+ )
+ 
++# --- Bounded C++ real-time evaluator ---
++add_executable(realtime_evaluator_node src/realtime_evaluator_node.cpp)
++target_link_libraries(realtime_evaluator_node
++  ${COMMON_MSG_TARGETS}
++)
++
+ install(TARGETS
+   imu_preintegration_node
+   backend_optimizer_node
+   laser_scan_matching_node
+   ball_tracking_node
++  realtime_evaluator_node
+   DESTINATION lib/${PROJECT_NAME}
+ )
+ 
+diff --git a/include/lio_localization/backend_optimizer_node.hpp b/include/lio_localization/backend_optimizer_node.hpp
+index b3e3cf8..60eb3cf 100644
+--- a/include/lio_localization/backend_optimizer_node.hpp
++++ b/include/lio_localization/backend_optimizer_node.hpp
+@@ -1,11 +1,16 @@
+ #pragma once
+ 
++#include <array>
++#include <atomic>
++#include <condition_variable>
+ #include <deque>
+ #include <map>
+ #include <memory>
++#include <mutex>
+ #include <optional>
+ #include <set>
+ #include <string>
++#include <thread>
+ #include <vector>
+ 
+ #include <gtsam/geometry/Pose3.h>
+@@ -33,6 +38,14 @@ class BackendOptimizerNode : public rclcpp::Node
+ {
+ public:
+   BackendOptimizerNode();
++  ~BackendOptimizerNode() override;
++
++  // This group is intentionally not auto-added with the node. main() assigns
++  // it to its own SingleThreadedExecutor, separate from scan/watchdog work.
++  rclcpp::CallbackGroup::SharedPtr imu_callback_group() const
++  {
++    return imu_callback_group_;
++  }
+ 
+ private:
+   struct CylinderConfig
+@@ -68,6 +81,10 @@ private:
+   rclcpp::Subscription<lio_localization::msg::ScanMatchResult>::SharedPtr scan_sub_;
+   rclcpp::Publisher<lio_localization::msg::StateEstimate>::SharedPtr state_pub_;
+   std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
++  // The IMU receive path stays mutually exclusive (arrival order and its
++  // lightweight counters have one writer) and is manually assigned to a
++  // dedicated executor, separate from the default callback group.
++  rclcpp::CallbackGroup::SharedPtr imu_callback_group_;
+ 
+   std::unique_ptr<gtsam::IncrementalFixedLagSmoother> smoother_;
+   std::shared_ptr<gtsam::PreintegrationCombinedParams> preint_params_;
+@@ -83,7 +100,7 @@ private:
+   //  インデックスに欠番があってもグラフの連結性は保たれる)。
+   uint64_t current_index_ = 0;
+   uint64_t next_index_ = 0;
+-  bool graph_initialized_ = false;
++  std::atomic<bool> graph_initialized_{false};
+   // ISAM2::update()は非トランザクショナル: 因子追加と新規変数挿入(theta_.insert)を
+   // 先に実行し、その後の再消去(recalculate)で例外を投げ得る。例外後のsmootherには
+   // 新キー(x_k/v_k/b_k)が残留するため、current_index_を進めずに同じインデックスで
+@@ -122,10 +139,14 @@ private:
+   // IMU喪失は原理的に回復不能なので、復帰は狙わず「検知して明示的にfail-safe
+   // 停止し、永続発散・NaNだけは絶対に起こさない」方針とする(ユーザー判断)。
+   // 壁時計(steady_clock)で到着間隔を測り、閾値超過でラッチする。
++  // imu_callback and the default-group watchdog execute concurrently.  Keep
++  // this short liveness lock separate from work_mutex_, which protects the
++  // IMU/scan work queues and can be held by the optimizer worker.
++  std::mutex imu_liveness_mutex_;
+   std::chrono::steady_clock::time_point last_imu_recv_;
+   std::chrono::steady_clock::time_point first_imu_recv_;
+   bool imu_ever_received_ = false;
+-  bool imu_fault_latched_ = false;
++  std::atomic<bool> imu_fault_latched_{false};
+   double imu_lost_timeout_sec_ = 0.3;
+   double imu_watchdog_arm_delay_sec_ = 0.0;
+   rclcpp::TimerBase::SharedPtr imu_watchdog_timer_;
+@@ -143,12 +164,37 @@ private:
+   // 以下のサンプルだけを積分する(残りは次ノードの区間に回す)。
+   struct QueuedImu
+   {
++    QueuedImu()
++    : stamp(0, 0, RCL_ROS_TIME), accel(gtsam::Vector3::Zero()), gyro(gtsam::Vector3::Zero()) {}
++
++    QueuedImu(
++      const rclcpp::Time & sample_stamp, const gtsam::Vector3 & sample_accel,
++      const gtsam::Vector3 & sample_gyro)
++    : stamp(sample_stamp), accel(sample_accel), gyro(sample_gyro) {}
++
+     rclcpp::Time stamp;
+     gtsam::Vector3 accel;
+     gtsam::Vector3 gyro;
+   };
+-  std::deque<QueuedImu> imu_queue_;
++  // Lock-free SPSC ring: the dedicated IMU executor is the only producer and
++  // optimizer_worker_ is the only consumer. The 2s normal horizon occupies
++  // about 2,000 slots; 8,192 usable slots provide 8s of overload margin.
++  static constexpr size_t kImuQueueCapacity = 8192;
++  static constexpr size_t kImuRingStorageCapacity = kImuQueueCapacity + 1;
++  std::array<QueuedImu, kImuRingStorageCapacity> imu_queue_;
++  std::atomic<size_t> imu_queue_head_{0};
++  std::atomic<size_t> imu_queue_tail_{0};
++  bool imu_queue_overflowed_ = false;
+   static constexpr double kImuQueueHorizonSec = 2.0;
++  // SPSC operations: push is called only by imu_callback; front/pop only by
++  // optimizer_worker_. No work_mutex_ is involved in this high-rate path.
++  bool imu_queue_push(const QueuedImu & sample);
++  const QueuedImu & imu_queue_front() const;
++  const QueuedImu & imu_queue_back() const;
++  void imu_queue_pop_front();
++  bool imu_queue_empty() const;
++  void trim_imu_queue_horizon();
++  std::atomic<bool> imu_horizon_cleanup_requested_{false};
+   // 直近に積分したIMU測定値。積分終端をノードのスタンプちょうどへ詰める
+   // (ゼロ次ホールド)ために保持する。integrate_imu_up_toのコメント参照。
+   gtsam::Vector3 last_imu_accel_{0.0, 0.0, 0.0};
+@@ -160,7 +206,44 @@ private:
+   // 結果の処理を保留する(②のodomカバレッジ待ちと同型。cpp側コメント参照)
+   std::deque<lio_localization::msg::ScanMatchResult::SharedPtr> pending_results_;
+   static constexpr size_t kMaxPendingResults = 40;  // 40Hzで約1秒分
+-  void drain_pending_results();
++  // executor側は受信キューへの追加と通知だけを行い、GTSAMとプレインテグレータは
++  // 専用ワーカーだけが触る。これによりISAM2最適化中も1kHz IMU callbackを継続する。
++  // pending_results_ / worker_stop_ / optimizer_busy_ はwork_mutex_で保護する。
++  // imu_queue_ is a separate lock-free SPSC ring (see above).
++  std::mutex work_mutex_;
++  std::condition_variable work_cv_;
++  std::thread optimizer_worker_;
++  bool worker_stop_ = false;
++  bool optimizer_busy_ = false;
++  // 外部subscriberを追加せず、専用worker化の効果を終了時に1回だけ定量化する。
++  // callback系カウンタはmutually-exclusiveなIMU callback groupだけが更新し、
++  // activeフラグだけをworkerとatomicで共有する。worker時間統計はworkerだけが更新する。
++  std::atomic<bool> optimizer_active_{false};
++  std::atomic<bool> smoother_update_active_{false};
++  uint64_t imu_callback_count_ = 0;
++  uint64_t imu_callbacks_during_optimizer_ = 0;
++  uint64_t imu_callbacks_during_smoother_ = 0;
++  uint64_t imu_callback_gaps_over_2ms_ = 0;
++  uint64_t imu_callback_gaps_over_10ms_ = 0;
++  double max_imu_callback_gap_ms_ = 0.0;
++  // Gapがexecutor/DDS側のdispatch待ちなのか、callback内の共有キューmutex待ち
++  // なのかを、外部subscriberを増やさず終了時に区別する。
++  uint64_t imu_stamp_gaps_over_1ms_ = 0;
++  double max_imu_stamp_gap_ms_ = 0.0;
++  rclcpp::Time last_imu_callback_stamp_{0, 0, RCL_ROS_TIME};
++  bool have_imu_callback_stamp_ = false;
++  uint64_t imu_ring_enqueue_durations_over_2ms_ = 0;
++  double max_imu_ring_enqueue_duration_ms_ = 0.0;
++  uint64_t imu_callback_durations_over_2ms_ = 0;
++  double max_imu_callback_duration_ms_ = 0.0;
++  uint64_t optimizer_job_count_ = 0;
++  double optimizer_job_total_ms_ = 0.0;
++  double optimizer_job_max_ms_ = 0.0;
++  uint64_t smoother_update_count_ = 0;
++  double smoother_update_total_ms_ = 0.0;
++  double smoother_update_max_ms_ = 0.0;
++  bool result_ready_locked() const;
++  void optimizer_worker_loop();
+   void process_scan_result(const lio_localization::msg::ScanMatchResult::SharedPtr & msg);
+ 
+   std::map<uint32_t, CylinderConfig> registered_cylinders_;
+diff --git a/src/backend_optimizer_node.cpp b/src/backend_optimizer_node.cpp
+index 7604ca7..b013eeb 100644
+--- a/src/backend_optimizer_node.cpp
++++ b/src/backend_optimizer_node.cpp
+@@ -162,13 +162,16 @@ BackendOptimizerNode::BackendOptimizerNode()
+   tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
+   state_pub_ = this->create_publisher<lio_localization::msg::StateEstimate>("/state_estimate", 10);
+ 
+-  // IMUは1kHzで届く一方、このノードのexecutorは40Hzのスキャンごとに数ms〜数十ms
+-  // のISAM2最適化でブロックされる。SensorDataQoS既定のdepth=5では最適化1回の間に
+-  // キューが溢れてIMUサンプルが大量に取りこぼされ、プレインテグレーションの
+-  // 抜け(=速度誤差)や積分不足スキップの原因になるため、深いキューで受ける。
++  // IMU group is manually assigned to its own SingleThreadedExecutor in
++  // main(). Do not let add_node() attach it to the scan/watchdog executor.
++  imu_callback_group_ = this->create_callback_group(
++    rclcpp::CallbackGroupType::MutuallyExclusive, false);
++  rclcpp::SubscriptionOptions imu_subscription_options;
++  imu_subscription_options.callback_group = imu_callback_group_;
+   imu_sub_ = this->create_subscription<sensor_msgs::msg::Imu>(
+     "/imu/data", rclcpp::SensorDataQoS().keep_last(2000),
+-    std::bind(&BackendOptimizerNode::imu_callback, this, std::placeholders::_1));
++    std::bind(&BackendOptimizerNode::imu_callback, this, std::placeholders::_1),
++    imu_subscription_options);
+   scan_sub_ = this->create_subscription<lio_localization::msg::ScanMatchResult>(
+     "/scan_match_result", 10,
+     std::bind(&BackendOptimizerNode::scan_match_callback, this, std::placeholders::_1));
+@@ -197,27 +200,95 @@ BackendOptimizerNode::BackendOptimizerNode()
+     std::chrono::milliseconds(50),
+     std::bind(&BackendOptimizerNode::imu_watchdog, this));
+ 
++  optimizer_worker_ = std::thread(&BackendOptimizerNode::optimizer_worker_loop, this);
++
+   RCLCPP_INFO(this->get_logger(), "backend_optimizer_node started (%zu cylinders registered)",
+     registered_cylinders_.size());
+ }
+ 
++BackendOptimizerNode::~BackendOptimizerNode()
++{
++  {
++    std::lock_guard<std::mutex> lock(work_mutex_);
++    worker_stop_ = true;
++  }
++  work_cv_.notify_all();
++  if (optimizer_worker_.joinable()) {
++    optimizer_worker_.join();
++  }
++  const double optimizer_overlap_pct = imu_callback_count_ > 0 ?
++    100.0 * static_cast<double>(imu_callbacks_during_optimizer_) /
++    static_cast<double>(imu_callback_count_) : 0.0;
++  const double smoother_overlap_pct = imu_callback_count_ > 0 ?
++    100.0 * static_cast<double>(imu_callbacks_during_smoother_) /
++    static_cast<double>(imu_callback_count_) : 0.0;
++  const double optimizer_mean_ms = optimizer_job_count_ > 0 ?
++    optimizer_job_total_ms_ / static_cast<double>(optimizer_job_count_) : 0.0;
++  const double smoother_mean_ms = smoother_update_count_ > 0 ?
++    smoother_update_total_ms_ / static_cast<double>(smoother_update_count_) : 0.0;
++  RCLCPP_INFO(
++    this->get_logger(),
++    "backend concurrency stats: imu_callbacks=%lu, during_worker=%lu (%.1f%%), "
++    "during_smoother=%lu (%.1f%%), callback_gap_max=%.3fms, gaps>2ms=%lu, "
++    "gaps>10ms=%lu; stamp_gap_max=%.3fms, gaps>1ms=%lu; "
++    "ring_enqueue_max=%.3fms, enqueues>2ms=%lu; callback_duration_max=%.3fms, "
++    "durations>2ms=%lu; worker_jobs=%lu mean/max=%.3f/%.3fms; "
++    "smoother_updates=%lu mean/max=%.3f/%.3fms",
++    static_cast<unsigned long>(imu_callback_count_),
++    static_cast<unsigned long>(imu_callbacks_during_optimizer_), optimizer_overlap_pct,
++    static_cast<unsigned long>(imu_callbacks_during_smoother_), smoother_overlap_pct,
++    max_imu_callback_gap_ms_,
++    static_cast<unsigned long>(imu_callback_gaps_over_2ms_),
++    static_cast<unsigned long>(imu_callback_gaps_over_10ms_),
++    max_imu_stamp_gap_ms_,
++    static_cast<unsigned long>(imu_stamp_gaps_over_1ms_),
++    max_imu_ring_enqueue_duration_ms_,
++    static_cast<unsigned long>(imu_ring_enqueue_durations_over_2ms_),
++    max_imu_callback_duration_ms_,
++    static_cast<unsigned long>(imu_callback_durations_over_2ms_),
++    static_cast<unsigned long>(optimizer_job_count_), optimizer_mean_ms, optimizer_job_max_ms_,
++    static_cast<unsigned long>(smoother_update_count_), smoother_mean_ms, smoother_update_max_ms_);
++}
++
+ void BackendOptimizerNode::imu_watchdog()
+ {
+-  if (imu_fault_latched_ || !imu_ever_received_ || !graph_initialized_) {
++  if (imu_fault_latched_.load()) {
++    return;
++  }
++  // The worker is the SPSC ring's sole consumer.  Request horizon cleanup
++  // there instead of making the 1kHz producer contend for work_mutex_.
++  imu_horizon_cleanup_requested_.store(true, std::memory_order_release);
++  work_cv_.notify_one();
++  if (!graph_initialized_.load()) {
+     return;
+   }
++  std::chrono::steady_clock::time_point first_receive;
++  std::chrono::steady_clock::time_point last_receive;
++  {
++    std::lock_guard<std::mutex> lock(imu_liveness_mutex_);
++    if (!imu_ever_received_) {
++      return;
++    }
++    first_receive = first_imu_recv_;
++    last_receive = last_imu_recv_;
++  }
+   const auto now = std::chrono::steady_clock::now();
+-  if (std::chrono::duration<double>(now - first_imu_recv_).count() <
++  if (std::chrono::duration<double>(now - first_receive).count() <
+     imu_watchdog_arm_delay_sec_)
+   {
+     return;
+   }
+   const double since = std::chrono::duration<double>(
+-    now - last_imu_recv_).count();
++    now - last_receive).count();
+   if (since > imu_lost_timeout_sec_) {
+     // IMU喪失は原理的に回復不能。ラッチして以降のスキャン処理を停止し
+     // (③を最後の確定状態で凍結)、永続発散・NaNを防ぐ。復帰は狙わない。
+-    imu_fault_latched_ = true;
++    imu_fault_latched_.store(true);
++    {
++      std::lock_guard<std::mutex> lock(work_mutex_);
++      pending_results_.clear();
++    }
++    work_cv_.notify_all();
+     RCLCPP_ERROR(this->get_logger(),
+       "IMU signal LOST (no IMU for %.2fs > %.2fs). Self-localization is the "
+       "dead-reckoning backbone and cannot continue without it: entering "
+@@ -359,9 +430,7 @@ bool BackendOptimizerNode::check_divergence(
+ 
+ void BackendOptimizerNode::imu_callback(const sensor_msgs::msg::Imu::SharedPtr msg)
+ {
+-  if (!graph_initialized_) {
+-    return;
+-  }
++  const auto callback_start = std::chrono::steady_clock::now();
+   const rclcpp::Time stamp(msg->header.stamp);
+ 
+   // 到着順の即時積分をやめ、キューに溜めるだけにする(hppのimu_queue_の
+@@ -373,26 +442,134 @@ void BackendOptimizerNode::imu_callback(const sensor_msgs::msg::Imu::SharedPtr m
+   const gtsam::Vector3 gyro(
+     msg->angular_velocity.x, msg->angular_velocity.y, msg->angular_velocity.z);
+   // IMUライブネス: 到着を壁時計で記録(watchdogが途絶を検知する)
+-  const auto receive_time = std::chrono::steady_clock::now();
+-  if (!imu_ever_received_) {
+-    first_imu_recv_ = receive_time;
++  const auto receive_time = callback_start;
++  ++imu_callback_count_;
++  if (optimizer_active_.load(std::memory_order_acquire)) {
++    ++imu_callbacks_during_optimizer_;
++  }
++  if (smoother_update_active_.load(std::memory_order_acquire)) {
++    ++imu_callbacks_during_smoother_;
+   }
+-  last_imu_recv_ = receive_time;
+-  imu_ever_received_ = true;
++  {
++    std::lock_guard<std::mutex> lock(imu_liveness_mutex_);
++    if (imu_ever_received_) {
++      const double gap_ms = std::chrono::duration<double, std::milli>(
++        receive_time - last_imu_recv_).count();
++      max_imu_callback_gap_ms_ = std::max(max_imu_callback_gap_ms_, gap_ms);
++      if (gap_ms > 2.0) {
++        ++imu_callback_gaps_over_2ms_;
++      }
++      if (gap_ms > 10.0) {
++        ++imu_callback_gaps_over_10ms_;
++      }
++    }
++    if (!imu_ever_received_) {
++      first_imu_recv_ = receive_time;
++    }
++    last_imu_recv_ = receive_time;
++    imu_ever_received_ = true;
++  }
++
++  if (have_imu_callback_stamp_) {
++    const double stamp_gap_ms = (stamp - last_imu_callback_stamp_).seconds() * 1000.0;
++    max_imu_stamp_gap_ms_ = std::max(max_imu_stamp_gap_ms_, stamp_gap_ms);
++    if (stamp_gap_ms > 1.001) {
++      ++imu_stamp_gaps_over_1ms_;
++    }
++  }
++  last_imu_callback_stamp_ = stamp;
++  have_imu_callback_stamp_ = true;
++
++  const auto enqueue_start = std::chrono::steady_clock::now();
++  const bool queued = imu_queue_push(QueuedImu{stamp, accel, gyro});
++  const double enqueue_duration_ms = std::chrono::duration<double, std::milli>(
++    std::chrono::steady_clock::now() - enqueue_start).count();
++  max_imu_ring_enqueue_duration_ms_ = std::max(
++    max_imu_ring_enqueue_duration_ms_, enqueue_duration_ms);
++  if (enqueue_duration_ms > 2.0) {
++    ++imu_ring_enqueue_durations_over_2ms_;
++  }
++
++  // imu_callback is the sole producer, so this flag has no concurrent writer.
++  const bool first_imu_queue_overflow = !queued && !imu_queue_overflowed_;
++  if (first_imu_queue_overflow) {
++    imu_queue_overflowed_ = true;
++    std::lock_guard<std::mutex> lock(work_mutex_);
++    pending_results_.clear();
++  }
++  if (first_imu_queue_overflow) {
++    // Do not discard old IMU samples and silently continue: the estimator can
++    // no longer construct a valid continuous factor. Latch the same fail-safe
++    // state used for an IMU transport loss.
++    imu_fault_latched_.store(true);
++    RCLCPP_ERROR(
++      this->get_logger(),
++      "IMU ring buffer overflowed (%zu samples / %.1fs capacity): entering FAIL-SAFE HALT",
++      kImuQueueCapacity, static_cast<double>(kImuQueueCapacity) / 1000.0);
++  }
++  // IMUカバレッジ待ちで保留中のスキャン結果があれば専用ワーカーを起こす。
++  work_cv_.notify_one();
++  const double callback_duration_ms = std::chrono::duration<double, std::milli>(
++    std::chrono::steady_clock::now() - callback_start).count();
++  max_imu_callback_duration_ms_ = std::max(max_imu_callback_duration_ms_, callback_duration_ms);
++  if (callback_duration_ms > 2.0) {
++    ++imu_callback_durations_over_2ms_;
++  }
++}
++
++bool BackendOptimizerNode::imu_queue_push(const QueuedImu & sample)
++{
++  const size_t tail = imu_queue_tail_.load(std::memory_order_relaxed);
++  const size_t next_tail = (tail + 1) % kImuRingStorageCapacity;
++  if (next_tail == imu_queue_head_.load(std::memory_order_acquire)) {
++    return false;
++  }
++  imu_queue_[tail] = sample;
++  imu_queue_tail_.store(next_tail, std::memory_order_release);
++  return true;
++}
++
++const BackendOptimizerNode::QueuedImu & BackendOptimizerNode::imu_queue_front() const
++{
++  return imu_queue_[imu_queue_head_.load(std::memory_order_relaxed)];
++}
++
++const BackendOptimizerNode::QueuedImu & BackendOptimizerNode::imu_queue_back() const
++{
++  const size_t tail = imu_queue_tail_.load(std::memory_order_acquire);
++  return imu_queue_[(tail + kImuRingStorageCapacity - 1) % kImuRingStorageCapacity];
++}
+ 
+-  imu_queue_.push_back(QueuedImu{stamp, accel, gyro});
+-  // スキャン途絶時にキューが無制限に育たないよう時間で上限を切る
+-  while (!imu_queue_.empty() &&
+-         (stamp - imu_queue_.front().stamp).seconds() > kImuQueueHorizonSec)
++void BackendOptimizerNode::imu_queue_pop_front()
++{
++  const size_t head = imu_queue_head_.load(std::memory_order_relaxed);
++  imu_queue_head_.store(
++    (head + 1) % kImuRingStorageCapacity, std::memory_order_release);
++}
++
++bool BackendOptimizerNode::imu_queue_empty() const
++{
++  return imu_queue_head_.load(std::memory_order_relaxed) ==
++    imu_queue_tail_.load(std::memory_order_acquire);
++}
++
++void BackendOptimizerNode::trim_imu_queue_horizon()
++{
++  if (imu_queue_empty()) {
++    return;
++  }
++  const rclcpp::Time newest_stamp = imu_queue_back().stamp;
++  while (!imu_queue_empty() &&
++    (newest_stamp - imu_queue_front().stamp).seconds() > kImuQueueHorizonSec)
+   {
+-    imu_queue_.pop_front();
++    imu_queue_pop_front();
+   }
+-  // IMUカバレッジ待ちで保留中のスキャン結果があれば、揃った時点で処理する
+-  drain_pending_results();
+ }
+ 
+ void BackendOptimizerNode::integrate_imu_up_to(const rclcpp::Time & t_end)
+ {
++  // optimizer worker is the ring's only consumer. The IMU callback can append
++  // concurrently through the SPSC producer side without waiting here.
+   // dtはノード境界をまたいでも「直前に積分したサンプルとの実間隔」を使い続ける。
+   // 旧実装はノード生成のたびに1サンプル目をdt=0.001(1kHz仮定)で積分していた
+   // ため、ホストジッタで境界の実間隔が2〜20msに伸びるたびに差分の積分時間が
+@@ -400,9 +577,9 @@ void BackendOptimizerNode::integrate_imu_up_to(const rclcpp::Time & t_end)
+   // =ω×欠損≈13.6°の回転取りこぼしを確認。低ωでは無害なためスピン中だけ
+   // ヨードリフトとして顕在化する。docs/icp_outlier_investigation.md 追記5)。
+   // 逆行・大きな欠落(>0.1s)のスキップは従来通り。
+-  while (!imu_queue_.empty() && imu_queue_.front().stamp <= t_end) {
+-    const QueuedImu s = imu_queue_.front();
+-    imu_queue_.pop_front();
++  while (!imu_queue_empty() && imu_queue_front().stamp <= t_end) {
++    const QueuedImu s = imu_queue_front();
++    imu_queue_pop_front();
+     double dt = 0.001;
+     if (have_imu_since_last_node_) {
+       dt = (s.stamp - last_imu_stamp_).seconds();
+@@ -448,8 +625,11 @@ void BackendOptimizerNode::scan_match_callback(
+   // IMU喪失でfail-safeラッチ済みなら、スキャンを一切処理しない(③を凍結)。
+   // これをしないと、IMU復帰後に②のstaleシード由来の誤ロック補正を受理して
+   // 速度・バイアスが爆発しNaNへ発散する(docs追記11)。ラッチは復帰しない。
+-  if (imu_fault_latched_) {
+-    pending_results_.clear();
++  if (imu_fault_latched_.load()) {
++    {
++      std::lock_guard<std::mutex> lock(work_mutex_);
++      pending_results_.clear();
++    }
+     RCLCPP_ERROR_THROTTLE(this->get_logger(), *this->get_clock(), 2000,
+       "FAIL-SAFE HALT active (IMU lost): ignoring scan corrections, "
+       "self-localization is frozen and must be restarted.");
+@@ -463,35 +643,101 @@ void BackendOptimizerNode::scan_match_callback(
+   // 怪しい」と誤帰属して正しい壁補正を抑圧、183mm×1.5秒の誤差エクスカー
+   // ションに発展することを直接観測した(docs 追記5)。②のodomカバレッジ
+   // 待ちと同様、IMUが揃うまで結果を保留する(次のIMU到着時に処理される)。
+-  pending_results_.push_back(msg);
+-  if (pending_results_.size() > kMaxPendingResults) {
+-    RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 2000,
++  bool dropped = false;
++  {
++    std::lock_guard<std::mutex> lock(work_mutex_);
++    pending_results_.push_back(msg);
++    if (pending_results_.size() > kMaxPendingResults) {
++      pending_results_.pop_front();
++      dropped = true;
++    }
++  }
++  if (dropped) {
++    RCLCPP_WARN_THROTTLE(
++      this->get_logger(), *this->get_clock(), 2000,
+       "dropping stale scan result: IMU coverage has been unavailable for >1s");
+-    pending_results_.pop_front();
+   }
+-  drain_pending_results();
++  work_cv_.notify_one();
+ }
+ 
+-void BackendOptimizerNode::drain_pending_results()
++bool BackendOptimizerNode::result_ready_locked() const
+ {
+-  while (!pending_results_.empty()) {
+-    const auto msg = pending_results_.front();
+-    const rclcpp::Time stamp(msg->header.stamp);
+-    // グラフ未初期化・毒付き時は待つ意味がない(process側の既存ガードに任せる)
+-    if (graph_initialized_ && !smoother_poisoned_ &&
+-        (imu_queue_.empty() || imu_queue_.back().stamp < stamp))
++  if (pending_results_.empty() || imu_fault_latched_.load()) {
++    return false;
++  }
++  // グラフ未初期化・毒付き時は待つ意味がない(process側の既存ガードに任せる)。
++  if (!graph_initialized_.load() || smoother_poisoned_) {
++    return true;
++  }
++  const rclcpp::Time stamp(pending_results_.front()->header.stamp);
++  return !imu_queue_empty() && imu_queue_back().stamp >= stamp;
++}
++
++void BackendOptimizerNode::optimizer_worker_loop()
++{
++  while (true) {
++    lio_localization::msg::ScanMatchResult::SharedPtr msg;
++    {
++      std::unique_lock<std::mutex> lock(work_mutex_);
++      work_cv_.wait(lock, [this]() {
++          return worker_stop_ ||
++            imu_horizon_cleanup_requested_.load(std::memory_order_acquire) ||
++            result_ready_locked();
++      });
++      if (worker_stop_) {
++        return;
++      }
++      const bool cleanup_requested = imu_horizon_cleanup_requested_.exchange(
++        false, std::memory_order_acq_rel);
++      // Do not trim while a correction is queued: it may still need the oldest
++      // samples for continuous integration. The worker is the only consumer.
++      if (cleanup_requested && pending_results_.empty() && !optimizer_busy_) {
++        trim_imu_queue_horizon();
++      }
++      if (!result_ready_locked()) {
++        continue;
++      }
++      msg = pending_results_.front();
++      pending_results_.pop_front();
++      optimizer_busy_ = true;
++    }
++
++    const auto job_start = std::chrono::steady_clock::now();
++    optimizer_active_.store(true, std::memory_order_release);
++    try {
++      process_scan_result(msg);
++    } catch (const std::exception & e) {
++      // process_scan_result内の既知GTSAM例外に加え、将来追加される処理の例外でも
++      // ワーカーを黙って死なせない。smootherは部分更新の可能性があるため毒化する。
++      smoother_poisoned_ = true;
++      RCLCPP_ERROR(this->get_logger(), "unhandled exception in optimizer worker: %s", e.what());
++    } catch (...) {
++      smoother_poisoned_ = true;
++      RCLCPP_ERROR(this->get_logger(), "unknown exception in optimizer worker");
++    }
++    smoother_update_active_.store(false, std::memory_order_release);
++    optimizer_active_.store(false, std::memory_order_release);
++    const double job_ms = std::chrono::duration<double, std::milli>(
++      std::chrono::steady_clock::now() - job_start).count();
++    ++optimizer_job_count_;
++    optimizer_job_total_ms_ += job_ms;
++    optimizer_job_max_ms_ = std::max(optimizer_job_max_ms_, job_ms);
++
+     {
+-      break;  // スキャンスタンプまでのIMUが未着: 揃ってから処理する
++      std::lock_guard<std::mutex> lock(work_mutex_);
++      optimizer_busy_ = false;
+     }
+-    pending_results_.pop_front();
+-    process_scan_result(msg);
++    // 次の保留結果が既にカバレッジ済みなら、そのまま続行できるよう再評価する。
++    work_cv_.notify_one();
+   }
+ }
+ 
+ void BackendOptimizerNode::process_scan_result(
+   const lio_localization::msg::ScanMatchResult::SharedPtr & msg)
+ {
+-  if (!graph_initialized_) {
++  // watchdogはexecutor側で最適化と並行して発火できる。取り出し済みのジョブも
++  // fail-safeラッチ後は処理せず、最後の確定状態を維持する。
++  if (imu_fault_latched_.load() || !graph_initialized_.load()) {
+     return;
+   }
+   // smoother_が一度例外を投げた後は内部状態が部分更新のまま壊れている
+@@ -862,20 +1108,26 @@ void BackendOptimizerNode::process_scan_result(
+   gtsam::Vector3 new_vel;
+   ConstantBias new_bias;
+   const auto update_start = std::chrono::steady_clock::now();
++  smoother_update_active_.store(true, std::memory_order_release);
+   try {
+     smoother_->update(graph, values, stamps);
+     new_pose = smoother_->calculateEstimate<gtsam::Pose3>(X(new_index));
+     new_vel = smoother_->calculateEstimate<gtsam::Vector3>(V(new_index));
+     new_bias = smoother_->calculateEstimate<ConstantBias>(B(new_index));
++    smoother_update_active_.store(false, std::memory_order_release);
+     // 40Hz(25ms周期)を大きく超えるupdateはスキャンキューの滞留→連続処理→
+     // IMU積分ゼロスキップ→補正間隔の伸び、として誤差スパイクに直結するため監視する
+     const double update_ms = std::chrono::duration<double, std::milli>(
+       std::chrono::steady_clock::now() - update_start).count();
++    ++smoother_update_count_;
++    smoother_update_total_ms_ += update_ms;
++    smoother_update_max_ms_ = std::max(smoother_update_max_ms_, update_ms);
+     if (update_ms > 20.0) {
+       RCLCPP_WARN(this->get_logger(), "slow smoother update: %.1fms (index %lu)",
+         update_ms, static_cast<unsigned long>(new_index));
+     }
+   } catch (const std::exception & e) {
++    smoother_update_active_.store(false, std::memory_order_release);
+     // main.md ③「発散検出とリセット」: 数値的に破綻した(縮退・特異な)線形システムは
+     // 事後の速度/バイアスしきい値チェックより先に例外として現れるため、ここでも捕捉する。
+     // gtsam::IndeterminantLinearSystemExceptionだけでなく、gtsam::ValuesKeyAlreadyExists
+@@ -975,8 +1227,15 @@ bool BackendOptimizerNode::update_lidar_dropout_diagnostics(
+   return false;
+ }
+ 
+-void BackendOptimizerNode::publish_state_estimate(const rclcpp::Time & stamp, bool wall_factor_valid)
++void BackendOptimizerNode::publish_state_estimate(
++  const rclcpp::Time & stamp,
++  bool wall_factor_valid)
+ {
++  // 専用ワーカー化後はwatchdogが最適化と並行してラッチできる。ラッチ直前に
++  // 取り出されていたジョブから新しい推定値を公開せず、外部から見える状態を凍結する。
++  if (imu_fault_latched_.load()) {
++    return;
++  }
+   lio_localization::msg::StateEstimate msg;
+   msg.header.stamp = stamp;
+   msg.header.frame_id = map_frame_id_;
+@@ -1029,7 +1288,30 @@ void BackendOptimizerNode::publish_map_to_odom_identity()
+ int main(int argc, char ** argv)
+ {
+   rclcpp::init(argc, argv);
+-  rclcpp::spin(std::make_shared<lio_localization::BackendOptimizerNode>());
++  auto node = std::make_shared<lio_localization::BackendOptimizerNode>();
++  {
++    // There are three deliberately distinct execution domains:
++    //  (1) this executor's sole thread dispatches the 1kHz IMU callback group;
++    //  (2) the control executor handles scan enqueueing and the watchdog; and
++    //  (3) BackendOptimizerNode owns iSAM2 in optimizer_worker_.
++    // IMU's group is manually associated, so control_executor.add_node() cannot
++    // schedule it even while a scan callback or watchdog is runnable.
++    rclcpp::executors::SingleThreadedExecutor imu_executor;
++    rclcpp::executors::SingleThreadedExecutor control_executor;
++    const auto node_base = node->get_node_base_interface();
++    const auto imu_group = node->imu_callback_group();
++    imu_executor.add_callback_group(imu_group, node_base);
++    control_executor.add_node(node);
++    std::thread imu_executor_thread([&imu_executor]() {imu_executor.spin();});
++    control_executor.spin();
++    imu_executor.cancel();
++    if (imu_executor_thread.joinable()) {
++      imu_executor_thread.join();
++    }
++    control_executor.remove_node(node);
++    imu_executor.remove_callback_group(imu_group);
++  }
++  node.reset();
+   rclcpp::shutdown();
+   return 0;
+ }
