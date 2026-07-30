@@ -1,0 +1,23 @@
+1785396496.6359582 [INFO] [launch]: All log files can be found below /home/yukichi6105/ros2_ws/src/lio_localization_sim/docs/stage4_runs/unity_direct_scan_worker_fix_20260730_r1/ros2_logs/2026-07-30-16-28-16-631138-fuku-pc-349020
+1785396496.6363151 [INFO] [launch]: Default logging verbosity is set to INFO
+1785396496.8381264 [INFO] [default_server_endpoint-1]: process started with pid [349246]
+1785396501.9098780 [INFO] [imu_preintegration_node-2]: process started with pid [349479]
+1785396501.9102545 [INFO] [backend_optimizer_node-3]: process started with pid [349480]
+1785396501.9104090 [INFO] [laser_scan_matching_node-4]: process started with pid [349481]
+1785396501.9105632 [INFO] [nice-5]: process started with pid [349482]
+1785396501.9107246 [INFO] [nice-6]: process started with pid [349483]
+1785396616.2819171 [INFO] [nice-6]: process has finished cleanly [pid 349483]
+1785396616.2953401 [INFO] [nice-5]: sending signal 'SIGINT' to process[nice-5]
+1785396616.2980862 [INFO] [laser_scan_matching_node-4]: sending signal 'SIGINT' to process[laser_scan_matching_node-4]
+1785396616.2995424 [INFO] [backend_optimizer_node-3]: sending signal 'SIGINT' to process[backend_optimizer_node-3]
+1785396616.3006029 [INFO] [imu_preintegration_node-2]: sending signal 'SIGINT' to process[imu_preintegration_node-2]
+1785396616.3016319 [INFO] [default_server_endpoint-1]: sending signal 'SIGINT' to process[default_server_endpoint-1]
+1785396616.4556777 [INFO] [nice-5]: process has finished cleanly [pid 349482]
+1785396616.4644241 [INFO] [backend_optimizer_node-3]: process has finished cleanly [pid 349480]
+1785396616.4695485 [INFO] [imu_preintegration_node-2]: process has finished cleanly [pid 349479]
+1785396616.6488061 [INFO] [default_server_endpoint-1]: process has finished cleanly [pid 349246]
+1785396621.2993960 [ERROR] [laser_scan_matching_node-4]: process[laser_scan_matching_node-4] failed to terminate '5' seconds after receiving 'SIGINT', escalating to 'SIGTERM'
+1785396621.3019233 [INFO] [laser_scan_matching_node-4]: sending signal 'SIGTERM' to process[laser_scan_matching_node-4]
+1785396626.2984304 [ERROR] [laser_scan_matching_node-4]: process[laser_scan_matching_node-4] failed to terminate '10.0' seconds after receiving 'SIGTERM', escalating to 'SIGKILL'
+1785396626.3001733 [INFO] [laser_scan_matching_node-4]: sending signal 'SIGKILL' to process[laser_scan_matching_node-4]
+1785396626.3563344 [ERROR] [laser_scan_matching_node-4]: process has died [pid 349481, exit code -9, cmd '/home/yukichi6105/ros2_ws/install/lio_localization/lib/lio_localization/laser_scan_matching_node --ros-args -r __node:=laser_scan_matching_node --params-file /home/yukichi6105/ros2_ws/src/lio_localization_sim/config/robocon2026_unity.yaml --params-file /tmp/launch_params_6zlqdqwi'].

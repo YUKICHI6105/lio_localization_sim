@@ -1,0 +1,520 @@
+diff --git a/include/lio_localization/laser_scan_matching_node.hpp b/include/lio_localization/laser_scan_matching_node.hpp
+index e8b6adf..e2551e3 100644
+--- a/include/lio_localization/laser_scan_matching_node.hpp
++++ b/include/lio_localization/laser_scan_matching_node.hpp
+@@ -1,8 +1,11 @@
+ #pragma once
+ 
+ #include <array>
++#include <condition_variable>
+ #include <deque>
+ #include <memory>
++#include <mutex>
++#include <thread>
+ #include <variant>
+ #include <vector>
+ 
+@@ -44,6 +47,14 @@ public:
+   LaserScanMatchingNode();
+   ~LaserScanMatchingNode() override;
+ 
++  // This group is intentionally not auto-added with the node. main() assigns
++  // it to its own SingleThreadedExecutor, separate from the scan/Unity-audit
++  // control executor (mirrors backend_optimizer_node's imu_callback_group()).
++  rclcpp::CallbackGroup::SharedPtr pose_callback_group() const
++  {
++    return pose_callback_group_;
++  }
++
+ private:
+   struct CylinderConfig
+   {
+@@ -63,34 +74,59 @@ private:
+     Eigen::Vector2d b;
+   };
+ 
++  // ①の外挿履歴から、指定時刻の自己位置(x,y,yaw)を線形補間で求める（Deskewing用）
++  struct Pose2D { double x, y, yaw, stamp_sec; };
++  // IMU直接deskew(LIO-SAM imageProjection方式): スキャン内の回転補正を、
++  // ①の姿勢履歴(③の補正遅延・処理停滞の影響を受ける)ではなく生ジャイロの
++  // 積分で行う。最大ドリフトの主因であるスピン中のdeskew品質を、①③の
++  // 健康状態から独立させるのが目的。並進は従来どおり①の履歴補間を使う
++  // (25msスキャン内の並進誤差は回転誤差に比べ支配的でない)。
++  struct StampedGyro { double t_sec; double wz; };
++
+   void odom_callback(const nav_msgs::msg::Odometry::SharedPtr msg);
+   void imu_callback(const sensor_msgs::msg::Imu::SharedPtr msg);
+   void scan_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg);
+   void unity_sensor_count_callback(const std_msgs::msg::String::SharedPtr msg);
+-  void process_scan(const sensor_msgs::msg::LaserScan::SharedPtr & msg);
+-  void try_process_pending_scan();
++
++  // ①③の設計と同じ「executorはキュー投入だけ、重い処理は専用workerだけが触る」
++  // パターン(experiment_history 13番, backend_optimizer_nodeのoptimizer_worker_
++  // 参照)。ICPは数ms〜数十msかかり、以前は odom/imu/scan の各callbackと同じ
++  // 単一executorスレッド上で直接実行していたため、ICP実行中は①からの
++  // /odom_fast・生ジャイロの受信自体が止まり、姿勢履歴(odom_history_/
++  // gyro_history_)が古びてscanカバレッジ判定が「未カバー→外挿tail処理」に
++  // 落ちる遅延過渡を生んでいた(Unity直結時のみbag再生より最大誤差が悪化する
++  // 原因として2026-07-30に特定)。ICPをicp_worker_専用スレッドへ移し、
++  // odom_callback/imu_callbackは姿勢履歴の追記だけを行うようにして分離する。
++  void icp_worker_loop();
++  // data_mutex_を保持した状態で呼ぶ。先頭の保留スキャンがカバー済み/待機
++  // タイムアウト済みなら取り出して返す(未カバーなら流用元と同じ理由で
++  // 破棄することもある)。まだ処理できないならnullptrを返す。
++  sensor_msgs::msg::LaserScan::SharedPtr try_pop_ready_scan_locked();
++  void process_scan(
++    const sensor_msgs::msg::LaserScan::SharedPtr & msg,
++    const std::deque<Pose2D> & odom_snapshot,
++    const std::deque<StampedGyro> & gyro_snapshot);
+ 
+   void build_static_objects();
+ 
+-  // ①の外挿履歴から、指定時刻の自己位置(x,y,yaw)を線形補間で求める（Deskewing用）
+-  struct Pose2D { double x, y, yaw, stamp_sec; };
+-  Pose2D interpolate_pose(double t_sec) const;
++  // odom_history_を直接読まず、呼び出し側が渡すスナップショットだけを見る
++  // (icp_worker_はodom_callbackと別スレッドで動くため、ICP処理中に
++  //  odom_history_をロックし続けると従来と同じ「追記阻害」が再発する)。
++  Pose2D interpolate_pose(double t_sec, const std::deque<Pose2D> & odom_history) const;
+   // スキャンが実際にアクティブスキャンする区間の長さ[秒]（270°分、time_incrementから算出）
+   static double scan_active_duration(const sensor_msgs::msg::LaserScan::SharedPtr & msg);
+ 
++  // data_mutex_で保護する(odom_callback/imu_callbackが専用pose executor
++  // スレッドから書き込み、icp_worker_が読み取ってスナップショットを取る)。
+   std::deque<Pose2D> odom_history_;
+   static constexpr double kOdomHistoryHorizonSec = 0.2;
+ 
+-  // IMU直接deskew(LIO-SAM imageProjection方式): スキャン内の回転補正を、
+-  // ①の姿勢履歴(③の補正遅延・処理停滞の影響を受ける)ではなく生ジャイロの
+-  // 積分で行う。最大ドリフトの主因であるスピン中のdeskew品質を、①③の
+-  // 健康状態から独立させるのが目的。並進は従来どおり①の履歴補間を使う
+-  // (25msスキャン内の並進誤差は回転誤差に比べ支配的でない)。
+-  struct StampedGyro { double t_sec; double wz; };
++  // data_mutex_で保護する(odom_history_と同じ理由)。
+   std::deque<StampedGyro> gyro_history_;
+   static constexpr double kGyroHistoryHorizonSec = 0.5;
+-  // [t0, t1]をジャイロ履歴がカバーしているか
+-  bool gyro_covers(double t0, double t1) const;
++  // [t0, t1]をジャイロ履歴がカバーしているか。interpolate_pose同様、渡された
++  // スナップショットだけを見る。
++  static bool gyro_covers(double t0, double t1, const std::deque<StampedGyro> & gyro_history);
+ 
+   // main.md ②-1「IMUカバレッジ待ちガード」: スキャン区間終端までカバーする
+   // ①の外挿履歴が揃っていない場合、補間ではなく外挿(未来方向への推測)に
+@@ -102,10 +138,14 @@ private:
+     sensor_msgs::msg::LaserScan::SharedPtr msg;
+     rclcpp::Time received_time;
+   };
++  // data_mutex_で保護する(scan_callbackが投入、icp_worker_が取り出す)。
+   std::deque<PendingScan> pending_scans_;
+   static constexpr size_t kPendingScanQueueDepth = 200;
+   // Scan-pipeline accounting. DDS drops before scan_callback cannot be observed
+   // here; compare scan_received_count_ with the recorded bag count to isolate them.
++  // scan_received_count_/pending_scan_queue_overflow_count_はdata_mutex_下の
++  // scan_callbackだけが書く。scan_processed_count_/fast_rotation_drop_count_は
++  // icp_worker_だけが書く(前者はロック不要、後者はdata_mutex_下)。
+   uint64_t scan_received_count_ = 0;
+   uint64_t scan_processed_count_ = 0;
+   uint64_t pending_scan_overwrite_count_ = 0;
+@@ -116,6 +156,15 @@ private:
+   uint64_t scan_received_at_last_unity_report_ = 0;
+   static constexpr double kMaxDeskewWaitSec = 0.05;
+ 
++  // odom_history_/gyro_history_/pending_scans_を保護する単一mutex。いずれの
++  // 臨界区間もdeque操作(push/pop/trim)かスナップショットのコピーだけで、
++  // ICP本体はicp_worker_がロック解放後に行うため、競合は無視できる程度に短い。
++  std::mutex data_mutex_;
++  std::condition_variable work_cv_;
++  std::thread icp_worker_;
++  bool worker_stop_ = false;
++  rclcpp::CallbackGroup::SharedPtr pose_callback_group_;
++
+   // coarse-to-fine ICP: accept_distance_(最終段)に入る前に、これらの広い
+   // 対応距離で粗く合わせておくことで収束半径を拡大する(単体検証済み)。
+   static constexpr std::array<double, 3> kCoarseAcceptDistances{2.0, 1.0, 0.5};
+diff --git a/src/laser_scan_matching_node.cpp b/src/laser_scan_matching_node.cpp
+index b55e809..153037f 100644
+--- a/src/laser_scan_matching_node.cpp
++++ b/src/laser_scan_matching_node.cpp
+@@ -163,20 +163,26 @@ LaserScanMatchingNode::LaserScanMatchingNode()
+ 
+   build_static_objects();
+ 
+-  // /odom_fastは1kHzで届く一方、ICP処理中はexecutorがブロックされるため、
+-  // depth=20ではICP1回(数ms〜数十ms)の間にキューが溢れてdeskew用の姿勢履歴に
+-  // 抜けが生じる。深いキューで受ける。
++  // /odom_fast・生ジャイロは専用pose_callback_group_(main()が独立executorへ
++  // 割り当てる)で受ける。ICP本体はicp_worker_専用スレッドで動くため、この
++  // グループのcallbackはdeque追記だけの軽量処理に留まり、ICP実行中も
++  // ブロックされない(experiment_history 13番: Unity直結時のみbag再生より
++  // 最大誤差が悪化した根本原因への対策)。
++  pose_callback_group_ = this->create_callback_group(
++    rclcpp::CallbackGroupType::MutuallyExclusive, false);
++  rclcpp::SubscriptionOptions pose_subscription_options;
++  pose_subscription_options.callback_group = pose_callback_group_;
+   odom_sub_ = this->create_subscription<nav_msgs::msg::Odometry>(
+     "/odom_fast", 500,
+-    std::bind(&LaserScanMatchingNode::odom_callback, this, std::placeholders::_1));
+-  // IMU直接deskew用。1kHz流入+ICP処理中のブロックに耐えるよう深いキューで受ける
++    std::bind(&LaserScanMatchingNode::odom_callback, this, std::placeholders::_1),
++    pose_subscription_options);
+   imu_sub_ = this->create_subscription<sensor_msgs::msg::Imu>(
+     "/imu/data", rclcpp::SensorDataQoS().keep_last(2000),
+-    std::bind(&LaserScanMatchingNode::imu_callback, this, std::placeholders::_1));
++    std::bind(&LaserScanMatchingNode::imu_callback, this, std::placeholders::_1),
++    pose_subscription_options);
+   scan_sub_ = this->create_subscription<sensor_msgs::msg::LaserScan>(
+-    // ICP can occupy the single callback thread for several scan periods. Retain
+-    // enough reliable history to absorb that burst rather than using SensorDataQoS's
+-    // shallow default queue.
++    // scan_callback only enqueues (icp_worker_ does the ICP work), so the
++    // deep queue is mainly a margin against transient DDS/executor jitter.
+     "/scan", rclcpp::SensorDataQoS().keep_last(200),
+     std::bind(&LaserScanMatchingNode::scan_callback, this, std::placeholders::_1));
+   unity_sensor_count_sub_ = this->create_subscription<std_msgs::msg::String>(
+@@ -188,6 +194,8 @@ LaserScanMatchingNode::LaserScanMatchingNode()
+   ball_pub_ = this->create_publisher<lio_localization::msg::BallCandidateArray>(
+     "/ball_candidates", 10);
+ 
++  icp_worker_ = std::thread(&LaserScanMatchingNode::icp_worker_loop, this);
++
+   RCLCPP_INFO(this->get_logger(), "laser_scan_matching_node started (%zu cylinders, %zu internal walls, field %.3fx%.3fm, "
+     "initial seed=(%.3f, %.3f, %.3f))",
+     registered_cylinders_.size(), registered_wall_segments_.size(), field_width_, field_height_,
+@@ -196,6 +204,14 @@ LaserScanMatchingNode::LaserScanMatchingNode()
+ 
+ LaserScanMatchingNode::~LaserScanMatchingNode()
+ {
++  {
++    std::lock_guard<std::mutex> lock(data_mutex_);
++    worker_stop_ = true;
++  }
++  work_cv_.notify_all();
++  if (icp_worker_.joinable()) {
++    icp_worker_.join();
++  }
+   RCLCPP_INFO(this->get_logger(),
+     "scan pipeline stats: received=%lu processed=%lu pending_overwrite=%lu pending_queue_overflow=%lu fast_rotation_drop=%lu; unity_audit reports=%lu source_scan_last=%lu receiver_at_last_report=%lu final_receiver=%lu",
+     scan_received_count_, scan_processed_count_, pending_scan_overwrite_count_,
+@@ -304,36 +320,44 @@ void LaserScanMatchingNode::build_static_objects()
+ void LaserScanMatchingNode::odom_callback(const nav_msgs::msg::Odometry::SharedPtr msg)
+ {
+   const double stamp_sec = rclcpp::Time(msg->header.stamp).seconds();
+-  odom_history_.push_back(Pose2D{
+-    msg->pose.pose.position.x, msg->pose.pose.position.y,
+-    quat_to_yaw(msg->pose.pose.orientation), stamp_sec});
+-  while (!odom_history_.empty() &&
+-         (stamp_sec - odom_history_.front().stamp_sec) > kOdomHistoryHorizonSec)
+   {
+-    odom_history_.pop_front();
++    std::lock_guard<std::mutex> lock(data_mutex_);
++    odom_history_.push_back(Pose2D{
++      msg->pose.pose.position.x, msg->pose.pose.position.y,
++      quat_to_yaw(msg->pose.pose.orientation), stamp_sec});
++    while (!odom_history_.empty() &&
++           (stamp_sec - odom_history_.front().stamp_sec) > kOdomHistoryHorizonSec)
++    {
++      odom_history_.pop_front();
++    }
+   }
+-  try_process_pending_scan();
++  // 新しい姿勢履歴でscanカバレッジが揃ったかもしれないため、icp_worker_を起こす。
++  work_cv_.notify_one();
+ }
+ 
+ void LaserScanMatchingNode::imu_callback(const sensor_msgs::msg::Imu::SharedPtr msg)
+ {
+   const double stamp_sec = rclcpp::Time(msg->header.stamp).seconds();
+-  gyro_history_.push_back(StampedGyro{stamp_sec, msg->angular_velocity.z});
+-  while (!gyro_history_.empty() &&
+-         (stamp_sec - gyro_history_.front().t_sec) > kGyroHistoryHorizonSec)
+   {
+-    gyro_history_.pop_front();
++    std::lock_guard<std::mutex> lock(data_mutex_);
++    gyro_history_.push_back(StampedGyro{stamp_sec, msg->angular_velocity.z});
++    while (!gyro_history_.empty() &&
++           (stamp_sec - gyro_history_.front().t_sec) > kGyroHistoryHorizonSec)
++    {
++      gyro_history_.pop_front();
++    }
+   }
+   // ジャイロが届いた時点でスキャン区間のカバーが完成することもあるため、
+-  // odom_callbackと同様にpendingスキャンの処理機会を与える
+-  try_process_pending_scan();
++  // odom_callbackと同様にicp_worker_を起こす機会を与える
++  work_cv_.notify_one();
+ }
+ 
+-bool LaserScanMatchingNode::gyro_covers(double t0, double t1) const
++bool LaserScanMatchingNode::gyro_covers(
++  double t0, double t1, const std::deque<StampedGyro> & gyro_history)
+ {
+-  return !gyro_history_.empty() &&
+-         gyro_history_.front().t_sec <= t0 &&
+-         gyro_history_.back().t_sec >= t1;
++  return !gyro_history.empty() &&
++         gyro_history.front().t_sec <= t0 &&
++         gyro_history.back().t_sec >= t1;
+ }
+ 
+ double LaserScanMatchingNode::scan_active_duration(const sensor_msgs::msg::LaserScan::SharedPtr & msg)
+@@ -345,19 +369,25 @@ double LaserScanMatchingNode::scan_active_duration(const sensor_msgs::msg::Laser
+   return 0.025 * (270.0 / 360.0);
+ }
+ 
+-void LaserScanMatchingNode::try_process_pending_scan()
++sensor_msgs::msg::LaserScan::SharedPtr LaserScanMatchingNode::try_pop_ready_scan_locked()
+ {
+-  if (pending_scans_.empty()) {
+-    return;
+-  }
+   const auto & pending = pending_scans_.front();
+   const double t_start = rclcpp::Time(pending.msg->header.stamp).seconds();
+   const double t_end = t_start + scan_active_duration(pending.msg);
+-  const bool covered = !odom_history_.empty() && odom_history_.back().stamp_sec >= t_end;
++  // main.md ②-1「IMUカバレッジ待ちガード」: スキャン区間終端までカバーする
++  // ①の外挿履歴が揃っていない場合は補間ではなく外挿(未来方向への推測)に
++  // なって精度が落ちるため、揃うまで待機する(LIO-SAMのimageProjection.cppと
++  // 同じパターン)。ただしodom_history_が完全に空(起動直後、まだ①から一度も
++  // /odom_fastが届いていない)場合はこの限りではない: ①は③からの最初の
++  // /state_estimateを待って初めて配信を始め、③はここ(②)からの最初の
++  // スキャン処理を待って初めて/state_estimateを配信するため、空のときまで
++  // 待機すると①<->③<->②の循環依存で永久にデッドロックする。空のときは
++  // interpolate_pose()の初期姿勢フォールバックでそのまま処理する。
++  const bool covered = odom_history_.empty() || odom_history_.back().stamp_sec >= t_end;
+   const bool waited_too_long =
+     (this->now() - pending.received_time).seconds() > kMaxDeskewWaitSec;
+   if (!covered && !waited_too_long) {
+-    return;
++    return nullptr;
+   }
+   if (waited_too_long && !covered) {
+     // 高角速度中に外挿でdeskewすると点群がスミアし、ICPが誤った局所解に
+@@ -379,37 +409,82 @@ void LaserScanMatchingNode::try_process_pending_scan()
+     // ジャイロがスキャン区間をカバーしていれば回転deskewはIMU直接積分で
+     // 行えるため、旋回中でも捨てる必要はない(捨てるのはodom・gyro両方が
+     // 使えない場合のみ)。
+-    const bool gyro_ok = use_imu_deskew_ && gyro_covers(t_start, t_end);
++    const bool gyro_ok = use_imu_deskew_ && gyro_covers(t_start, t_end, gyro_history_);
+     if (!gyro_ok && std::abs(omega) > max_extrapolation_yaw_rate_) {
+       RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 1000,
+         "dropping uncovered scan during fast rotation (%.2f rad/s): "
+         "extrapolated deskew would smear the cloud", omega);
+       pending_scans_.pop_front();
+       ++fast_rotation_drop_count_;
+-      return;
++      return nullptr;
+     }
+     RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 1000,
+       "IMU coverage wait exceeded %.3fs, processing scan with extrapolated tail", kMaxDeskewWaitSec);
+   }
+-  const auto msg = pending.msg;
++  const auto ready_msg = pending.msg;
+   pending_scans_.pop_front();
+-  process_scan(msg);
++  return ready_msg;
+ }
+ 
+-LaserScanMatchingNode::Pose2D LaserScanMatchingNode::interpolate_pose(double t_sec) const
++void LaserScanMatchingNode::icp_worker_loop()
+ {
+-  if (odom_history_.empty()) {
++  while (true) {
++    sensor_msgs::msg::LaserScan::SharedPtr msg_to_process;
++    std::deque<Pose2D> odom_snapshot;
++    std::deque<StampedGyro> gyro_snapshot;
++    {
++      std::unique_lock<std::mutex> lock(data_mutex_);
++      // wait_for(明示的タイムアウト付き)にする理由: 「待機タイムアウト超過」
++      // の判定は壁時計の経過だけで真になるため、odom/imu/scanのどれからも
++      // notifyが来ない極端なケース(①③が両方とも完全停止)でも、次のscanが
++      // 届けば必ず10ms以内に再評価する。通常運用ではodom/imu(各1kHz)が
++      // 継続的にnotifyするため、この周期はほぼ効かない安全網に過ぎない。
++      work_cv_.wait_for(lock, std::chrono::milliseconds(10), [this]() {
++        return worker_stop_ || !pending_scans_.empty();
++      });
++      // Exit unconditionally on stop, regardless of leftover pending_scans_
++      // (mirrors backend_optimizer_node::optimizer_worker_loop). Waiting for
++      // the queue to drain here would rely on waited_too_long becoming true,
++      // which needs this->now() to keep advancing; under use_sim_time the
++      // /clock source (Unity) has already stopped by the time the destructor
++      // runs, so that condition would never become true and join() would
++      // hang, forcing the launch system to SIGKILL the process (observed
++      // 2026-07-30, unity_direct_scan_worker_fix_20260730_r1).
++      if (worker_stop_) {
++        return;
++      }
++      if (!pending_scans_.empty()) {
++        msg_to_process = try_pop_ready_scan_locked();
++      }
++      if (msg_to_process) {
++        // ICP本体はロック解放後に行うため、必要な履歴はここで複製して渡す
++        // (odom_history_/gyro_history_を直接参照し続けるとodom_callback/
++        //  imu_callbackがICP処理中ブロックされ、従来の問題が再発する)。
++        odom_snapshot = odom_history_;
++        gyro_snapshot = gyro_history_;
++      }
++    }
++    if (msg_to_process) {
++      process_scan(msg_to_process, odom_snapshot, gyro_snapshot);
++    }
++  }
++}
++
++LaserScanMatchingNode::Pose2D LaserScanMatchingNode::interpolate_pose(
++  double t_sec, const std::deque<Pose2D> & odom_history) const
++{
++  if (odom_history.empty()) {
+     return Pose2D{initial_x_, initial_y_, initial_theta_, t_sec};
+   }
+-  if (t_sec <= odom_history_.front().stamp_sec) {
+-    return odom_history_.front();
++  if (t_sec <= odom_history.front().stamp_sec) {
++    return odom_history.front();
+   }
+-  if (t_sec >= odom_history_.back().stamp_sec) {
+-    return odom_history_.back();
++  if (t_sec >= odom_history.back().stamp_sec) {
++    return odom_history.back();
+   }
+-  for (size_t i = 0; i + 1 < odom_history_.size(); ++i) {
+-    const auto & a = odom_history_[i];
+-    const auto & b = odom_history_[i + 1];
++  for (size_t i = 0; i + 1 < odom_history.size(); ++i) {
++    const auto & a = odom_history[i];
++    const auto & b = odom_history[i + 1];
+     if (t_sec >= a.stamp_sec && t_sec <= b.stamp_sec) {
+       const double span = b.stamp_sec - a.stamp_sec;
+       const double ratio = (span > 1e-9) ? (t_sec - a.stamp_sec) / span : 0.0;
+@@ -420,51 +495,41 @@ LaserScanMatchingNode::Pose2D LaserScanMatchingNode::interpolate_pose(double t_s
+         t_sec};
+     }
+   }
+-  return odom_history_.back();
++  return odom_history.back();
+ }
+ 
+ void LaserScanMatchingNode::scan_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg)
+ {
+-  ++scan_received_count_;
+-  // fableの敵対的レビューで指摘: try_process_pending_scan()はodom_callbackからしか
+-  // 呼ばれないため、①が完全停止すると最大待機時間を超えても強制処理が発火せず、
+-  // 新しいスキャンがpending_scan_を上書きし続けて②の出力が永久に止まりうる
+-  // (main.mdのLiDAR途絶診断の前提を崩す)。/scanは①の生死に関係なく届き続ける
+-  // ため、ここでも毎回チェックすることで、①停止時もkMaxDeskewWaitSec以内に
+-  // 必ず強制処理される保証を持たせる。
+-  try_process_pending_scan();
+-
+-  // main.md ②-1「IMUカバレッジ待ちガード」: スキャン区間終端(t_start+約18.75ms)
+-  // までカバーする①の外挿履歴が届いていない場合、外挿(未来方向への推測)に
+-  // なって精度が落ちるため、揃うまでこのスキャンをバッファして待機する
+-  // (LIO-SAMのimageProjection.cppと同じパターン)。fableの敵対的レビューで、
+-  // 高角速度スピンバースト中のスパイクの一因として指摘された。
+-  // ただしodom_history_が完全に空(起動直後、まだ①から一度も/odom_fastが
+-  // 届いていない)場合はこの限りではない: ①は③からの最初の/state_estimateを
+-  // 待って初めて配信を始め、③はここ(②)からの最初のスキャン処理を待って
+-  // 初めて/state_estimateを配信するため、空のときまで待機すると
+-  // ①<->③<->②の循環依存で永久にデッドロックする。空のときは
+-  // interpolate_pose()の初期姿勢フォールバックでそのまま処理する。
+-  const double t_start = rclcpp::Time(msg->header.stamp).seconds();
+-  const double t_end = t_start + scan_active_duration(msg);
+-  if (!odom_history_.empty() && odom_history_.back().stamp_sec < t_end) {
++  // scan_callbackはキュー投入だけを行う(ICP本体はicp_worker_専用スレッドが
++  // 行う)。以前はここでtry_process_pending_scan()を直接呼び、ICPが完了する
++  // まで①からの/odom_fast・生ジャイロ受信そのものが止まっていた
++  // (experiment_history 13番で特定した、Unity直結時のみbag再生より最大誤差
++  // が悪化する原因)。work_cv_.notify_one()はicp_worker_を起こすだけで、
++  // ①が完全停止していてもscanが届き続ける限りkMaxDeskewWaitSec以内に
++  // 強制処理される保証(元のfableの敵対的レビュー指摘)は、icp_worker_の
++  // wait_for周期的タイムアウトでも独立に保たれる。
++  {
++    std::lock_guard<std::mutex> lock(data_mutex_);
++    ++scan_received_count_;
+     if (pending_scans_.size() >= kPendingScanQueueDepth) {
+       // This is a true bounded-memory overflow, distinct from the former silent
+       // one-element overwrite. Keep the oldest scan so temporal order is preserved.
+       ++pending_scan_queue_overflow_count_;
+-      return;
++    } else {
++      pending_scans_.push_back(PendingScan{msg, this->now()});
+     }
+-    pending_scans_.push_back(PendingScan{msg, this->now()});
+-    return;
+   }
+-  process_scan(msg);
++  work_cv_.notify_one();
+ }
+ 
+-void LaserScanMatchingNode::process_scan(const sensor_msgs::msg::LaserScan::SharedPtr & msg)
++void LaserScanMatchingNode::process_scan(
++  const sensor_msgs::msg::LaserScan::SharedPtr & msg,
++  const std::deque<Pose2D> & odom_snapshot,
++  const std::deque<StampedGyro> & gyro_snapshot)
+ {
+   ++scan_processed_count_;
+   const double t_start = rclcpp::Time(msg->header.stamp).seconds();
+-  const Pose2D pose_start = interpolate_pose(t_start);
++  const Pose2D pose_start = interpolate_pose(t_start, odom_snapshot);
+   const double cos_s = std::cos(pose_start.yaw);
+   const double sin_s = std::sin(pose_start.yaw);
+ 
+@@ -475,7 +540,7 @@ void LaserScanMatchingNode::process_scan(const sensor_msgs::msg::LaserScan::Shar
+   // (run27で確認: 競合悪化で③のslow updateが4→108回に増え精度も劣化)ため、
+   // スキャン冒頭で一度だけ累積ヨー増分表を作り、ビーム毎は線形補間で引く。
+   const double t_scan_end = t_start + scan_active_duration(msg);
+-  const bool imu_deskew_active = use_imu_deskew_ && gyro_covers(t_start, t_scan_end);
++  const bool imu_deskew_active = use_imu_deskew_ && gyro_covers(t_start, t_scan_end, gyro_snapshot);
+   std::vector<double> yaw_cum_t;    // サンプル時刻(t_start起点)
+   std::vector<double> yaw_cum_val;  // t_startからの累積ヨー増分[rad]
+   if (imu_deskew_active) {
+@@ -483,7 +548,7 @@ void LaserScanMatchingNode::process_scan(const sensor_msgs::msg::LaserScan::Shar
+     yaw_cum_val.push_back(0.0);
+     double prev_t = t_start;
+     double prev_w = 0.0;
+-    for (const auto & s : gyro_history_) {
++    for (const auto & s : gyro_snapshot) {
+       if (s.t_sec <= t_start) {
+         prev_w = s.wz;
+         continue;
+@@ -534,7 +599,7 @@ void LaserScanMatchingNode::process_scan(const sensor_msgs::msg::LaserScan::Shar
+     const double angle = msg->angle_min + static_cast<double>(i) * msg->angle_increment;
+     const double dt_i = (msg->time_increment > 0.0) ?
+       (static_cast<double>(i) * msg->time_increment) : (static_cast<double>(i) * fallback_dt);
+-    Pose2D pose_i = interpolate_pose(t_start + dt_i);
++    Pose2D pose_i = interpolate_pose(t_start + dt_i, odom_snapshot);
+     if (imu_deskew_active) {
+       pose_i.yaw = pose_start.yaw + yaw_offset_at(dt_i);
+     }
+@@ -1083,7 +1148,30 @@ void LaserScanMatchingNode::process_scan(const sensor_msgs::msg::LaserScan::Shar
+ int main(int argc, char ** argv)
+ {
+   rclcpp::init(argc, argv);
+-  rclcpp::spin(std::make_shared<lio_localization::LaserScanMatchingNode>());
++  auto node = std::make_shared<lio_localization::LaserScanMatchingNode>();
++  {
++    // backend_optimizer_nodeのmain()と同じ3領域分離: このexecutorの唯一の
++    // スレッドが1kHzの/odom_fast・生ジャイロ(pose_callback_group_)を捌き、
++    // control_executorは/scan受信とUnity監査callbackを扱い、ICP本体は
++    // LaserScanMatchingNodeが所有するicp_worker_専用スレッドが行う。
++    // pose_callback_group_を手動割り当てすることで、scan_callbackや
++    // 監査callbackが実行中でもcontrol_executor側からは横取りされない。
++    rclcpp::executors::SingleThreadedExecutor pose_executor;
++    rclcpp::executors::SingleThreadedExecutor control_executor;
++    const auto node_base = node->get_node_base_interface();
++    const auto pose_group = node->pose_callback_group();
++    pose_executor.add_callback_group(pose_group, node_base);
++    control_executor.add_node(node);
++    std::thread pose_executor_thread([&pose_executor]() {pose_executor.spin();});
++    control_executor.spin();
++    pose_executor.cancel();
++    if (pose_executor_thread.joinable()) {
++      pose_executor_thread.join();
++    }
++    control_executor.remove_node(node);
++    pose_executor.remove_callback_group(pose_group);
++  }
++  node.reset();
+   rclcpp::shutdown();
+   return 0;
+ }
