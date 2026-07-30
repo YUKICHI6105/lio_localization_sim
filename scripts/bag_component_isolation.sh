@@ -3,7 +3,7 @@
 # Usage: bag_component_isolation.sh <tag> [--bag path] [--ball] [--endpoint]
 #        [--record-stages] [--play-rate N] [--post-play-wait N]
 #        [--scan-yaw-bias-rad N]
-#        [--laser-param name:=value] [--backend-param name:=value]
+#        [--laser-param name:=value] [--backend-param name:=value] [--imu-param name:=value]
 set -euo pipefail
 
 TAG="${1:?usage: bag_component_isolation.sh <tag> [--ball] [--endpoint]}"
@@ -18,6 +18,7 @@ POST_PLAY_WAIT=10
 SCAN_YAW_BIAS_RAD=0.0
 LASER_PARAMS=()
 BACKEND_PARAMS=()
+IMU_PARAMS=()
 while [ "$#" -gt 0 ]; do
   case "$1" in
     --bag)
@@ -52,6 +53,11 @@ while [ "$#" -gt 0 ]; do
     --backend-param)
       [ "$#" -ge 2 ] || { echo "--backend-param requires name:=value" >&2; exit 2; }
       BACKEND_PARAMS+=("-p" "$2")
+      shift 2
+      ;;
+    --imu-param)
+      [ "$#" -ge 2 ] || { echo "--imu-param requires name:=value" >&2; exit 2; }
+      IMU_PARAMS+=("-p" "$2")
       shift 2
       ;;
     *) echo "unknown option: $1" >&2; exit 2 ;;
@@ -154,7 +160,7 @@ start_node backend.log ros2 run lio_localization backend_optimizer_node --ros-ar
   -p initial_x:=-2.419 -p initial_y:=1.354 -p initial_theta:=0.0 \
   -p initial_vx:=0.0 -p initial_vy:=0.0 "${BACKEND_PARAMS[@]}"
 start_node imu_preintegration.log ros2 run lio_localization imu_preintegration_node --ros-args \
-  --params-file "$OUT/robocon2026_unity.yaml" -p use_sim_time:=true
+  --params-file "$OUT/robocon2026_unity.yaml" -p use_sim_time:=true "${IMU_PARAMS[@]}"
 start_node scan_matching.log ros2 run lio_localization laser_scan_matching_node --ros-args \
   --params-file "$OUT/robocon2026_unity.yaml" -p use_sim_time:=true \
   -p initial_x:=-2.419 -p initial_y:=1.354 -p initial_theta:=0.0 \

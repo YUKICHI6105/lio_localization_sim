@@ -1,0 +1,8 @@
+1785412662.5072289 [INFO] [launch]: All log files can be found below /home/yukichi6105/ros2_ws/src/lio_localization_sim/docs/stage4_runs/unity_direct_angvel_fix_notes_20260730_r1/ros2_logs/2026-07-30-20-57-42-504261-fuku-pc-1018457
+1785412662.5076334 [INFO] [launch]: Default logging verbosity is set to INFO
+1785412662.6232836 [INFO] [default_server_endpoint-1]: process started with pid [1018476]
+1785412667.6459074 [INFO] [imu_preintegration_node-2]: process started with pid [1018763]
+1785412667.6466057 [INFO] [backend_optimizer_node-3]: process started with pid [1018764]
+1785412667.6467559 [INFO] [laser_scan_matching_node-4]: process started with pid [1018765]
+1785412667.6468713 [INFO] [nice-5]: process started with pid [1018766]
+1785412667.6469543 [INFO] [nice-6]: process started with pid [1018767]

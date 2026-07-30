@@ -1,0 +1,6 @@
+[INFO] [1785413807.908509597] [imu_preintegration_node]: imu_preintegration_node started (waiting for first /state_estimate)
+[ERROR] [1785413855.708884661] [imu_preintegration_node]: IMU signal LOST (no IMU for 2.01s > 2.00s): stopping /odom_fast. IMU is the dead-reckoning backbone; recovery is not possible, restart required.
+[ros2run]: Received signal:  Interrupt
+[INFO] [1785413863.901408936] [rclcpp]: signal_handler(signum=2)
+[INFO] [1785413863.983009244] [imu_preintegration_node]: diag odom dump: ok (41011 records)
+Failed to publish log message to rosout: publisher's context is invalid, at ./src/rcl/publisher.c:427

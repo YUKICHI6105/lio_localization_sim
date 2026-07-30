@@ -1,0 +1,12 @@
+run_tag=yawlost_mechanism_check_20260730
+mode=bag_component_isolation
+with_ball=false
+with_endpoint=false
+with_stage_record=false
+play_rate=1.0
+post_play_wait=10
+scan_yaw_bias_rad=0.0
+laser_params=-p enable_yaw_lost_mode:=true
+backend_params=
+bag=/tmp/robocon_angvel_fix_20260730.mcap
+started_at=2026-07-30T21:54:49+09:00

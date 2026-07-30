@@ -1,0 +1,14 @@
+[INFO] [1785407088.103612614] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[INFO] [1785407088.104238083] [backend_optimizer_node]: backend_optimizer_node started (0 cylinders registered)
+[INFO] [1785407103.878457019] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0129, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[INFO] [1785407105.968746868] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0129, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[INFO] [1785407107.980499481] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0129, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[INFO] [1785407110.050850201] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0129, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[INFO] [1785407112.108974192] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0129, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[WARN] [1785407112.434057549] [backend_optimizer_node]: wall correction downweighted by DCS: d_xy=0.051m (> 0.047m, dt=0.025s, scale=1.10x) — reduced confidence, not rejected
+[WARN] [1785407114.038954232] [backend_optimizer_node]: LiDAR wall correction unavailable for 0.78s (> 0.75s): drifting on IMU dead-reckoning
+[WARN] [1785407114.225679876] [backend_optimizer_node]: wall correction downweighted by DCS: d_xy=0.086m (> 0.047m, dt=0.025s, scale=1.85x) — reduced confidence, not rejected
+[WARN] [1785407117.117238637] [backend_optimizer_node]: LiDAR wall correction unavailable for 0.78s (> 0.75s): drifting on IMU dead-reckoning
+[WARN] [1785407136.410372533] [backend_optimizer_node]: slow smoother update: 22.3ms (index 1188)
+[WARN] [1785407147.894933464] [backend_optimizer_node]: slow smoother update: 21.6ms (index 1632)
+[INFO] [1785407168.516990221] [rclcpp]: signal_handler(signum=2)

@@ -1,0 +1,10 @@
+[INFO] [1785408365.957267076] [unity_evaluator_node]: C++ realtime evaluator started: measuring 60.0s from first ground truth
+[INFO] [1785408387.268099044] [unity_evaluator_node]: first ground truth received; measurement window started
+[INFO] [1785408392.038170174] [unity_evaluator_node]: t=5.0s  recent 5s: pos_err mean=0.37mm max=1.37mm samples=5001 balls=0
+[INFO] [1785408397.165339666] [unity_evaluator_node]: t=10.0s  recent 5s: pos_err mean=0.50mm max=1.19mm samples=10201 balls=0
+[INFO] [1785408402.353635847] [unity_evaluator_node]: t=15.0s  recent 5s: pos_err mean=2656.80mm max=7232.61mm samples=15401 balls=0
+[INFO] [1785408407.523252937] [unity_evaluator_node]: t=20.0s  recent 5s: pos_err mean=12209.50mm max=17185.38mm samples=20601 balls=0
+[INFO] [1785408412.709934177] [unity_evaluator_node]: t=25.0s  recent 5s: pos_err mean=22142.38mm max=27078.27mm samples=25801 balls=0
+[INFO] [1785408417.848101318] [unity_evaluator_node]: t=30.0s  recent 5s: pos_err mean=32125.27mm max=37221.33mm samples=31001 balls=0
+[INFO] [1785408422.997593376] [unity_evaluator_node]: t=35.0s  recent 5s: pos_err mean=42417.02mm max=47663.74mm samples=36178 balls=0
+[INFO] [1785408428.227823267] [unity_evaluator_node]: t=40.0s  recent 5s: pos_err mean=52987.96mm max=58347.18mm samples=41373 balls=0

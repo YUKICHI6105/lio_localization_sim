@@ -1,0 +1,11 @@
+[INFO] [1785413808.018394889] [realtime_evaluator_node]: C++ realtime evaluator started: measuring 60.0s from first ground truth
+[INFO] [1785413813.960557608] [realtime_evaluator_node]: first ground truth received; measurement window started
+[INFO] [1785413818.960437558] [realtime_evaluator_node]: t=5.0s  recent 5s: pos_err mean=0.29mm max=1.04mm samples=4870 balls=0
+[INFO] [1785413823.960386424] [realtime_evaluator_node]: t=10.0s  recent 5s: pos_err mean=0.54mm max=1.24mm samples=10070 balls=0
+[INFO] [1785413828.960511965] [realtime_evaluator_node]: t=15.0s  recent 5s: pos_err mean=10.18mm max=27.65mm samples=15270 balls=0
+[INFO] [1785413833.960387144] [realtime_evaluator_node]: t=20.0s  recent 5s: pos_err mean=3.50mm max=7.47mm samples=20470 balls=0
+[INFO] [1785413838.960483159] [realtime_evaluator_node]: t=25.0s  recent 5s: pos_err mean=1.48mm max=1.92mm samples=25670 balls=0
+[INFO] [1785413843.960395884] [realtime_evaluator_node]: t=30.0s  recent 5s: pos_err mean=0.85mm max=1.45mm samples=30870 balls=0
+[INFO] [1785413848.960510373] [realtime_evaluator_node]: t=35.0s  recent 5s: pos_err mean=0.88mm max=1.32mm samples=36070 balls=0
+[ros2run]: Received signal:  Interrupt
+[INFO] [1785413863.901605092] [rclcpp]: signal_handler(signum=2)

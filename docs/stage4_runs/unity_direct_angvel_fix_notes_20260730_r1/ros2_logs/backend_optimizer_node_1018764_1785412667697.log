@@ -1,0 +1,11 @@
+[INFO] [1785412667.771361487] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[INFO] [1785412667.771889802] [backend_optimizer_node]: backend_optimizer_node started (0 cylinders registered)
+[INFO] [1785412695.571963055] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0129, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[INFO] [1785412697.619673697] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0129, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[INFO] [1785412699.688841708] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0129, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[INFO] [1785412701.761118983] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0129, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[INFO] [1785412703.795641137] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0129, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[WARN] [1785412704.375192819] [backend_optimizer_node]: wall correction downweighted by DCS: d_xy=0.090m (> 0.047m, dt=0.025s, scale=1.93x) — reduced confidence, not rejected
+[WARN] [1785412705.470086074] [backend_optimizer_node]: LiDAR wall correction unavailable for 0.78s (> 0.75s): drifting on IMU dead-reckoning
+[WARN] [1785412734.090987903] [backend_optimizer_node]: slow smoother update: 26.6ms (index 1578)
+[ERROR] [1785412737.671793654] [backend_optimizer_node]: IMU signal LOST (no IMU for 2.01s > 2.00s). Self-localization is the dead-reckoning backbone and cannot continue without it: entering FAIL-SAFE HALT (freezing estimate, no further graph updates).

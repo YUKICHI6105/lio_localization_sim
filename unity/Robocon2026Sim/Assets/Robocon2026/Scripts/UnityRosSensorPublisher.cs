@@ -344,7 +344,7 @@ namespace Robocon2026.Simulation
                 accelerationWorld - Physics.gravity);
             var angularVelocityLocalUnity = transform.InverseTransformDirection(body.angularVelocity);
             var accelerationRos = UnityVectorToRos(specificForceLocalUnity);
-            var angularVelocityRos = UnityVectorToRos(angularVelocityLocalUnity);
+            var angularVelocityRos = UnityAngularVelocityToRos(angularVelocityLocalUnity);
 
             // Convert the ICM-42688-P continuous-time noise densities to independent
             // 1/dt sample noise.  The estimator receives the same density in its
@@ -402,7 +402,7 @@ namespace Robocon2026.Simulation
             var sinYaw = Math.Sin(yaw);
             var bodyVx = cosYaw * worldVelocityRos.x + sinYaw * worldVelocityRos.y;
             var bodyVy = -sinYaw * worldVelocityRos.x + cosYaw * worldVelocityRos.y;
-            var localAngularRos = UnityVectorToRos(
+            var localAngularRos = UnityAngularVelocityToRos(
                 transform.InverseTransformDirection(body.angularVelocity));
 
             var msg = new OdometryMsg
@@ -539,6 +539,19 @@ namespace Robocon2026.Simulation
 
         private static Vector3Msg UnityVectorToRos(Vector3 value) =>
             new(value.z, -value.x, value.y);
+
+        // UnityVectorToRosの(x,y,z)->(z,-x,y)写像は行列式-1(鏡映)であり、
+        // 速度・加速度のような極性ベクトルには正しいが、角速度は擬ベクトルなので
+        // 鏡映変換では追加の符号反転が必要(v' = det(M)・M・v)。この符号を
+        // 落としたまま配信していたため、実旋回を初めて有効化するまで気づかれずに
+        // 埋もれていた: ①(imu_preintegration_node)がこの符号反転したジャイロを
+        // 積分し、予測ヨーが真値と正確に符号反転する(絶対値はほぼ一致)ことを
+        // 診断ログで直接確認した(2026-07-30, experiment_history 16番)。
+        private static Vector3Msg UnityAngularVelocityToRos(Vector3 value)
+        {
+            var v = UnityVectorToRos(value);
+            return new Vector3Msg(-v.x, -v.y, -v.z);
+        }
 
         private static double[] DiagonalCovariance3(double variance) => new[]
         {

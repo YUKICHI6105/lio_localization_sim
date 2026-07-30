@@ -1,0 +1,4 @@
+run_tag=unity_direct_with_yaw_rotation_yawgate070_20260730_r1
+started_at=2026-07-30T19:31:54+09:00
+probe_mode=
+ros_distro=lyrical

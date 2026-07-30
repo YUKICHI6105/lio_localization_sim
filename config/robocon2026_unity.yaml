@@ -98,7 +98,15 @@
     planar_huber_delta: 0.025
     planar_max_mean_residual: 0.060
     planar_max_shift: 0.120
-    planar_max_yaw_shift: 0.080
+    # 2026-07-30: 実ヨー回転を初めて有効化した際、この値を0.080rad(約4.6°)から
+    # 緩めても発散そのものは解消しなかった(真因はUnity側の3つのバグ、
+    # experiment_history 16番参照)。真因を修正した後の検証(bag再生)はこの
+    # 0.700radの状態で行っており、target_limits.max_yaw_rate(2π rad/s)×
+    # スキャン周期(25ms)の数周期分の遅れを許容できる値として妥当と判断し
+    # 維持している。0.080radへ戻した場合の再検証はまだ行っていない。
+    # 壁のπ反転(180°)誤ロック対策はbackend側のwall_gate_yaw_(既定1.2rad)が
+    # 別途担うため、ここは1.2radより十分小さい値に留める。
+    planar_max_yaw_shift: 0.700
     # Unity emits per-ray Gaussian range noise.  Match it directly against finite
     # mapped walls rather than projecting it into a point-to-line residual.
     planar_use_ray_to_wall: true

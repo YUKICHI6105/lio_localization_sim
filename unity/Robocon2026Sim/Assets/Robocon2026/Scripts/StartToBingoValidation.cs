@@ -23,6 +23,14 @@ namespace Robocon2026.Simulation
         private const float ReturnCrossLowY = 0.5f;
         private const float ReturnPickupBypassY = 1.1f;
         private readonly List<float> segmentDurations = new();
+        // 各区間の終端で向くべきヨー(Unity座標系、rad)。区間iはsegmentYawEnd[i]
+        // まで、位置と同じタイムライン(MinimumJerk, segmentDurations[i])でなめらかに
+        // 回転する。開始時の向き(区間0の始点)は機体のスポーン姿勢(yaw=0)。
+        private readonly List<float> segmentYawEnd = new();
+        // 現在のラップの区間0が始まる時点で向いているべきヨー(Unity座標系、rad)。
+        // 初回は機体のスポーン姿勢(0)。ラップ反転時はStartNextLapで前ラップの
+        // 最終区間の向きを引き継ぎ、ラップ間で不連続なヨーの飛びが起きないようにする。
+        private float startYawRad;
         private Rigidbody body = null!;
         private UnityRosSensorPublisher sensorPublisher = null!;
         private Transform robot = null!;
@@ -49,6 +57,24 @@ namespace Robocon2026.Simulation
         // this is contingent on notes staying non-contact -- see BuildRobot's contact-force note
         // for the plan to eventually re-enable it once an intake model exists.
         private const bool RepeatLaps = true;
+        // 2026-07-30: 自己位置推定の残差調査で「旋回ダイナミクス」由来と誤報告した
+        // 事象が、実際にはCSV列の取り違えによる誤りで、本ロボットは
+        // body.constraints=FreezeRotation(全軸凍結)によりこれまで一度も物理的に
+        // 回転していなかったことが判明した。実旋回下での自己位置推定挙動を初めて
+        // 検証するためのフラグ。trueでヨー軸のみ回転を許可する。
+        //
+        // 最初の実装(進行方向を向くAddTorque PD)は、区間の切り替わりごとに
+        // 目標ヨーが瞬時にスナップし、並進の立ち上がりと同時に大きな旋回要求が
+        // 発生して自己位置推定が完全にロストする事象を引き起こした
+        // (t=10〜15s付近で位置誤差が数十〜150m規模まで発散、全点非対応)。
+        // ユーザー判断により、フィードバック制御(追従)を使わず、位置と同じ
+        // quintic minimum-jerkタイムラインで事前に決めたヨーレートを
+        // body.angularVelocityへ直接与えるopen-loop方式に変更した(詳細は
+        // FixedUpdate内のコメント参照。当初MoveRotationを使ったところ
+        // angularVelocityが更新されずIMU/ground truthが旋回を感知しない
+        // 別のバグを踏んだため、angularVelocity直接代入方式へ再修正した)。
+        // 追従のバグと自己位置推定側の問題を切り分けるための実験的措置。
+        private const bool EnableYawRotation = true;
         // Match the real startup sequence: keep the chassis stationary while the IMU prior and
         // first LiDAR factors settle, then run the complete mission. Previously the robot moved
         // after only 0.5 s, so the reported maximum mixed filter startup convergence into the
@@ -110,6 +136,11 @@ namespace Robocon2026.Simulation
                 var duration = 1.08f * Mathf.Max(speedLimited, accelerationLimited);
                 segmentDurations.Add(duration);
                 routeDuration += duration;
+                // 区間iの終端で向くべきヨー: 区間の進行方向(フィールド座標の
+                // delta)を、FixedUpdateの速度変換と同じ規約(Unity x=-field dy,
+                // Unity z=field dx)でUnity座標系のradへ変換する。
+                var delta = route[i + 1] - route[i];
+                segmentYawEnd.Add(Mathf.Atan2(-delta.y, delta.x));
                 if (i == 0 && !routeReversed)
                 {
                     pickupTime = duration;
@@ -142,7 +173,9 @@ namespace Robocon2026.Simulation
                     pickupDelay = elapsed - pickupTime;
                 }
             }
-            EvaluateRoute(effectiveElapsed, out var target, out var targetVelocity, out var routeDone);
+            EvaluateRoute(
+                effectiveElapsed, out var target, out var targetVelocity, out var targetYawRad,
+                out var targetYawRateRad, out var routeDone);
 
             var targetUnity = FieldCoordinates.ToUnity(target.x, target.y, 0.065);
             var velocityUnity = new Vector3(-targetVelocity.y, 0f, targetVelocity.x);
@@ -176,6 +209,22 @@ namespace Robocon2026.Simulation
             var force = body.mass * (60f * positionError + 12f * velocityError);
             var maxForce = body.mass * (float)robotDefinition.TargetLimits.MaxAcceleration;
             body.AddForce(Vector3.ClampMagnitude(force, maxForce), ForceMode.Force);
+
+            if (EnableYawRotation)
+            {
+                // 2026-07-30訂正: body.MoveRotation()は非kinematicなRigidbodyでは
+                // body.angularVelocityを正しく更新しないため、IMU/ground truthの
+                // ジャイロが実際の回転を全く感知しない(常にバイアス+ノイズレベルの
+                // まま)というバグを生んでいた。姿勢(transform.rotation)自体は
+                // MoveRotationで正しく回るためground truthの"姿勢"は正しく見えるが、
+                // angularVelocity由来のセンサ値だけが壊れており、これが3回の
+                // 修正でも破綻が直らなかった真因だった。
+                // 修正: 目標ヨーレート(位置のvelocityと同じ規約で解析的に求めた値、
+                // EvaluateRoute参照)をangularVelocityへ直接代入する。物理エンジンが
+                // これを毎ステップ積分して姿勢を更新するため、位置の力積分と
+                // 同じ意味でopen-loopのまま、angularVelocityも正しく実態を反映する。
+                body.angularVelocity = new Vector3(0f, targetYawRateRad, 0f);
+            }
 
             estimatedPosition.x += body.linearVelocity.z * Time.fixedDeltaTime;
             estimatedPosition.y -= body.linearVelocity.x * Time.fixedDeltaTime;
@@ -246,7 +295,11 @@ namespace Robocon2026.Simulation
             {
                 route.AddRange(outboundRoute);
             }
+            // 前ラップの最終区間の向きを、新ラップの区間0が始まる時点の向きとして
+            // 引き継ぐ(ヨーがラップの継ぎ目で不連続に飛ばないようにするため)。
+            startYawRad = segmentYawEnd[^1];
             segmentDurations.Clear();
+            segmentYawEnd.Clear();
             routeDuration = 0f;
             pickupTime = 0f;
             BuildTimeline();
@@ -289,7 +342,11 @@ namespace Robocon2026.Simulation
             body.sleepThreshold = 0f;
             body.interpolation = RigidbodyInterpolation.Interpolate;
             body.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
-            body.constraints = RigidbodyConstraints.FreezeRotation;
+            // EnableYawRotationの説明はフィールド宣言のコメント参照。ヨー軸のみ
+            // 回転を許可する場合もロール/ピッチは倒立防止のため常に凍結する。
+            body.constraints = EnableYawRotation
+                ? (RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ)
+                : RigidbodyConstraints.FreezeRotation;
             collisionRecorder = robotObject.AddComponent<CollisionRecorder>();
             IgnoreNoteContactForLocalizationBaseline(collider);
             robotObject.AddComponent<UnityRosSensorPublisher>();
@@ -377,7 +434,9 @@ namespace Robocon2026.Simulation
             }
         }
 
-        private void EvaluateRoute(float time, out Vector2 position, out Vector2 velocity, out bool done)
+        private void EvaluateRoute(
+            float time, out Vector2 position, out Vector2 velocity, out float yawRad,
+            out float yawRateRad, out bool done)
         {
             var elapsed = 0f;
             for (var i = 0; i < segmentDurations.Count; ++i)
@@ -389,6 +448,10 @@ namespace Robocon2026.Simulation
                     {
                         position = route[1];
                         velocity = Vector2.zero;
+                        // 停止中(ピックアップ待機)はその時点までに向いた区間0の
+                        // 向きを保持する。
+                        yawRad = segmentYawEnd[0];
+                        yawRateRad = 0f;
                         done = false;
                         return;
                     }
@@ -402,11 +465,24 @@ namespace Robocon2026.Simulation
                     var delta = route[i + 1] - route[i];
                     position = route[i] + delta * blend;
                     velocity = delta * (derivative / duration);
+                    // ヨーも位置と同じタイムラインでなめらかに変化させる
+                    // (最短角度でラップアラウンドを扱う)。区間0の開始向きは
+                    // startYawRad(スポーン姿勢、またはラップ継ぎ目の引き継ぎ値)。
+                    var yawStart = i == 0 ? startYawRad : segmentYawEnd[i - 1];
+                    var yawDelta = Mathf.Repeat(
+                        segmentYawEnd[i] - yawStart + Mathf.PI, 2f * Mathf.PI) - Mathf.PI;
+                    yawRad = yawStart + yawDelta * blend;
+                    // 位置のvelocityと同じ規約(delta * derivative/duration)でヨーレートも
+                    // 解析的に求める。MoveRotationではなくangularVelocityへ直接
+                    // 与えるための値(FixedUpdate参照)。
+                    yawRateRad = yawDelta * (derivative / duration);
                     done = false;
                     return;
                 }
                 elapsed += duration;
             }
+            yawRad = segmentYawEnd.Count > 0 ? segmentYawEnd[^1] : startYawRad;
+            yawRateRad = 0f;
             position = route[^1];
             velocity = Vector2.zero;
             done = true;

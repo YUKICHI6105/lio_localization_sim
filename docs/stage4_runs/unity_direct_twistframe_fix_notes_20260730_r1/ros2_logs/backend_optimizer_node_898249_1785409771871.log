@@ -1,0 +1,13 @@
+[INFO] [1785409771.905846250] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[INFO] [1785409771.906253172] [backend_optimizer_node]: backend_optimizer_node started (0 cylinders registered)
+[INFO] [1785409809.540633169] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0129, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[WARN] [1785409811.080043386] [backend_optimizer_node]: slow smoother update: 20.4ms (index 140)
+[INFO] [1785409811.579961591] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0129, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[INFO] [1785409813.624157329] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0129, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[INFO] [1785409815.694291071] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0129, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[INFO] [1785409817.774456316] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0129, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[WARN] [1785409818.537029209] [backend_optimizer_node]: wall correction downweighted by DCS: d_xy=0.085m (> 0.047m, dt=0.025s, scale=1.83x) — reduced confidence, not rejected
+[WARN] [1785409819.674639329] [backend_optimizer_node]: wall correction downweighted by DCS: d_xy=0.061m (> 0.047m, dt=0.025s, scale=1.31x) — reduced confidence, not rejected
+[WARN] [1785409821.130998323] [backend_optimizer_node]: wall correction downweighted by DCS: d_xy=0.085m (> 0.047m, dt=0.025s, scale=1.82x) — reduced confidence, not rejected
+[WARN] [1785409822.422138308] [backend_optimizer_node]: LiDAR wall correction unavailable for 0.78s (> 0.75s): drifting on IMU dead-reckoning
+[ERROR] [1785409848.006308988] [backend_optimizer_node]: IMU signal LOST (no IMU for 2.00s > 2.00s). Self-localization is the dead-reckoning backbone and cannot continue without it: entering FAIL-SAFE HALT (freezing estimate, no further graph updates).

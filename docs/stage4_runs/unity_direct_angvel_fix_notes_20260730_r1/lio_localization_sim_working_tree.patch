@@ -1,0 +1,301 @@
+diff --git a/config/robocon2026_unity.yaml b/config/robocon2026_unity.yaml
+index c61c045..da25230 100644
+--- a/config/robocon2026_unity.yaml
++++ b/config/robocon2026_unity.yaml
+@@ -98,7 +98,14 @@
+     planar_huber_delta: 0.025
+     planar_max_mean_residual: 0.060
+     planar_max_shift: 0.120
+-    planar_max_yaw_shift: 0.080
++    # 2026-07-30: 実ヨー回転を初めて有効化したところ(experiment_history 16番)、
++    # 0.080rad(約4.6°)では①のシード予測がわずかに真値からずれただけで壁補正が
++    # 拒否され続け、無補正のままIMU積分だけでヨーがさらにずれる発散スパイラルに
++    # 陥り、全点非対応(541/541)まで完全ロストした。target_limits.max_yaw_rate
++    # (2π rad/s)×スキャン周期(25ms)の数周期分の遅れを許容できる値へ緩めた。
++    # 壁のπ反転(180°)誤ロック対策はbackend側のwall_gate_yaw_(既定1.2rad)が
++    # 別途担うため、ここは1.2radより十分小さい値に留める。
++    planar_max_yaw_shift: 0.700
+     # Unity emits per-ray Gaussian range noise.  Match it directly against finite
+     # mapped walls rather than projecting it into a point-to-line residual.
+     planar_use_ray_to_wall: true
+diff --git a/docs/project_status_overview_2026-07-30.md b/docs/project_status_overview_2026-07-30.md
+index 6873b39..a1e8b13 100644
+--- a/docs/project_status_overview_2026-07-30.md
++++ b/docs/project_status_overview_2026-07-30.md
+@@ -39,8 +39,12 @@ MPC)は`robocon2026_autonomy_plan.md`に構想はあるが実装は未着手。
+ - 主要な修正: ノーツ除外クラスタリングのバグ修正、センサノイズのデータシート
+   照合、②(`laser_scan_matching_node`)へのICP専用worker分離(③は2026-07-29に
+   対応済み)。
+-- 残る1.7〜5mm級の残差はノーツ接近時の除外不完全性(支配的)と旋回ダイナミクスに
+-  起因すると特定済みだが、要件には十分な余裕があるため追加対応は不要と判断。
++- 残る1.7〜5mm級の残差はノーツ接近時の除外不完全性が支配的要因。副次要因として
++  「旋回ダイナミクス」を挙げていたが、これは解析ミス(CSV列の取り違えで並進
++  速度をヨー角速度と誤読)によるもので、シミュレーション上ロボットは物理的に
++  一度も回転していなかったことが判明した(訂正内容は最終レポート§4.2参照)。
++  実際の旋回下での挙動は§4.4で新たに検証した。要件には十分な余裕があるため
++  追加対応は不要と判断。
+ - 推定器のアーキテクチャ図・スレッド構成は
+   [backend_estimator_architecture_2026-07-28.md](requirements/backend_estimator_architecture_2026-07-28.md)
+   (2026-07-30更新版)を参照。
+@@ -50,9 +54,11 @@ MPC)は`robocon2026_autonomy_plan.md`に構想はあるが実装は未着手。
+ 現行の走行制御は`StartToBingoValidation.cs`が実装する、区間(waypoint)ごとの
+ quintic minimum-jerkプロファイル + Cartesian PD servoである。`MaxSpeed`/
+ `MaxAcceleration`(`RobotDefinition.TargetLimits`)による並進速度・加速度の制約は
+-持つが、**旋回角速度・角加速度の上限を陽に制約する仕組みは無い**。waypoint間の
+-方向転換時に生じる急な角速度変化が、§3で特定した残差要因の一つ(旋回ダイナミクス)
+-の発生源になっている。
++持つが、**旋回角速度・角加速度の上限を陽に制約する仕組みは無い**。さらに言えば
++現行の`StartToBingoValidation.cs`は`body.constraints = FreezeRotation`でロボットの
++回転そのものを物理的に凍結しており、走行中に姿勢(向き)を変える制御自体が
++存在しない(位置のみ制御)。§3で当初「旋回ダイナミクスが残差要因」としていたのは
++解析ミスによる誤りで、実際には一度も旋回していなかった。
+ 
+ `robocon2026_autonomy_plan.md`§4.4が構想する「オムニ対応の時間最適軌道生成
+ (速度5m/s、加速度4.905m/s²、角速度2π rad/s以下)」「jerk・モータ飽和・横滑りを
+diff --git a/docs/requirements/backend_estimator_architecture_2026-07-28.md b/docs/requirements/backend_estimator_architecture_2026-07-28.md
+index 7bb81b7..8f2b1d0 100644
+--- a/docs/requirements/backend_estimator_architecture_2026-07-28.md
++++ b/docs/requirements/backend_estimator_architecture_2026-07-28.md
+@@ -319,13 +319,20 @@ NaN・信号飽和・通信破損といった**センサー故障の兆候はな
+    A/Bテストした結果、最大位置誤差が4〜5mm台から1.75mmまで低下しスパイクが
+    消滅した。これにより上記「軸別対応点数の均等割り当て・固定共分散値」よりも、
+    ノーツ除外(`ball_exclusion_*`パラメータ)側が支配的要因であると判明した。
+-3. **残る1.7mm級の残差は旋回ダイナミクス起因**: ノーツ無効化後もなお残る1.7mm級の
+-   ピークは、Unity記録の実角速度データで実際の急旋回(0→約1.5rad/s)と時刻が一致
+-   することを確認した。線形加速度トリガー版で無効化済みだった`imu_dynamics_*`の
+-   角速度トリガー版(`imu_dynamics_gyro_*`)を実装しA/Bテストしたが、有意な改善は
+-   得られなかった(1.7346mm→1.7333mm、ノイズレベルの差)。壁補正のσを締めても
+-   「補正が届くまでの待ち時間」自体は縮まらないため、スキャン周期(40Hz=25ms)に
+-   内在する遅れの可能性が高いが、これは推論であり直接検証はしていない。
++3. **訂正: 「残る1.7mm級の残差は旋回ダイナミクス起因」は誤りだった**。当初、
++   Unity記録の`ground_truth.csv`で「実角速度0→約1.5rad/s」とスパイク時刻が
++   一致すると報告したが、これは`awk`の列指定が1列ずれ、`linear_y`(横方向並進
++   速度、m/s)を`angular_z`(ヨー角速度、rad/s)と誤読した解析ミスだった。
++   正しい`angular_z`列は試験全体を通じて厳密に`0.0000`、姿勢クォータニオンも
++   不変であり、`StartToBingoValidation.cs`の`body.constraints = FreezeRotation`
++   (全軸回転を物理的に凍結、`AddTorque`等の回転制御コードも皆無)と整合する。
++   **このシミュレーションではロボットは一度も物理的に回転していない**。
++   実体はロボット座標系の横方向(オムニホイールによる並進)速度の急変であり、
++   角速度トリガー版`imu_dynamics_gyro_*`で改善が出なかったのも、実際の
++   `angular_z`が常に約0で閾値超過イベント自体がほぼ発生しないためだったと
++   考えられる。「自己位置推定が実際の旋回中にどう振る舞うか」は
++   [localization_final_report_2026-07-30.md §4.4](localization_final_report_2026-07-30.md)
++   で改めて検証した。
+ 
+ 要件A(定常RMSE≤10mm・最大位置誤差≤10mm)はノーツありの状態でも十分な余裕で
+ PASSしているため、上記1.7mm級の残差はこれ以上追う必要のある水準ではないと
+diff --git a/docs/requirements/localization_final_report_2026-07-30.md b/docs/requirements/localization_final_report_2026-07-30.md
+index 76ce0b5..303c382 100644
+--- a/docs/requirements/localization_final_report_2026-07-30.md
++++ b/docs/requirements/localization_final_report_2026-07-30.md
+@@ -6,7 +6,8 @@
+ ③`backend_optimizer_node`)による自己位置推定は、要件Aを達成した。
+ 
+ - 定常位置誤差 RMSE ≤ 10mm: **PASS**(実測 0.68〜0.80mm、複数run)
+-- 最大位置誤差 ≤ 10mm: **PASS**(実測 1.7〜5.1mm、ノーツ有無・旋回動作の有無で変動)
++- 最大位置誤差 ≤ 10mm: **PASS**(実測 1.7〜5.1mm、ノーツ有無で変動。実旋回を
++  含めた検証結果は§4.4参照)
+ 
+ 要件の定義・変更履歴は
+ [requirements_spec_2026-07-27.md §0/§2](requirements_spec_2026-07-27.md)を正本とする。
+@@ -58,13 +59,31 @@
+ 支配的要因であることを確認した(`15`)。競技本番ではノーツが存在するため、この
+ 残差は実運用でも同程度発生し得る。
+ 
+-### 4.2 旋回ダイナミクスに起因する残差(ノーツ非依存)
+-
+-ノーツ無効化後もなお残る1.7mm級のピークは、Unity記録の実角速度データで
+-急旋回(0→約1.5rad/s)と時刻が一致することを確認した(`15`)。壁補正の共分散を
+-角速度トリガーで締める対策を実装・検証したが、有意な改善は得られなかった
+-(1.7346mm→1.7333mm)。スキャン周期(40Hz=25ms)に内在する「補正が届くまでの
+-待ち時間」が律速している可能性が高いが、これは推論であり直接検証はしていない。
++### 4.2 訂正: 「旋回ダイナミクス」説は列の取り違えによる誤りだった
++
++当初、ノーツ無効化後もなお残る1.7mm級のピークが、Unity記録の`ground_truth.csv`で
++「実角速度0→約1.5rad/s」と時刻が一致すると報告していたが、これは**`awk`での
++列指定の誤り**による誤った解析結果だった。実際にはCSVの列順は
++`...,linear_x,linear_y,linear_z,angular_x,angular_y,angular_z,...`であり、
++1列分ずれて`linear_y`(ロボット座標系の横方向並進速度、単位m/s)を
++`angular_z`(ヨー角速度、単位rad/s)として読んでいた。正しい`angular_z`列を
++確認し直すと、該当区間を含め試験全体を通じて厳密に`0.0000`であり、姿勢
++クォータニオン(`orientation_z`, `orientation_w`)も一切変化していなかった。
++
++これは`StartToBingoValidation.cs`で`body.constraints = RigidbodyConstraints.FreezeRotation`
++(全軸の回転を物理的に凍結)が設定されており、`AddTorque`や`transform.rotation`の
++直接操作もコード上どこにも存在しないという事実と完全に整合する。**この
++シミュレーション環境ではロボットは一度も物理的に回転していない。**
++
++したがって、当該ピークの正体は「旋回」ではなく、**ロボット座標系の横方向
++(Y軸)並進速度が短時間で大きく変化する事象**(オムニホイールによる、機体の
++向きを変えずに横へ移動する動き)だった。壁補正の共分散を角速度トリガーで
++締める対策(`imu_dynamics_gyro_*`)を検証した際に有意な改善が見られなかったのも、
++当然の結果だったと考えられる。実際の`angular_z`が常にほぼ0である以上、
++角速度閾値(0.3rad/s)を超えるイベント自体がほとんど発生し得ないためである。
++
++**この訂正の帰結として、「自己位置推定が実際の旋回中にどう振る舞うか」は
++現時点で一度も検証されていない。** 検証結果は §4.4 を参照。
+ 
+ ### 4.3 明確に否定された仮説
+ 
+diff --git a/unity/Robocon2026Sim/Assets/Robocon2026/Scripts/StartToBingoValidation.cs b/unity/Robocon2026Sim/Assets/Robocon2026/Scripts/StartToBingoValidation.cs
+index 575d4cc..b2660e2 100644
+--- a/unity/Robocon2026Sim/Assets/Robocon2026/Scripts/StartToBingoValidation.cs
++++ b/unity/Robocon2026Sim/Assets/Robocon2026/Scripts/StartToBingoValidation.cs
+@@ -23,6 +23,14 @@ namespace Robocon2026.Simulation
+         private const float ReturnCrossLowY = 0.5f;
+         private const float ReturnPickupBypassY = 1.1f;
+         private readonly List<float> segmentDurations = new();
++        // 各区間の終端で向くべきヨー(Unity座標系、rad)。区間iはsegmentYawEnd[i]
++        // まで、位置と同じタイムライン(MinimumJerk, segmentDurations[i])でなめらかに
++        // 回転する。開始時の向き(区間0の始点)は機体のスポーン姿勢(yaw=0)。
++        private readonly List<float> segmentYawEnd = new();
++        // 現在のラップの区間0が始まる時点で向いているべきヨー(Unity座標系、rad)。
++        // 初回は機体のスポーン姿勢(0)。ラップ反転時はStartNextLapで前ラップの
++        // 最終区間の向きを引き継ぎ、ラップ間で不連続なヨーの飛びが起きないようにする。
++        private float startYawRad;
+         private Rigidbody body = null!;
+         private UnityRosSensorPublisher sensorPublisher = null!;
+         private Transform robot = null!;
+@@ -49,6 +57,24 @@ namespace Robocon2026.Simulation
+         // this is contingent on notes staying non-contact -- see BuildRobot's contact-force note
+         // for the plan to eventually re-enable it once an intake model exists.
+         private const bool RepeatLaps = true;
++        // 2026-07-30: 自己位置推定の残差調査で「旋回ダイナミクス」由来と誤報告した
++        // 事象が、実際にはCSV列の取り違えによる誤りで、本ロボットは
++        // body.constraints=FreezeRotation(全軸凍結)によりこれまで一度も物理的に
++        // 回転していなかったことが判明した。実旋回下での自己位置推定挙動を初めて
++        // 検証するためのフラグ。trueでヨー軸のみ回転を許可する。
++        //
++        // 最初の実装(進行方向を向くAddTorque PD)は、区間の切り替わりごとに
++        // 目標ヨーが瞬時にスナップし、並進の立ち上がりと同時に大きな旋回要求が
++        // 発生して自己位置推定が完全にロストする事象を引き起こした
++        // (t=10〜15s付近で位置誤差が数十〜150m規模まで発散、全点非対応)。
++        // ユーザー判断により、フィードバック制御(追従)を使わず、位置と同じ
++        // quintic minimum-jerkタイムラインで事前に決めたヨーレートを
++        // body.angularVelocityへ直接与えるopen-loop方式に変更した(詳細は
++        // FixedUpdate内のコメント参照。当初MoveRotationを使ったところ
++        // angularVelocityが更新されずIMU/ground truthが旋回を感知しない
++        // 別のバグを踏んだため、angularVelocity直接代入方式へ再修正した)。
++        // 追従のバグと自己位置推定側の問題を切り分けるための実験的措置。
++        private const bool EnableYawRotation = true;
+         // Match the real startup sequence: keep the chassis stationary while the IMU prior and
+         // first LiDAR factors settle, then run the complete mission. Previously the robot moved
+         // after only 0.5 s, so the reported maximum mixed filter startup convergence into the
+@@ -110,6 +136,11 @@ namespace Robocon2026.Simulation
+                 var duration = 1.08f * Mathf.Max(speedLimited, accelerationLimited);
+                 segmentDurations.Add(duration);
+                 routeDuration += duration;
++                // 区間iの終端で向くべきヨー: 区間の進行方向(フィールド座標の
++                // delta)を、FixedUpdateの速度変換と同じ規約(Unity x=-field dy,
++                // Unity z=field dx)でUnity座標系のradへ変換する。
++                var delta = route[i + 1] - route[i];
++                segmentYawEnd.Add(Mathf.Atan2(-delta.y, delta.x));
+                 if (i == 0 && !routeReversed)
+                 {
+                     pickupTime = duration;
+@@ -142,7 +173,9 @@ namespace Robocon2026.Simulation
+                     pickupDelay = elapsed - pickupTime;
+                 }
+             }
+-            EvaluateRoute(effectiveElapsed, out var target, out var targetVelocity, out var routeDone);
++            EvaluateRoute(
++                effectiveElapsed, out var target, out var targetVelocity, out var targetYawRad,
++                out var targetYawRateRad, out var routeDone);
+ 
+             var targetUnity = FieldCoordinates.ToUnity(target.x, target.y, 0.065);
+             var velocityUnity = new Vector3(-targetVelocity.y, 0f, targetVelocity.x);
+@@ -177,6 +210,22 @@ namespace Robocon2026.Simulation
+             var maxForce = body.mass * (float)robotDefinition.TargetLimits.MaxAcceleration;
+             body.AddForce(Vector3.ClampMagnitude(force, maxForce), ForceMode.Force);
+ 
++            if (EnableYawRotation)
++            {
++                // 2026-07-30訂正: body.MoveRotation()は非kinematicなRigidbodyでは
++                // body.angularVelocityを正しく更新しないため、IMU/ground truthの
++                // ジャイロが実際の回転を全く感知しない(常にバイアス+ノイズレベルの
++                // まま)というバグを生んでいた。姿勢(transform.rotation)自体は
++                // MoveRotationで正しく回るためground truthの"姿勢"は正しく見えるが、
++                // angularVelocity由来のセンサ値だけが壊れており、これが3回の
++                // 修正でも破綻が直らなかった真因だった。
++                // 修正: 目標ヨーレート(位置のvelocityと同じ規約で解析的に求めた値、
++                // EvaluateRoute参照)をangularVelocityへ直接代入する。物理エンジンが
++                // これを毎ステップ積分して姿勢を更新するため、位置の力積分と
++                // 同じ意味でopen-loopのまま、angularVelocityも正しく実態を反映する。
++                body.angularVelocity = new Vector3(0f, targetYawRateRad, 0f);
++            }
++
+             estimatedPosition.x += body.linearVelocity.z * Time.fixedDeltaTime;
+             estimatedPosition.y -= body.linearVelocity.x * Time.fixedDeltaTime;
+             var truth = UnityToField(body.position);
+@@ -246,7 +295,11 @@ namespace Robocon2026.Simulation
+             {
+                 route.AddRange(outboundRoute);
+             }
++            // 前ラップの最終区間の向きを、新ラップの区間0が始まる時点の向きとして
++            // 引き継ぐ(ヨーがラップの継ぎ目で不連続に飛ばないようにするため)。
++            startYawRad = segmentYawEnd[^1];
+             segmentDurations.Clear();
++            segmentYawEnd.Clear();
+             routeDuration = 0f;
+             pickupTime = 0f;
+             BuildTimeline();
+@@ -289,7 +342,11 @@ namespace Robocon2026.Simulation
+             body.sleepThreshold = 0f;
+             body.interpolation = RigidbodyInterpolation.Interpolate;
+             body.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+-            body.constraints = RigidbodyConstraints.FreezeRotation;
++            // EnableYawRotationの説明はフィールド宣言のコメント参照。ヨー軸のみ
++            // 回転を許可する場合もロール/ピッチは倒立防止のため常に凍結する。
++            body.constraints = EnableYawRotation
++                ? (RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ)
++                : RigidbodyConstraints.FreezeRotation;
+             collisionRecorder = robotObject.AddComponent<CollisionRecorder>();
+             IgnoreNoteContactForLocalizationBaseline(collider);
+             robotObject.AddComponent<UnityRosSensorPublisher>();
+@@ -377,7 +434,9 @@ namespace Robocon2026.Simulation
+             }
+         }
+ 
+-        private void EvaluateRoute(float time, out Vector2 position, out Vector2 velocity, out bool done)
++        private void EvaluateRoute(
++            float time, out Vector2 position, out Vector2 velocity, out float yawRad,
++            out float yawRateRad, out bool done)
+         {
+             var elapsed = 0f;
+             for (var i = 0; i < segmentDurations.Count; ++i)
+@@ -389,6 +448,10 @@ namespace Robocon2026.Simulation
+                     {
+                         position = route[1];
+                         velocity = Vector2.zero;
++                        // 停止中(ピックアップ待機)はその時点までに向いた区間0の
++                        // 向きを保持する。
++                        yawRad = segmentYawEnd[0];
++                        yawRateRad = 0f;
+                         done = false;
+                         return;
+                     }
+@@ -402,11 +465,24 @@ namespace Robocon2026.Simulation
+                     var delta = route[i + 1] - route[i];
+                     position = route[i] + delta * blend;
+                     velocity = delta * (derivative / duration);
++                    // ヨーも位置と同じタイムラインでなめらかに変化させる
++                    // (最短角度でラップアラウンドを扱う)。区間0の開始向きは
++                    // startYawRad(スポーン姿勢、またはラップ継ぎ目の引き継ぎ値)。
++                    var yawStart = i == 0 ? startYawRad : segmentYawEnd[i - 1];
++                    var yawDelta = Mathf.Repeat(
++                        segmentYawEnd[i] - yawStart + Mathf.PI, 2f * Mathf.PI) - Mathf.PI;
++                    yawRad = yawStart + yawDelta * blend;
++                    // 位置のvelocityと同じ規約(delta * derivative/duration)でヨーレートも
++                    // 解析的に求める。MoveRotationではなくangularVelocityへ直接
++                    // 与えるための値(FixedUpdate参照)。
++                    yawRateRad = yawDelta * (derivative / duration);
+                     done = false;
+                     return;
+                 }
+                 elapsed += duration;
+             }
++            yawRad = segmentYawEnd.Count > 0 ? segmentYawEnd[^1] : startYawRad;
++            yawRateRad = 0f;
+             position = route[^1];
+             velocity = Vector2.zero;
+             done = true;

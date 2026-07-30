@@ -1,0 +1,13 @@
+[INFO] [1785413519.736741357] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[INFO] [1785413519.736934835] [backend_optimizer_node]: backend_optimizer_node started (0 cylinders registered)
+[INFO] [1785413527.805834755] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0129, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[INFO] [1785413529.830766042] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0129, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[INFO] [1785413531.831530333] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0129, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[INFO] [1785413533.855810752] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0129, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[INFO] [1785413535.856001431] [backend_optimizer_node]: wall prior loosened by ICP covariance: sigma(yaw,x,y)=(0.0129, 0.0063, 0.0063) censi=(0.0063, 0.0063, 0.0063)
+[WARN] [1785413536.385357493] [backend_optimizer_node]: wall correction downweighted by DCS: d_xy=0.090m (> 0.047m, dt=0.025s, scale=1.93x) — reduced confidence, not rejected
+[WARN] [1785413537.461440689] [backend_optimizer_node]: LiDAR wall correction unavailable for 0.78s (> 0.75s): drifting on IMU dead-reckoning
+[ERROR] [1785413567.587090197] [backend_optimizer_node]: IMU signal LOST (no IMU for 2.04s > 2.00s). Self-localization is the dead-reckoning backbone and cannot continue without it: entering FAIL-SAFE HALT (freezing estimate, no further graph updates).
+[ros2run]: Received signal:  Interrupt
+[INFO] [1785413575.755130070] [rclcpp]: signal_handler(signum=2)
+[INFO] [1785413575.756489143] [backend_optimizer_node]: backend concurrency stats: imu_callbacks=39434, during_worker=1059 (2.7%), during_smoother=893 (2.3%), callback_gap_max=8.149ms, gaps>2ms=37, gaps>10ms=0; stamp_gap_max=1.000ms, gaps>1ms=0; ring_enqueue_max=0.024ms, enqueues>2ms=0; callback_duration_max=0.741ms, durations>2ms=0; worker_jobs=1577 mean/max=0.730/5.887ms; smoother_updates=1577 mean/max=0.565/5.699ms; unity_audit reports=0 source_imu_last=0 receiver_at_last_report=0 final_receiver=39434

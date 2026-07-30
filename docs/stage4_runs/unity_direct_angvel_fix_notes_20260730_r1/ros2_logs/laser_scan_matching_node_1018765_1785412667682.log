@@ -1,0 +1,11 @@
+[INFO] [1785412667.762081534] [laser_scan_matching_node]: laser_scan_matching_node started (0 cylinders, 9 internal walls, field 5.572x3.310m, initial seed=(-2.419, 1.354, 0.000))
+[WARN] [1785412696.692347225] [laser_scan_matching_node]: IMU coverage wait exceeded 0.050s, processing scan with extrapolated tail
+[INFO] [1785412698.640725830] [laser_scan_matching_node]: note rejection: 0/541 returns unexplained, 0 clusters -> 0 accepted, 0 points dropped (last extent=-1.0000m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[INFO] [1785412703.795152876] [laser_scan_matching_node]: note rejection: 0/541 returns unexplained, 0 clusters -> 0 accepted, 0 points dropped (last extent=-1.0000m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[WARN] [1785412704.395743681] [laser_scan_matching_node]: wall match rejected by quality check: mean_residual=0.092m (<=0.090) inlier_ratio=0.64 (>=0.40)
+[WARN] [1785412708.672551391] [laser_scan_matching_node]: IMU coverage wait exceeded 0.050s, processing scan with extrapolated tail
+[INFO] [1785412708.946552996] [laser_scan_matching_node]: note rejection: 541/541 returns unexplained, 2 clusters -> 0 accepted, 0 points dropped (last extent=1.0929m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[INFO] [1785412714.119375542] [laser_scan_matching_node]: note rejection: 541/541 returns unexplained, 2 clusters -> 0 accepted, 0 points dropped (last extent=1.1020m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[INFO] [1785412719.234971676] [laser_scan_matching_node]: note rejection: 541/541 returns unexplained, 2 clusters -> 0 accepted, 0 points dropped (last extent=1.0962m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[INFO] [1785412724.390240007] [laser_scan_matching_node]: note rejection: 541/541 returns unexplained, 2 clusters -> 0 accepted, 0 points dropped (last extent=1.0878m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[INFO] [1785412729.526206163] [laser_scan_matching_node]: note rejection: 541/541 returns unexplained, 2 clusters -> 0 accepted, 0 points dropped (last extent=1.0780m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)

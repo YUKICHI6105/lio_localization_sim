@@ -1,0 +1,166 @@
+diff --git a/include/lio_localization/laser_scan_matching_node.hpp b/include/lio_localization/laser_scan_matching_node.hpp
+index e2551e3..255146b 100644
+--- a/include/lio_localization/laser_scan_matching_node.hpp
++++ b/include/lio_localization/laser_scan_matching_node.hpp
+@@ -227,6 +227,17 @@ private:
+   double max_extrapolation_yaw_rate_;
+   // 迷子モードの有効化(既定false。cpp側コメント参照)
+   bool enable_lost_mode_;
++  // ヨー版の迷子モード(π反転からの保険的回復。2026-07-30、experiment_history
++  // 16番)。実際に使われるplanar solverの`planar_valid`が連続で失敗した場合に
++  // 限り、シードそのまま/シードのヨーに180°足した2つの仮説を両方解いて
++  // 対応点数の多い方を採用する。位置のkLostModeExtraDistancesと同じく、
++  // 「保険が発動すること自体が上流の追跡失敗を意味する」ため、発動時は
++  // RCLCPP_ERRORで目立たせ、根本原因調査の対象として扱う(=保険が正常動作
++  // として恒常的に発動する状態を許容しない)。既定false(位置版と同じ理由:
++  // 誤った局所解に確信を持って固着するリスクがあるため、明示的に有効化する)。
++  bool enable_yaw_lost_mode_;
++  int consecutive_planar_invalid_ = 0;
++  static constexpr int kYawLostModeThreshold = 80;  // 40Hzで約2秒(位置版と同じ)
+   // IMU直接deskewの有効化(既定true。gyro_history_のコメント参照)
+   bool use_imu_deskew_;
+   int min_cylinder_inliers_;
+diff --git a/src/imu_preintegration_node.cpp b/src/imu_preintegration_node.cpp
+index b5bedfd..15383ba 100644
+--- a/src/imu_preintegration_node.cpp
++++ b/src/imu_preintegration_node.cpp
+@@ -323,8 +323,16 @@ void ImuPreintegrationNode::publish_odom(const rclcpp::Time & /*stamp*/)
+   odom.pose.pose.orientation.z = q.z();
+   odom.pose.pose.orientation.w = q.w();
+ 
+-  odom.twist.twist.linear.x = vel.x();
+-  odom.twist.twist.linear.y = vel.y();
++  // vel(=predicted.velocity())はGTSAM NavStateの規約でワールド座標系。
++  // nav_msgs/Odometryのtwistはchild_frame_id(=base_link)、すなわちボディ
++  // 座標系であるべき(Unity側UnityRosSensorPublisher.OnOdomFastReceivedも
++  // 「twistはボディ座標系」を前提にヨーで回転しワールド座標へ戻している)。
++  // yaw=0では回転が恒等変換になり無症状だったため、実旋回を初めて有効化する
++  // まで発見されなかった(2026-07-30)。ヨーの逆回転でボディ座標系へ変換する。
++  const double cos_yaw = std::cos(yaw);
++  const double sin_yaw = std::sin(yaw);
++  odom.twist.twist.linear.x = cos_yaw * vel.x() + sin_yaw * vel.y();
++  odom.twist.twist.linear.y = -sin_yaw * vel.x() + cos_yaw * vel.y();
+   odom.twist.twist.linear.z = 0.0;
+ 
+   odom_pub_->publish(odom);
+diff --git a/src/laser_scan_matching_node.cpp b/src/laser_scan_matching_node.cpp
+index 153037f..3a228db 100644
+--- a/src/laser_scan_matching_node.cpp
++++ b/src/laser_scan_matching_node.cpp
+@@ -79,6 +79,9 @@ LaserScanMatchingNode::LaserScanMatchingNode()
+   // 確認したため既定無効。正直に迷子でいる方が、誤った自己位置で走るより
+   // 試合では安全(誤ロックは③のゲートで拒否され続け、事実上回復もしない)。
+   enable_lost_mode_ = this->declare_parameter<bool>("enable_lost_mode", false);
++  // ヨー版迷子モード(hppのenable_yaw_lost_mode_コメント参照)。位置版と同じ
++  // 理由で既定無効。
++  enable_yaw_lost_mode_ = this->declare_parameter<bool>("enable_yaw_lost_mode", false);
+   // スキャン内回転補正を生ジャイロで行う(hppのgyro_history_コメント参照)。
+   // ジャイロバイアス(実測想定0.005rad/s)は25msスキャンで1.25e-4radにしか
+   // ならず、deskew用途では未補正の生値で十分。
+@@ -842,8 +845,9 @@ void LaserScanMatchingNode::process_scan(
+   // planar point-to-line objective, the same range error is multiplied by the angle
+   // between ray and wall normal.  This direct finite-segment ray model instead uses
+   // residual = measured_range - predicted_range, so it is the matching likelihood.
+-  const auto solve_planar_ray_to_wall = [&](const std::vector<bool> & excluded) {
+-      Pose2D pose = pose_start;
++  const auto solve_planar_ray_to_wall =
++    [&](const std::vector<bool> & excluded, const Pose2D & seed) {
++      Pose2D pose = seed;
+       for (int iteration = 0; iteration < planar_max_iterations_; ++iteration) {
+         Eigen::Matrix3d h = Eigen::Matrix3d::Zero();
+         Eigen::Vector3d g = Eigen::Vector3d::Zero();
+@@ -910,8 +914,8 @@ void LaserScanMatchingNode::process_scan(
+       }
+       return pose;
+     };
+-  const auto solve_planar = [&](const std::vector<bool> & excluded) {
+-      Pose2D pose = pose_start;
++  const auto solve_planar = [&](const std::vector<bool> & excluded, const Pose2D & seed) {
++      Pose2D pose = seed;
+       for (int iteration = 0; iteration < planar_max_iterations_; ++iteration) {
+         Eigen::Matrix3d h = Eigen::Matrix3d::Zero();
+         Eigen::Vector3d g = Eigen::Vector3d::Zero();
+@@ -956,8 +960,46 @@ void LaserScanMatchingNode::process_scan(
+   // First pass uses every return. Its pose is only needed to decide which returns the map
+   // cannot explain -- it is biased by the very notes we are about to reject, but a ~15 mm
+   // bias does not change whether a return is 120 mm off the map.
+-  Pose2D planar_pose = planar_use_ray_to_wall_ ?
+-    solve_planar_ray_to_wall({}) : solve_planar({});
++  //
++  // ヨー版迷子モード(保険): planar_valid連続失敗がkYawLostModeThresholdへ
++  // 達した場合に限り、シードそのままとシードのヨー+π(π反転)の両方を解いて
++  // 対応点数の多い方をこの第1パスの結果として採用する。発動自体を「上流の
++  // 追跡失敗」を示す異常事象として扱うため、通常運転で発動しないことを
++  // 前提にRCLCPP_ERRORで残す(hppのenable_yaw_lost_mode_コメント参照)。
++  Pose2D active_seed = pose_start;
++  Pose2D planar_pose;
++  if (enable_yaw_lost_mode_ && consecutive_planar_invalid_ >= kYawLostModeThreshold) {
++    Pose2D flipped_seed = pose_start;
++    flipped_seed.yaw = wrap_angle_diff(pose_start.yaw + M_PI);
++    const Pose2D normal_result = planar_use_ray_to_wall_ ?
++      solve_planar_ray_to_wall({}, pose_start) : solve_planar({}, pose_start);
++    const size_t normal_inliers = planar_inliers;
++    const double normal_residual_sum = planar_abs_residual;
++    const Pose2D flipped_result = planar_use_ray_to_wall_ ?
++      solve_planar_ray_to_wall({}, flipped_seed) : solve_planar({}, flipped_seed);
++    const size_t flipped_inliers = planar_inliers;
++    const double flipped_residual_sum = planar_abs_residual;
++    const bool flipped_wins = flipped_inliers > normal_inliers ||
++      (flipped_inliers == normal_inliers && flipped_residual_sum < normal_residual_sum);
++    RCLCPP_ERROR(this->get_logger(),
++      "YAW RECOVERY ACTIVATED (consecutive planar-invalid=%d): +-pi coarse yaw search chose the "
++      "%s hypothesis (inliers %zu vs %zu). This means self-localization already failed upstream -- "
++      "treat every activation as a bug to root-cause, not as a working recovery path.",
++      consecutive_planar_invalid_, flipped_wins ? "flipped" : "original",
++      flipped_wins ? flipped_inliers : normal_inliers, flipped_wins ? normal_inliers : flipped_inliers);
++    if (flipped_wins) {
++      active_seed = flipped_seed;
++      planar_pose = flipped_result;
++    } else {
++      // 最後に呼んだのはflipped側なので、採用するoriginal側の値へ復元する。
++      planar_inliers = normal_inliers;
++      planar_abs_residual = normal_residual_sum;
++      planar_pose = normal_result;
++    }
++  } else {
++    planar_pose = planar_use_ray_to_wall_ ?
++      solve_planar_ray_to_wall({}, active_seed) : solve_planar({}, active_seed);
++  }
+ 
+   std::vector<bool> planar_excluded;
+   size_t excluded_points = 0;
+@@ -1024,7 +1066,7 @@ void LaserScanMatchingNode::process_scan(
+ 
+     if (excluded_points > 0) {
+       planar_pose = planar_use_ray_to_wall_ ?
+-        solve_planar_ray_to_wall(planar_excluded) : solve_planar(planar_excluded);
++        solve_planar_ray_to_wall(planar_excluded, active_seed) : solve_planar(planar_excluded, active_seed);
+     }
+     RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 5000,
+       "note rejection: %zu/%zu returns unexplained, %zu clusters -> %zu accepted, "
+@@ -1036,14 +1078,23 @@ void LaserScanMatchingNode::process_scan(
+   }
+   const double planar_mean_residual = planar_inliers > 0 ?
+     planar_abs_residual / static_cast<double>(planar_inliers) : std::numeric_limits<double>::infinity();
+-  const double planar_shift = std::hypot(planar_pose.x - pose_start.x, planar_pose.y - pose_start.y);
+-  const double planar_yaw_shift = std::abs(wrap_angle_diff(planar_pose.yaw - pose_start.yaw));
++  // active_seedとの差でシフト量を測る(ヨー版迷子モードでπ反転仮説を採用した
++  // 場合、その仮説自体がpose_start±πを承知の上で選んだものなので、
++  // pose_start基準で測るとゲートが必ず超過し、保険が採用され得ない)。
++  const double planar_shift = std::hypot(planar_pose.x - active_seed.x, planar_pose.y - active_seed.y);
++  const double planar_yaw_shift = std::abs(wrap_angle_diff(planar_pose.yaw - active_seed.yaw));
+   // Do not let a symmetric wall arrangement pull the estimator into another bay.
+   // A real scan correction is local because IMU prediction is continuous at 1 kHz.
+   const bool planar_valid =
+     planar_inliers >= static_cast<size_t>(planar_min_inliers_) &&
+     planar_mean_residual <= planar_max_mean_residual_ &&
+     planar_shift <= planar_max_shift_ && planar_yaw_shift <= planar_max_yaw_shift_;
++  // ヨー版迷子モード用のカウンタ更新(hppのconsecutive_planar_invalid_参照)。
++  if (planar_valid) {
++    consecutive_planar_invalid_ = 0;
++  } else {
++    ++consecutive_planar_invalid_;
++  }
+   // The generic 3-D ICP remains available for its unmatched-point/circle extraction
+   // below, but it must never publish a pose correction in this Unity field path.
+   result.wall.valid = false;
