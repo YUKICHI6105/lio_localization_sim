@@ -1,0 +1,58 @@
+diff --git a/include/lio_localization/backend_optimizer_node.hpp b/include/lio_localization/backend_optimizer_node.hpp
+index f40a2e0..7622d58 100644
+--- a/include/lio_localization/backend_optimizer_node.hpp
++++ b/include/lio_localization/backend_optimizer_node.hpp
+@@ -278,6 +278,18 @@ private:
+   double imu_dynamics_accel_threshold_;
+   double imu_dynamics_wall_sigma_scale_;
+ 
++  // imu_dynamics_*(線形加速度版)の変種(2026-07-30): 通常巡航中の減速(4〜
++  // 7m/s^2)でも閾値を超えて発火し選択性が無かったため線形加速度版は無効化
++  // されていた。experiment_history 15番で、worker分離・ノーツ除外後に残る
++  // 数mm級スパイクが、Unity実測の角速度(旋回開始直後に0→1.5rad/s近くまで
++  // 急増する区間)と一致することを確認した。巡航中の並進加減速では発火せず、
++  // 実際の旋回開始だけを選択的に捉えられるよう、線形加速度ではなく直近の
++  // 生ジャイロ値(last_imu_gyro_、積分済みでバイアス除去はしていないが
++  // 閾値判定には無視できる程度の影響)のz軸成分の大きさで判定する。
++  bool imu_dynamics_gyro_enabled_;
++  double imu_dynamics_gyro_threshold_;
++  double imu_dynamics_gyro_sigma_scale_;
++
+   // 壁マップ整合PriorFactorの共分散（main.md 4-2）
+   gtsam::Vector wall_prior_sigmas_;
+   // Yaw/X/Yは対応点数Nに応じて sigma_per_point/sqrt(N) で動的に計算する
+diff --git a/src/backend_optimizer_node.cpp b/src/backend_optimizer_node.cpp
+index 2397325..44d5c2e 100644
+--- a/src/backend_optimizer_node.cpp
++++ b/src/backend_optimizer_node.cpp
+@@ -71,6 +71,15 @@ BackendOptimizerNode::BackendOptimizerNode()
+   imu_dynamics_wall_sigma_scale_ =
+     this->declare_parameter<double>("imu_dynamics_wall_sigma_scale", 0.5);
+ 
++  // 上記の変種(角速度トリガー版、hppのコメント参照)。C++既定はfalseとし、
++  // 有効化する場合はYAML側で明示的にtrue+閾値を指定する(imu_dynamics_enabled
++  // のC++既定とYAML実効値が食い違っていた過去の混乱を繰り返さないため)。
++  imu_dynamics_gyro_enabled_ = this->declare_parameter<bool>("imu_dynamics_gyro_enabled", false);
++  imu_dynamics_gyro_threshold_ =
++    this->declare_parameter<double>("imu_dynamics_gyro_threshold", 0.3);
++  imu_dynamics_gyro_sigma_scale_ =
++    this->declare_parameter<double>("imu_dynamics_gyro_sigma_scale", 0.5);
++
+   initial_x_ = this->declare_parameter<double>("initial_x", 0.0);
+   initial_y_ = this->declare_parameter<double>("initial_y", 0.0);
+   initial_theta_ = this->declare_parameter<double>("initial_theta", 0.0);
+@@ -874,6 +883,14 @@ void BackendOptimizerNode::process_scan_result(
+       imu_dynamics_scale = imu_dynamics_wall_sigma_scale_;
+     }
+   }
++  // 角速度トリガー版(hppのコメント参照)。線形加速度版とは独立したゲートで、
++  // どちらか一方でも発火すればより締める側(小さい方)を採用する。
++  if (imu_dynamics_gyro_enabled_) {
++    const double gyro_rate_estimate = std::abs(last_imu_gyro_.z());
++    if (gyro_rate_estimate > imu_dynamics_gyro_threshold_) {
++      imu_dynamics_scale = std::min(imu_dynamics_scale, imu_dynamics_gyro_sigma_scale_);
++    }
++  }
+ 
+   // --- 壁マップ整合PriorFactor（条件付き）---
+   // DCS(Dynamic Covariance Scaling, Agarwal et al. ICRA 2013)風の連続的な

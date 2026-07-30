@@ -1,0 +1,90 @@
+# 実験履歴: worker分離後に残る数mm級スパイクの原因調査（2026-07-30）
+
+## 目的
+
+14番のICP worker分離により、Unity直結時の最大位置誤差はreport 13のbaseline
+17.55mmから4〜5mm台まで改善した。この残留する数mm級スパイクの原因を特定する。
+
+## 1. ログ相関による当初の仮説（誤り）
+
+r2(max=5.13mm@t=14.53s)・r3(max=4.11mm@t=31.88s)それぞれのスパイク時刻の
+近傍で、`laser_scan_matching_node`の`IMU coverage wait exceeded`(IMUカバレッジ
+待ちタイムアウトによる外挿tail処理)、または`backend_optimizer_node`の
+`slow smoother update`(ISAM2更新の遅延)が発生していた。これらのイベント自体は
+60秒中13〜17回程度発生するが、うち1〜2回だけが数mm級のスパイクに一致していた
+ため、「配送・スケジューリング遅延 × その瞬間の速度/角速度」が原因という
+仮説を立てた。
+
+## 2. bag再生による反証
+
+同じ物理走行のUnity生成センサ値を、Play直前にCSVへ記録する既存の仕組み
+(`UnityRosSensorPublisher`, docs/setup/UNITY_SENSOR_CSV_ROSBAG_GUIDE.md参照)
+でr3のCSVを取得し、`unity_csv_to_rosbag2`でMCAP化、`bag_component_isolation.sh`
+でROS単体再生した。bag再生はUnity↔ROSの実TCP転送を経由しないため、転送・
+スケジューリングのジッタが原理的に存在しない。
+
+run: `docs/stage4_runs/bag_replay_r3_compare_20260730/`
+
+| 指標 | ライブUnity(r3) | bag再生 |
+|---|---:|---:|
+| 位置誤差 max | 4.11mm @ t=31.88s | 4.10mm @ t=31.81s |
+| backend callback_gap_max | 502.648ms | 6.924ms |
+| backend gaps>10ms | 1276件 | 0件 |
+| IMU coverage wait exceeded | 11件 | 0件 |
+| slow smoother update | 6件 | 0件 |
+
+転送・スケジューリングのジッタをほぼ完全に排除しても、**同じ時刻・ほぼ同じ大きさの
+スパイクがそのまま再現された**。これにより「配送・スケジューリング遅延が原因」
+という1節の仮説は否定される。IMUセンサの精度・遅延はいずれも無関係である。
+
+## 3. ノーツ除外の不完全性を疑う
+
+bag再生ログの`note rejection`(平面ICPのノーツ除外診断)を確認すると、
+両runのスパイク前後でノーツ由来の未説明点が現れていた。
+
+- r3: t=30.08s「18/541点がマップ未説明、2クラスタ→8点除外」→ t=31.81sスパイク
+  → t=35.08s「23/541点」
+- r2: t=11.4s「0点」→ t=14.5sスパイク → t=16.7s「17/541点、1クラスタ→4点除外」
+
+いずれもロボットがノーツへ接近し、除外ロジックが部分的にしか点群を除去できて
+いないタイミングとスパイクが一致していた。
+
+## 4. ノーツ無効化によるA/B検証
+
+`RoboconFieldBuilder.DisableNotesExperimentFlag`
+(`DisableNotesForLocalizationExperiment.flag`をUnityプロジェクト直下に置くと、
+`Build()`が全ノーツGameObjectを非アクティブ化する。11番の以前のA/Bテストで
+使われた既存の仕組み)を有効化し、同じ60秒runを実行した。
+
+run: `docs/stage4_runs/unity_direct_notes_disabled_20260730_r1/`
+
+| 指標 | ノーツあり(r2/r3) | ノーツ無効化 |
+|---|---:|---:|
+| 位置誤差 mean/RMSE | 0.59mm/0.68-0.70mm | 0.59mm/0.68mm |
+| 位置誤差 max | 4.11-5.13mm | **1.75mm** |
+
+mean/RMSEはほぼ変化しない一方、maxはノーツ無効化で4〜5mm台から1.75mmまで
+明確に低下し、スパイクそのものが消えた。実験後、フラグファイルは
+`.disabled.<timestamp>`へリネームして通常状態(ノーツあり)へ復帰させた。
+
+## 結論
+
+残留する数mm級スパイクの原因は、IMUの精度でもUnity↔ROS間の転送・
+スケジューリング遅延でもなく、**②(`laser_scan_matching_node`)の平面ICPに
+おけるノーツ除外の不完全性**である。ロボットがノーツに接近した際、
+除外ロジックが除ききれなかった点群がわずかに壁とみなされ、その方向へ
+数mm推定値が引っ張られる。これはコード側のコメント(`planar_exclude_balls_`
+周辺、「95/1081点のノーツ由来点が推定値を13mm引っ張った」という既存の
+実測値)に記録済みの既知の限界と整合する。
+
+要件A(定常RMSE≤10mm・最大位置誤差≤10mm)は現状のノーツありでも十分な
+余裕でPASSしているため、緊急の追加対応は必須ではない。さらに詰める場合の
+対処候補は、ball_exclusion系パラメータ(`ball_exclusion_distance_`,
+`ball_exclusion_max_extent_`, `ball_exclusion_max_adjacent_gap_`)の
+チューニング、または除外後残差点にHuber以上の頑健推定を追加すること。
+
+## 対応状態
+
+- ノーツ無効化フラグ: 実験後に無効化済み(`.disabled.<timestamp>`へリネーム)
+- ビルド: 変更なし(Unity側フラグのみ、ROS側コードは14番から変更なし)
+- Unity: 試験終了後`isPlaying=false`を確認済み
