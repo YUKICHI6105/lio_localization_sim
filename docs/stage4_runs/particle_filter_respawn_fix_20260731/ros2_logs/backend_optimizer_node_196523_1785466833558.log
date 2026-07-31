@@ -1,0 +1,4 @@
+[INFO] [1785466833.620502639] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[INFO] [1785466833.620790585] [backend_optimizer_node]: backend_optimizer_node started (0 cylinders registered)
+[WARN] [1785466841.324902250] [backend_optimizer_node]: LiDAR wall correction unavailable for 0.75s (> 0.75s): drifting on IMU dead-reckoning
+[ERROR] [1785466842.892839492] [backend_optimizer_node]: PARTICLE RELOCALIZATION ACCEPTED BY BACKEND: bypassing wall gate (d_xy=4.15m d_yaw=-1.57rad would have been rejected). Exiting for a clean respawn at (-2.42, 1.35, 0.00) instead of an in-process graph rebuild (known to crash GTSAM/TBB, see docs/experiment_history/22番以降).

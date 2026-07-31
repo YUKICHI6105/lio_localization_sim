@@ -1,0 +1,4 @@
+[INFO] [1785438010.406955662] [realtime_evaluator_node]: C++ realtime evaluator started: measuring 60.0s from first ground truth
+[INFO] [1785438016.080417306] [realtime_evaluator_node]: first ground truth received; measurement window started
+[WARN] [1785438016.083796632] [realtime_evaluator_node]: no /odom_fast samples matched to ground truth yet
+[ERROR] [1785438016.083861804] [realtime_evaluator_node]: No /odom_fast samples were matched to ground truth

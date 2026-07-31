@@ -1,0 +1,338 @@
+[INFO] [1785464640.201771865] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[INFO] [1785464640.202161840] [backend_optimizer_node]: backend_optimizer_node started (0 cylinders registered)
+[WARN] [1785464648.283556461] [backend_optimizer_node]: LiDAR wall correction unavailable for 0.75s (> 0.75s): drifting on IMU dead-reckoning
+[ERROR] [1785464650.656315821] [backend_optimizer_node]: PARTICLE RELOCALIZATION ACCEPTED BY BACKEND: bypassing wall gate (d_xy=0.91m d_yaw=-1.57rad would have been rejected), rebuilding graph at (0.40, -0.32, -0.00)
+[INFO] [1785464650.656633322] [backend_optimizer_node]: graph (re)initialized at X0=(0.401, -0.316, -0.001) V0=(0.003, -0.002)
+[ERROR] [1785464650.677465743] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464651.143305367] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464651.143696372] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[WARN] [1785464651.182570654] [backend_optimizer_node]: wall correction rejected by gate: d_xy=0.91m d_yaw=-1.57rad (1 consecutive)
+[ERROR] [1785464651.182729775] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464651.692079053] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464651.692748826] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464651.735579680] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464652.229031628] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464652.229419859] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464652.255925625] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464652.748545805] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464652.748857034] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464652.779510173] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464653.255895064] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464653.256240449] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464653.280765516] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464653.805712175] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464653.806044088] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464653.847076394] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464654.328412906] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464654.328724396] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464654.347815011] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464654.872163252] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464654.872428212] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464654.894303407] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464655.396097495] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464655.396392027] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464655.426615597] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464655.943806464] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464655.944215653] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464655.977519490] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464656.438688804] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464656.439031313] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464656.464146000] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464656.951593236] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464656.951931509] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464656.977724959] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464657.465307515] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464657.465619824] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464657.501099688] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464657.973236325] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464657.973602823] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464658.017511011] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464658.494562660] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464658.494833755] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464658.536141820] [backend_optimizer_node]: PARTICLE RELOCALIZATION ACCEPTED BY BACKEND: bypassing wall gate (d_xy=4.11m d_yaw=-1.57rad would have been rejected), rebuilding graph at (-2.37, 1.28, -0.09)
+[INFO] [1785464658.536457725] [backend_optimizer_node]: graph (re)initialized at X0=(-2.372, 1.283, -0.094) V0=(0.000, 0.000)
+[ERROR] [1785464658.539740623] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464659.094963916] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464659.095242503] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464659.099866305] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464659.604204163] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464659.604498681] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464659.634299640] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464660.119911555] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464660.120231601] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464660.162676852] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464660.631692387] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464660.632153404] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464660.652819594] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464661.133223272] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464661.133521217] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464661.170395503] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464661.660378373] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464661.660721921] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464661.680297795] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464662.193808237] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464662.194167457] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464662.233971572] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464662.711824546] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464662.712358446] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464662.762890491] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464663.230775730] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464663.231108874] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464663.249536575] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464663.723294213] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464663.723663360] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464663.770240417] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464664.239281818] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464664.239668146] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464664.269636028] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464664.765969430] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464664.766251992] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464664.778728982] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464665.351911871] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464665.352282739] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464665.371141640] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464665.839322961] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464665.839698396] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464665.886148115] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464666.354375571] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464666.354676312] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464666.381443066] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464666.852153653] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464666.852470841] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464666.896839620] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464667.364575520] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464667.364845377] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464667.389788268] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464667.873582476] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464667.873933990] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464667.903730560] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464668.378162727] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464668.378438189] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464668.414632796] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464668.910856818] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464668.911135966] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464668.934601402] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464669.404724542] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464669.405084050] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464669.432459870] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464669.908005274] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464669.908331213] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464669.936377684] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464670.444361085] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464670.444644097] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464670.456615758] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464671.021648231] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464671.021970039] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464671.041575321] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464671.528171911] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464671.528562283] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464671.562845117] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464672.040877637] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464672.041213300] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464672.064160001] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464672.554351969] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464672.554684785] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464672.593394004] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464673.102720912] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464673.103181387] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464673.120048399] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464673.603764573] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464673.604106243] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464673.632440043] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464674.114822128] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464674.115221127] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464674.132185227] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464674.617068411] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464674.619187683] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464674.639250989] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464675.125414367] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464675.125742345] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464675.161005190] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464675.666012826] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464675.666528612] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464675.708602063] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464676.145090778] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464676.145601327] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464676.178160945] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464676.669808649] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464676.670706648] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464676.683490288] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464677.231144434] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464677.231502735] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464677.263574275] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464677.735516817] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464677.735833792] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464677.767819999] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464678.258059269] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464678.258381816] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464678.288444095] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464678.783035384] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464678.783293754] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464678.810526104] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464679.361257331] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464679.361585772] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464679.385552655] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464679.831493133] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464679.831846630] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464679.861275327] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464680.349714960] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464680.350200914] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464680.369116580] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464680.869727279] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464680.870107091] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464680.922988394] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464681.381918761] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464681.382374201] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464681.416002251] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464681.893585646] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464681.893971973] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464681.925333474] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464682.395435731] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464682.395776529] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464682.432567357] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464682.956985183] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464682.957294765] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464682.979710988] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464683.485184367] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464683.485560147] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464683.512071648] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464684.023575328] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464684.023840122] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464684.047270934] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464684.576435076] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464684.576722975] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464684.595120891] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464685.090576155] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464685.090845602] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464685.108418979] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464685.596325842] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464685.596650803] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464685.623462691] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464686.101212602] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464686.101510828] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464686.140768183] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464686.616813249] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464686.617256558] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464686.647841415] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464687.130026174] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464687.130335959] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464687.156650042] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464687.657133498] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464687.657389669] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464687.671008116] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464688.175568983] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464688.175956727] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464688.198159032] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464688.729153119] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464688.729444609] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464688.778422400] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464689.278259381] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464689.278626629] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464689.290830271] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464689.793429319] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464689.793906832] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464689.814346687] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464690.296071179] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464690.296402846] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464690.320138519] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464690.815688527] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464690.816019979] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464690.832821236] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464691.365978954] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464691.366316879] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464691.387975561] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464691.834743633] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464691.835113652] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464691.875786625] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464692.370903745] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464692.371194319] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464692.390935587] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464692.874362081] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464692.874667755] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464692.916143746] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464693.400644934] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464693.400928494] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464693.416500463] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464693.912427752] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464693.912749424] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464693.937009504] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464694.530738258] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464694.531034595] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464694.560085565] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464695.052549929] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464695.052827285] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464695.062909584] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464695.566614335] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464695.566888366] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464695.593180716] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464696.072184733] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464696.072481672] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464696.097180925] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464696.604225002] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464696.604801499] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464696.639594192] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464697.107149627] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464697.107691442] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464697.141621691] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464697.628829665] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464697.629115505] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464697.655028787] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464698.153443737] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464698.153750353] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464698.188195718] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464698.673689448] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464698.673962914] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464698.711374167] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464699.280813977] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464699.281109064] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464699.298288490] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464699.857092218] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464699.857377716] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464699.889217305] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464700.372263657] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464700.372607661] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464700.410323439] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464700.886758921] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464700.887219640] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464700.914671587] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464701.383812011] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464701.384192937] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464701.413295318] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464701.921260996] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464701.921592617] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464701.933962911] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464702.442625386] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464702.442955373] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464702.449226760] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464702.933428264] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464702.933733615] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464702.961869167] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464703.442232083] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464703.442490341] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464703.465545177] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464703.982254603] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464703.982636957] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464704.039628539] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464704.507557658] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464704.507860159] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464704.527926436] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464705.029327896] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464705.029691567] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464705.077551623] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464705.546152607] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464705.546489197] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464705.573175497] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464706.137081831] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464706.137405649] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464706.156997929] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464706.665437057] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464706.665769549] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464706.673918502] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464707.169219450] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464707.169532591] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464707.205926416] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464707.675840214] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785464707.676153919] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785464707.700323509] [backend_optimizer_node]: exception in smoother update: Index out of requested size range
+[ERROR] [1785464710.202323497] [backend_optimizer_node]: IMU signal LOST (no IMU for 2.03s > 2.00s). Self-localization is the dead-reckoning backbone and cannot continue without it: entering FAIL-SAFE HALT (freezing estimate, no further graph updates).
+[INFO] [1785464728.417138693] [rclcpp]: signal_handler(signum=2)

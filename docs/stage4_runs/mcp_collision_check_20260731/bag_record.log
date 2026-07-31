@@ -1,0 +1,21 @@
+stdin is not a terminal device. Keyboard handling disabled.[INFO] [1785434719.944485345] [rosbag2_recorder]: Press SPACE for pausing/resuming
+[INFO] [1785434719.944534855] [rosbag2_recorder]: Event publisher thread: Started
+[INFO] [1785434719.956742865] [rosbag2_recorder]: Starting recording to '/home/yukichi6105/ros2_ws/src/lio_localization_sim/docs/stage4_runs/mcp_collision_check_20260731/live_capture'
+[WARN] [1785434719.956827726] [rosbag2_recorder]: No input serialization format specified, using default rmw serialization format: 'cdr'.
+[INFO] [1785434719.960574747] [rosbag2_recorder]: Listening for topics...
+[INFO] [1785434719.960649358] [rosbag2_recorder]: Recording...
+[INFO] [1785434719.960618217] [rosbag2_recorder]: Topics discovery started.
+[INFO] [1785434720.065671716] [rosbag2_recorder]: Subscribed to topic '/scan_match_result'
+[INFO] [1785434720.068600011] [rosbag2_recorder]: Subscribed to topic '/odom_fast'
+[INFO] [1785434720.069637877] [rosbag2_recorder]: Subscribed to topic '/state_estimate'
+[INFO] [1785434771.040665998] [rosbag2_recorder]: Subscribed to topic '/clock'
+[INFO] [1785434771.172498721] [rosbag2_recorder]: Subscribed to topic '/scan'
+[INFO] [1785434771.184535739] [rosbag2_recorder]: Subscribed to topic '/ground_truth_pose'
+[INFO] [1785434771.207124129] [rosbag2_recorder]: Subscribed to topic '/unity_sensor_publish_counts'
+[INFO] [1785434771.219594728] [rosbag2_recorder]: Subscribed to topic '/robot_collision'
+[INFO] [1785434771.234760207] [rosbag2_recorder]: Subscribed to topic '/imu/data'
+[INFO] [1785434771.234835662] [rosbag2_recorder]: All requested topics are subscribed. Stopping discovery...
+[INFO] [1785434771.234885243] [rosbag2_recorder]: Topics discovery stopped.
+[INFO] [1785434868.211864474] [rosbag2_cpp]: Writing remaining messages from cache to the bag. It may take a while
+[INFO] [1785434868.219500249] [rosbag2_recorder]: Recording stopped
+[INFO] [1785434868.224178777] [rosbag2_recorder]: Event publisher thread: Exited

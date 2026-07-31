@@ -1,0 +1,5 @@
+[INFO] [1785438974.139717540] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[INFO] [1785438974.140085506] [backend_optimizer_node]: backend_optimizer_node started (0 cylinders registered)
+[ros2run]: Received signal:  Interrupt
+[INFO] [1785439045.094961451] [rclcpp]: signal_handler(signum=2)
+[INFO] [1785439045.096100127] [backend_optimizer_node]: backend concurrency stats: imu_callbacks=60286, during_worker=2105 (3.5%), during_smoother=1620 (2.7%), callback_gap_max=1281.002ms, gaps>2ms=9384, gaps>10ms=916; stamp_gap_max=1.000ms, gaps>1ms=0; ring_enqueue_max=0.056ms, enqueues>2ms=0; callback_duration_max=5.704ms, durations>2ms=1; worker_jobs=2402 mean/max=0.958/6.851ms; smoother_updates=2402 mean/max=0.732/6.647ms; unity_audit reports=242 source_imu_last=60251 receiver_at_last_report=60237 final_receiver=60286

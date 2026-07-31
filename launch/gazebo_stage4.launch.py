@@ -30,7 +30,8 @@ def generate_launch_description():
              parameters=[{'config_file': bridge}], output='screen'),
         Node(package='lio_localization_sim', executable='gazebo_driver_node', parameters=[{'use_sim_time': True}]),
         Node(package='lio_localization', executable='imu_preintegration_node', parameters=common),
-        Node(package='lio_localization', executable='backend_optimizer_node', parameters=common),
+        Node(package='lio_localization', executable='backend_optimizer_node', parameters=common,
+             respawn=True, respawn_delay=0.2),
         Node(package='lio_localization', executable='laser_scan_matching_node', parameters=common),
         Node(package='lio_localization', executable='ball_tracking_node', parameters=[{'use_sim_time': True}]),
     ])

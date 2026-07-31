@@ -1,0 +1,10 @@
+[INFO] [1785463346.362014203] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[INFO] [1785463346.362275173] [backend_optimizer_node]: backend_optimizer_node started (0 cylinders registered)
+[WARN] [1785463352.955457036] [backend_optimizer_node]: LiDAR wall correction unavailable for 0.75s (> 0.75s): drifting on IMU dead-reckoning
+[WARN] [1785463354.591829107] [backend_optimizer_node]: wall correction rejected by gate: d_xy=0.91m d_yaw=-1.55rad (1 consecutive)
+[WARN] [1785463359.041048902] [backend_optimizer_node]: wall correction rejected by gate: d_xy=0.90m d_yaw=-1.50rad (2 consecutive)
+[WARN] [1785463361.220265011] [backend_optimizer_node]: wall correction rejected by gate: d_xy=4.13m d_yaw=-1.48rad (3 consecutive)
+[WARN] [1785463363.540104343] [backend_optimizer_node]: wall correction rejected by gate: d_xy=4.31m d_yaw=-1.46rad (4 consecutive)
+[WARN] [1785463365.280803088] [backend_optimizer_node]: LiDAR wall correction unavailable for 0.78s (> 0.75s): drifting on IMU dead-reckoning
+[ERROR] [1785463393.962368484] [backend_optimizer_node]: IMU signal LOST (no IMU for 2.02s > 2.00s). Self-localization is the dead-reckoning backbone and cannot continue without it: entering FAIL-SAFE HALT (freezing estimate, no further graph updates).
+[INFO] [1785463412.169218866] [rclcpp]: signal_handler(signum=2)

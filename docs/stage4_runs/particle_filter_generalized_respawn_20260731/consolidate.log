@@ -1,0 +1,3 @@
+/home/yukichi6105/ros2_ws/src/lio_localization_sim/tools/consolidate_stage_log.py:50: DeprecationWarning: Use read_next_ext() which returns both send and receive timestamps instead of just receive timestamp.
+  topic, data, _ = reader.read_next()
+wrote ground_truth.csv (5779), odom_fast.csv (59939), state_estimate.csv (2288), scan_match_wall.csv (2188), collisions.csv (0) to /home/yukichi6105/ros2_ws/src/lio_localization_sim/docs/stage4_runs/particle_filter_generalized_respawn_20260731/consolidated

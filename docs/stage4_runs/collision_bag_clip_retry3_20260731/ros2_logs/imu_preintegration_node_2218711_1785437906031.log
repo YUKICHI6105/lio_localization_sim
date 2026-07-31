@@ -1,0 +1,7 @@
+[INFO] [1785437906.066436016] [imu_preintegration_node]: imu_preintegration_node started (waiting for first /state_estimate)
+[WARN] [1785437912.213273768] [imu_preintegration_node]: IMU accel anomaly (|a|=157.82 m/s^2 > 20.00): clipping to threshold before integrating (count=1) -- likely a collision, not a modelled dynamic
+[WARN] [1785437930.888336401] [imu_preintegration_node]: IMU accel anomaly (|a|=22.27 m/s^2 > 20.00): clipping to threshold before integrating (count=4) -- likely a collision, not a modelled dynamic
+[WARN] [1785437945.831569839] [imu_preintegration_node]: IMU accel anomaly (|a|=125.87 m/s^2 > 20.00): clipping to threshold before integrating (count=7) -- likely a collision, not a modelled dynamic
+[WARN] [1785437961.401509709] [imu_preintegration_node]: IMU accel anomaly (|a|=21.27 m/s^2 > 20.00): clipping to threshold before integrating (count=11) -- likely a collision, not a modelled dynamic
+[ERROR] [1785437978.966612970] [imu_preintegration_node]: IMU signal LOST (no IMU for 2.05s > 2.00s): stopping /odom_fast. IMU is the dead-reckoning backbone; recovery is not possible, restart required.
+[INFO] [1785437992.140768063] [rclcpp]: signal_handler(signum=2)

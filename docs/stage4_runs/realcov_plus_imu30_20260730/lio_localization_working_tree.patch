@@ -1,0 +1,181 @@
+diff --git a/src/laser_scan_matching_node.cpp b/src/laser_scan_matching_node.cpp
+index 3a228db..0cccf8d 100644
+--- a/src/laser_scan_matching_node.cpp
++++ b/src/laser_scan_matching_node.cpp
+@@ -841,12 +841,15 @@ void LaserScanMatchingNode::process_scan(
+ 
+   size_t planar_inliers = 0;
+   double planar_abs_residual = 0.0;
++  // 最終反復のGauss-Newton情報行列(x,y,yaw順、Huber重み込み、正則化前)。
++  // Censi型共分散(cov = wall_cov_range_sigma_^2 * h^-1)をここから直接出す。
++  Eigen::Matrix3d planar_h = Eigen::Matrix3d::Zero();
+   // Each Unity beam is generated as a range measurement with Gaussian noise.  In the
+   // planar point-to-line objective, the same range error is multiplied by the angle
+   // between ray and wall normal.  This direct finite-segment ray model instead uses
+   // residual = measured_range - predicted_range, so it is the matching likelihood.
+   const auto solve_planar_ray_to_wall =
+-    [&](const std::vector<bool> & excluded, const Pose2D & seed) {
++    [&](const std::vector<bool> & excluded, const Pose2D & seed, double gate) {
+       Pose2D pose = seed;
+       for (int iteration = 0; iteration < planar_max_iterations_; ++iteration) {
+         Eigen::Matrix3d h = Eigen::Matrix3d::Zero();
+@@ -889,7 +892,7 @@ void LaserScanMatchingNode::process_scan(
+           if (!std::isfinite(predicted_range)) continue;
+           const double residual = measured_range - predicted_range;
+           const double abs_residual = std::abs(residual);
+-          if (abs_residual > planar_ray_to_wall_gate_) continue;
++          if (abs_residual > gate) continue;
+           const double denominator = chosen_normal.dot(ray_direction);
+           const double numerator = chosen_normal.dot(chosen_a - Eigen::Vector2d{pose.x, pose.y});
+           // d(measured - predicted)/d(x,y,yaw)
+@@ -904,6 +907,7 @@ void LaserScanMatchingNode::process_scan(
+           ++planar_inliers;
+           planar_abs_residual += abs_residual;
+         }
++        planar_h = h;
+         if (planar_inliers < static_cast<size_t>(planar_min_inliers_)) break;
+         h.diagonal().array() += 1e-6;
+         const Eigen::Vector3d delta = -h.ldlt().solve(g);
+@@ -914,7 +918,7 @@ void LaserScanMatchingNode::process_scan(
+       }
+       return pose;
+     };
+-  const auto solve_planar = [&](const std::vector<bool> & excluded, const Pose2D & seed) {
++  const auto solve_planar = [&](const std::vector<bool> & excluded, const Pose2D & seed, double gate) {
+       Pose2D pose = seed;
+       for (int iteration = 0; iteration < planar_max_iterations_; ++iteration) {
+         Eigen::Matrix3d h = Eigen::Matrix3d::Zero();
+@@ -932,7 +936,7 @@ void LaserScanMatchingNode::process_scan(
+           Eigen::Vector2d best_projection = Eigen::Vector2d::Zero();
+           Eigen::Vector2d best_tangent;
+           const double best_d2 = nearest_segment(world, best_projection, best_tangent);
+-          if (best_d2 > planar_correspondence_distance_ * planar_correspondence_distance_) continue;
++          if (best_d2 > gate * gate) continue;
+           const Eigen::Vector2d normal{-best_tangent.y(), best_tangent.x()};
+           const double residual = normal.dot(world - best_projection);
+           const Eigen::Vector2d d_yaw{-s * local.x() - c * local.y(),
+@@ -946,6 +950,7 @@ void LaserScanMatchingNode::process_scan(
+           ++planar_inliers;
+           planar_abs_residual += abs_residual;
+         }
++        planar_h = h;
+         if (planar_inliers < static_cast<size_t>(planar_min_inliers_)) break;
+         h.diagonal().array() += 1e-6;
+         const Eigen::Vector3d delta = -h.ldlt().solve(g);
+@@ -957,6 +962,29 @@ void LaserScanMatchingNode::process_scan(
+       return pose;
+     };
+ 
++  // 粗→細のゲート探索(2026-07-30、ICP改造)。位置側の汎用3D ICPが既に持つ
++  // coarse-to-fine(kCoarseAcceptDistances)と同じ考え方を平面ソルバーにも
++  // 導入した。旋回中にシードのヨーが数度ズレると、最初から最終ゲート
++  // (`planar_correspondence_distance_`/`planar_ray_to_wall_gate_`)で対応点を
++  // 探すと、遠い壁の点(距離×角度誤差で大きくズレる)がゲート外に落ちて
++  // 対応点数が減り、収束が遅れる/浅い局所解に留まる。まず広いゲートで大まかに
++  // 合わせてから徐々に絞ることで、同じ反復回数予算のまま収束半径を広げる
++  // (experiment_history 16番で確認した「旋回中の一過性ピーク」への対処)。
++  static constexpr std::array<double, 2> kPlanarCoarseGateScale{4.0, 2.0};
++  const auto solve_planar_coarse_to_fine =
++    [&](const std::vector<bool> & excluded, const Pose2D & seed) {
++      const double final_gate =
++        planar_use_ray_to_wall_ ? planar_ray_to_wall_gate_ : planar_correspondence_distance_;
++      Pose2D pose = seed;
++      for (const double scale : kPlanarCoarseGateScale) {
++        pose = planar_use_ray_to_wall_ ?
++          solve_planar_ray_to_wall(excluded, pose, final_gate * scale) :
++          solve_planar(excluded, pose, final_gate * scale);
++      }
++      return planar_use_ray_to_wall_ ?
++        solve_planar_ray_to_wall(excluded, pose, final_gate) : solve_planar(excluded, pose, final_gate);
++    };
++
+   // First pass uses every return. Its pose is only needed to decide which returns the map
+   // cannot explain -- it is biased by the very notes we are about to reject, but a ~15 mm
+   // bias does not change whether a return is 120 mm off the map.
+@@ -971,12 +999,11 @@ void LaserScanMatchingNode::process_scan(
+   if (enable_yaw_lost_mode_ && consecutive_planar_invalid_ >= kYawLostModeThreshold) {
+     Pose2D flipped_seed = pose_start;
+     flipped_seed.yaw = wrap_angle_diff(pose_start.yaw + M_PI);
+-    const Pose2D normal_result = planar_use_ray_to_wall_ ?
+-      solve_planar_ray_to_wall({}, pose_start) : solve_planar({}, pose_start);
++    const Pose2D normal_result = solve_planar_coarse_to_fine({}, pose_start);
+     const size_t normal_inliers = planar_inliers;
+     const double normal_residual_sum = planar_abs_residual;
+-    const Pose2D flipped_result = planar_use_ray_to_wall_ ?
+-      solve_planar_ray_to_wall({}, flipped_seed) : solve_planar({}, flipped_seed);
++    const Eigen::Matrix3d normal_h = planar_h;
++    const Pose2D flipped_result = solve_planar_coarse_to_fine({}, flipped_seed);
+     const size_t flipped_inliers = planar_inliers;
+     const double flipped_residual_sum = planar_abs_residual;
+     const bool flipped_wins = flipped_inliers > normal_inliers ||
+@@ -991,14 +1018,14 @@ void LaserScanMatchingNode::process_scan(
+       active_seed = flipped_seed;
+       planar_pose = flipped_result;
+     } else {
+-      // 最後に呼んだのはflipped側なので、採用するoriginal側の値へ復元する。
++      // 最後に呼んだのはflipped側なので、採用するoriginal側の値(hも含め)へ復元する。
+       planar_inliers = normal_inliers;
+       planar_abs_residual = normal_residual_sum;
++      planar_h = normal_h;
+       planar_pose = normal_result;
+     }
+   } else {
+-    planar_pose = planar_use_ray_to_wall_ ?
+-      solve_planar_ray_to_wall({}, active_seed) : solve_planar({}, active_seed);
++    planar_pose = solve_planar_coarse_to_fine({}, active_seed);
+   }
+ 
+   std::vector<bool> planar_excluded;
+@@ -1065,8 +1092,7 @@ void LaserScanMatchingNode::process_scan(
+     flush_cluster();
+ 
+     if (excluded_points > 0) {
+-      planar_pose = planar_use_ray_to_wall_ ?
+-        solve_planar_ray_to_wall(planar_excluded, active_seed) : solve_planar(planar_excluded, active_seed);
++      planar_pose = solve_planar_coarse_to_fine(planar_excluded, active_seed);
+     }
+     RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 5000,
+       "note rejection: %zu/%zu returns unexplained, %zu clusters -> %zu accepted, "
+@@ -1101,7 +1127,6 @@ void LaserScanMatchingNode::process_scan(
+   result.wall.covariance_valid = false;
+   if (planar_valid) {
+     result.wall.valid = true;
+-    result.wall.covariance_valid = true;
+     result.wall.degenerate = false;
+     result.wall.x_axis_degenerate = false;
+     result.wall.y_axis_degenerate = false;
+@@ -1115,7 +1140,33 @@ void LaserScanMatchingNode::process_scan(
+     result.wall.corrected_pose.orientation.y = 0.0;
+     result.wall.corrected_pose.orientation.z = std::sin(planar_pose.yaw * 0.5);
+     result.wall.corrected_pose.orientation.w = std::cos(planar_pose.yaw * 0.5);
+-    result.wall.covariance = {1e-5, 0.0, 0.0, 0.0, 1e-5, 0.0, 0.0, 0.0, 1e-5};
++
++    // --- 平面ソルバーの実共分散(2026-07-30、Censi 2007型) ---
++    // 汎用3D ICP側(上記772行付近)と同じ考え方: 最終反復のGauss-Newton情報行列
++    // planar_h(x,y,yaw順、Huber重み込み、正則化前)から Cov = wall_cov_range_sigma_^2
++    // * h^-1 で共分散を得る。ここのhは各点で `weight * J Jᵀ` を正規化なしに
++    // 積算したもの(標準的な重み付き最小二乗の情報行列そのもの)なので、
++    // 3D ICP側のような追加の /N 補正は不要。backend側(backend_optimizer_node.cpp、
++    // wall_use_icp_covariance_)は既にこの値を「従来のN数ヒューリスティックσを
++    // 下限、縮退σを上限」とするクランプで緩める方向にのみ使うため、旋回中に
++    // ヨー方向の見える壁の向きが偏って情報量が落ちても、③へその劣化がそのまま
++    // 伝わり、固定1e-5の人工値では出せなかった適応的な信頼度調整が働く。
++    Eigen::SelfAdjointEigenSolver<Eigen::Matrix3d> planar_es(planar_h);
++    if (planar_es.info() == Eigen::Success && planar_es.eigenvalues().minCoeff() > 1e-6) {
++      const Eigen::Matrix3d cov_xyyaw =
++        (wall_cov_range_sigma_ * wall_cov_range_sigma_) * planar_h.inverse();
++      // メッセージはcovariance[0]=yaw分散,[4]=x分散,[8]=y分散の(yaw,x,y)対角順を
++      // 期待する(backend_optimizer_node.cppで確認済み)。hは(x,y,yaw)順なので、
++      // メッセージのrow/col i を order[i]でhのindexへ変換する。
++      static constexpr std::array<int, 3> kYawXYOrder{2, 0, 1};
++      for (int r = 0; r < 3; ++r) {
++        for (int c = 0; c < 3; ++c) {
++          result.wall.covariance[static_cast<size_t>(r * 3 + c)] =
++            cov_xyyaw(kYawXYOrder[r], kYawXYOrder[c]);
++        }
++      }
++      result.wall.covariance_valid = true;
++    }
+   }
+ 
+   // --- 円柱観測の抽出 ---

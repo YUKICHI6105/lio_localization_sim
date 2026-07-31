@@ -1,0 +1,6 @@
+[INFO] [1785436867.808407565] [imu_preintegration_node]: imu_preintegration_node started (waiting for first /state_estimate)
+[WARN] [1785436892.643358341] [imu_preintegration_node]: IMU accel anomaly (|a|=22.27 m/s^2 > 20.00): holding /odom_fast extrapolation (count=1) -- likely a collision, no reliable information to integrate
+[WARN] [1785436907.586615940] [imu_preintegration_node]: IMU accel anomaly (|a|=125.87 m/s^2 > 20.00): holding /odom_fast extrapolation (count=4) -- likely a collision, no reliable information to integrate
+[WARN] [1785436923.156418574] [imu_preintegration_node]: IMU accel anomaly (|a|=21.27 m/s^2 > 20.00): holding /odom_fast extrapolation (count=8) -- likely a collision, no reliable information to integrate
+[ros2run]: Received signal:  Interrupt
+[INFO] [1785436939.145828955] [rclcpp]: signal_handler(signum=2)

@@ -1,0 +1,150 @@
+diff --git a/scripts/bag_component_isolation.sh b/scripts/bag_component_isolation.sh
+index 01971dc..35fe7aa 100755
+--- a/scripts/bag_component_isolation.sh
++++ b/scripts/bag_component_isolation.sh
+@@ -1,7 +1,7 @@
+ #!/bin/bash
+ # Replay the reproducible Unity bag with only selected non-core components.
+ # Usage: bag_component_isolation.sh <tag> [--bag path] [--ball] [--endpoint]
+-#        [--record-stages] [--play-rate N] [--post-play-wait N]
++#        [--no-record-stages] [--play-rate N] [--post-play-wait N]
+ #        [--scan-yaw-bias-rad N]
+ #        [--laser-param name:=value] [--backend-param name:=value] [--imu-param name:=value]
+ set -euo pipefail
+@@ -12,9 +12,13 @@ WS=/home/yukichi6105/ros2_ws
+ BAG=/tmp/robocon_unity_88s_20260729.mcap
+ WITH_BALL=false
+ WITH_ENDPOINT=false
+-WITH_STAGE_RECORD=false
++# 2026-07-31(ユーザー指示): ②(壁マッチング)と③(state_estimate)を真値と
++# 突き合わせた誤差は毎回の検証に必要な標準データなので、既定で常時記録する。
++# 必要な場合のみ--no-record-stagesで無効化できる。
++WITH_STAGE_RECORD=true
+ PLAY_RATE=1.0
+ POST_PLAY_WAIT=10
++PLAYBACK_DURATION=62
+ SCAN_YAW_BIAS_RAD=0.0
+ LASER_PARAMS=()
+ BACKEND_PARAMS=()
+@@ -28,12 +32,18 @@ while [ "$#" -gt 0 ]; do
+       ;;
+     --ball) WITH_BALL=true; shift ;;
+     --endpoint) WITH_ENDPOINT=true; shift ;;
+-    --record-stages) WITH_STAGE_RECORD=true; shift ;;
++    --record-stages) WITH_STAGE_RECORD=true; shift ;;  # 既定で有効なので明示指定は不要(後方互換で残す)
++    --no-record-stages) WITH_STAGE_RECORD=false; shift ;;
+     --play-rate)
+       [ "$#" -ge 2 ] || { echo "--play-rate requires a numeric rate" >&2; exit 2; }
+       PLAY_RATE="$2"
+       shift 2
+       ;;
++    --playback-duration)
++      [ "$#" -ge 2 ] || { echo "--playback-duration requires seconds" >&2; exit 2; }
++      PLAYBACK_DURATION="$2"
++      shift 2
++      ;;
+     --post-play-wait)
+       [ "$#" -ge 2 ] || { echo "--post-play-wait requires seconds" >&2; exit 2; }
+       POST_PLAY_WAIT="$2"
+@@ -198,8 +208,15 @@ fi
+ # its initial scan while IMU and ground-truth already stream, which is not a valid
+ # localization trial.
+ sleep 6
+-ros2 bag play "$BAG" --clock 250 --rate "$PLAY_RATE" --playback-duration 62 --disable-keyboard-controls \
+-  "${BAG_REMAP_ARGS[@]}" \
++# Only replay raw sensor/truth topics. Some bags (e.g. a live --topics capture used to
++# check ground truth against the estimator's own live output) also contain the
++# estimator's OUTPUT topics (/odom_fast, /scan_match_result, /state_estimate). Replaying
++# those too would collide with the freshly-launched nodes started above, which publish
++# the same topic names from scratch -- the evaluator then sees an interleaved mix of the
++# bag's old recorded values and this run's newly computed ones and its ground-truth
++# matching breaks silently (observed 2026-07-31: "No /odom_fast samples were matched").
++ros2 bag play "$BAG" --clock 250 --rate "$PLAY_RATE" --playback-duration "$PLAYBACK_DURATION" --disable-keyboard-controls \
++  "${BAG_REMAP_ARGS[@]}" --topics /clock /imu/data /scan /ground_truth_pose /unity_sensor_publish_counts \
+   --progress-bar-update-rate 0 > "$OUT/bag_play.log" 2>&1
+ 
+ # Allow the C++ evaluator to flush its bounded CSV before signalling the
+@@ -217,4 +234,12 @@ if [ -f "$OUT/diag_raw_errors.csv" ]; then
+   python3 "$WS/src/lio_localization_sim/tools/render_eval_plot.py" \
+     "$OUT/diag_raw_errors.csv" "$OUT/sim_eval_plot.png"
+ fi
++# ②/③(と①)を真値と突き合わせた標準比較データを毎回自動生成する
++# (2026-07-31、ユーザー指示: 常時記録・評価できるようにする)。
++if "$WITH_STAGE_RECORD" && [ -d "$OUT/stage_derived" ]; then
++  mkdir -p "$OUT/consolidated"
++  python3 "$WS/src/lio_localization_sim/tools/consolidate_stage_log.py" \
++    "$OUT/stage_derived" "$OUT/consolidated" > "$OUT/consolidate.log" 2>&1 || \
++    echo "WARNING: consolidate_stage_log.py failed, see $OUT/consolidate.log" >&2
++fi
+ echo "DONE: $OUT"
+diff --git a/unity/Robocon2026Sim/Assets/Robocon2026/Scripts/StartToBingoValidation.cs b/unity/Robocon2026Sim/Assets/Robocon2026/Scripts/StartToBingoValidation.cs
+index b2660e2..890020c 100644
+--- a/unity/Robocon2026Sim/Assets/Robocon2026/Scripts/StartToBingoValidation.cs
++++ b/unity/Robocon2026Sim/Assets/Robocon2026/Scripts/StartToBingoValidation.cs
+@@ -601,12 +601,22 @@ namespace Robocon2026.Simulation
+     {
+         private readonly HashSet<string> collisionNames = new();
+         public string CollisionNames => string.Join(",", collisionNames);
++        // UnityRosSensorPublisherはCollisionRecorderと同じGameObjectへBuildRobot内で
++        // 後から追加されるが、Start()は同一フレームの全AddComponent完了後に呼ばれる
++        // ため、ここで取得すれば必ず見つかる(2026-07-31、衝突をbagへ残すため追加)。
++        private UnityRosSensorPublisher publisher;
++
++        private void Start()
++        {
++            publisher = GetComponent<UnityRosSensorPublisher>();
++        }
+ 
+         private void OnCollisionEnter(Collision collision)
+         {
+             if (collision.gameObject.name == "Floor") return;
+             collisionNames.Add(collision.gameObject.name);
+             Debug.LogWarning($"[StartToBingo] Collision with {collision.gameObject.name}");
++            publisher?.PublishCollision(collision.gameObject.name, collision.relativeVelocity.magnitude);
+         }
+     }
+ }
+diff --git a/unity/Robocon2026Sim/Assets/Robocon2026/Scripts/UnityRosSensorPublisher.cs b/unity/Robocon2026Sim/Assets/Robocon2026/Scripts/UnityRosSensorPublisher.cs
+index 6dda3da..1b7c69f 100644
+--- a/unity/Robocon2026Sim/Assets/Robocon2026/Scripts/UnityRosSensorPublisher.cs
++++ b/unity/Robocon2026Sim/Assets/Robocon2026/Scripts/UnityRosSensorPublisher.cs
+@@ -30,6 +30,12 @@ namespace Robocon2026.Simulation
+         // every 250 ms.  ROS receivers compare it with their own counters, so a
+         // rate probe can never be mistaken for an upstream sensor loss.
+         private const string SensorCountTopic = "/unity_sensor_publish_counts";
++        // 2026-07-31: OnCollisionEnter(CollisionRecorder)はこれまでUnity Editorの
++        // Debug.Logにしか出さず、bag再生では衝突の有無を一切確認できなかった。
++        // 旋回直後に真値速度が~200m/s^2相当で急停止する事象の原因切り分け
++        // (経路のセグメント境界問題か、衝突かを区別するため)には衝突情報が
++        // 標準的にbagへ残る必要があるため、ROSトピックとして配信する。
++        private const string CollisionTopic = "/robot_collision";
+ 
+         // Closed-loop control feedback: the localisation stack's own estimate (node ①'s
+         // /odom_fast), consumed by StartToBingoValidation instead of the ground-truth
+@@ -177,6 +183,7 @@ namespace Robocon2026.Simulation
+             ros.RegisterPublisher<LaserScanMsg>(ScanTopic, 80);
+             ros.RegisterPublisher<OdometryMsg>(GroundTruthTopic, 200);
+             ros.RegisterPublisher<StringMsg>(SensorCountTopic, 20);
++            ros.RegisterPublisher<StringMsg>(CollisionTopic, 20);
+             // Register IMU last. Registering the larger message types can briefly block the
+             // endpoint; publishing IMU before that makes the ROS watchdog see a false outage.
+             ros.RegisterPublisher<ImuMsg>(ImuTopic, 2000);
+@@ -324,6 +331,18 @@ namespace Robocon2026.Simulation
+             ros.Publish(SensorCountTopic, new StringMsg(payload));
+         }
+ 
++        // CollisionRecorder(StartToBingoValidation.cs)から呼ばれる。衝突発生時刻・
++        // 相手・衝突時の相対速度をbagへ残し、真値速度の急変が経路由来か衝突由来か
++        // をオフラインで判別できるようにする。
++        public void PublishCollision(string colliderName, float relativeSpeed)
++        {
++            var simulationTime = Time.timeAsDouble - sessionStartTime;
++            var payload = string.Format(CultureInfo.InvariantCulture,
++                "v=1;stamp_ns={0};name={1};relative_speed_mps={2:F4}",
++                (long)Math.Round(simulationTime * 1_000_000_000.0), colliderName, relativeSpeed);
++            ros.Publish(CollisionTopic, new StringMsg(payload));
++        }
++
+         private void PublishImu(TimeMsg stamp, double simulationTime)
+         {
+             // The acceleration sample spans the interval since the last published IMU value,

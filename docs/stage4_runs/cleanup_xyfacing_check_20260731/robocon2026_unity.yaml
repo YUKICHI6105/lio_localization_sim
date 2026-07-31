@@ -1,0 +1,121 @@
+/**:
+  ros__parameters:
+    use_sim_time: true
+    # Unity performs 1081 physics raycasts for its first scan. Allow that one-time
+    # transport stall while retaining the watchdog for sustained IMU loss.
+    # Unity can run slower than wall time at 1 kHz physics.  This remains a
+    # simulation transport watchdog; the real-robot profile keeps 0.3 s.
+    # Measured 2026-07-23: the Unity->ROS transport stalls up to 2.075 s once, right after
+    # the connection comes up (1081 first-scan raycasts plus publisher registration), then
+    # never gaps more than 0.049 s for the rest of a 60 s run. With the timeout at 2.0 s that
+    # one startup stall latched the unrecoverable fail-safe halt and killed whole runs.
+    # Keep the timeout tight and instead hold the watchdog disarmed through the transient.
+    imu_lost_timeout_sec: 2.0
+    imu_watchdog_arm_delay_sec: 10.0
+    # ICM-42688-P (DS-000347) noise density.  Use the conservative Z-axis
+    # accelerometer figure (70 ug/sqrt(Hz)) for all axes: 6.864655e-4 m/s^2/sqrt(Hz).
+    # Gyroscope: 2.8 mdps/sqrt(Hz) = 4.886922e-5 rad/s/sqrt(Hz).
+    # These are continuous-time densities for GTSAM; Unity converts each to
+    # per-sample sigma using density/sqrt(dt) at its 1 kHz publish rate.
+    accelerometer_sigma: 0.000686466
+    gyroscope_sigma: 0.0000488692
+    integration_sigma: 0.00001
+    # Unity now injects a genuine continuous-time random walk on top of the calibrated
+    # starting bias (see UnityRosSensorPublisher.PublishImu, biasRandomWalkSigma), so this
+    # must match what is actually injected rather than assume a fixed bias.
+    # (2026-07-28: bias/random-walk/sensor-noise isolation tests confirmed the
+    # deceleration-linked spikes are independent of all three; reverted to adopted values.)
+    bias_acc_random_walk_sigma: 0.0001
+    bias_gyro_random_walk_sigma: 0.0001
+    # Values obtained by the startup stationary calibration for this simulated
+    # IMU instance.  Real hardware must populate these from its own calibration.
+    initial_bias_accel_x: 0.05
+    initial_bias_accel_y: -0.03
+    initial_bias_accel_z: 0.0
+    initial_bias_gyro_x: 0.0
+    initial_bias_gyro_y: 0.0
+    initial_bias_gyro_z: 0.005
+    lpf_tau: 0.005
+    # A wall-map absolute factor arrives at every 40 Hz scan. Keeping 1.5 s of
+    # states made individual iSAM2 updates miss the next scan under WSL/Unity
+    # load; 0.5 s retains 20 constrained states while reducing correction latency.
+    smoother_lag_sec: 0.5
+    # During calibration, retain the continuous IMU solution if a scan is rejected;
+    # do not reset to an older, possibly biased scan anchor.
+    dropout_error_sec: 120.0
+    # 2026-07-28: tightening relinearize_threshold to 0.001 (from the adopted 0.01)
+    # gave no RMSE/max improvement (6.81mm/13.45mm, same range as every other
+    # variant tried) while adding more slow-smoother-update warnings (11 vs 1-2).
+    # Reverted. Smoother relinearization lag is not the cause either.
+    relinearize_threshold: 0.01
+    # ZUPT (2026-07-28, backend defaults to zupt_enabled=false): tried
+    # thresholds 0.1/0.3/0.5 m/s. 0.5 caused a 27.92mm max spike (forced
+    # v=0 while still moving); 0.1/0.3 gave only marginal RMSE gains and
+    # never fixed the max-error FAIL.
+    # imu_dynamics_* (accel/gyro-threshold wall-sigma tightening) removed
+    # 2026-07-31: dead code, always disabled and shown ineffective/wrong-
+    # direction (see docs/experiment_history/22 for the removal rationale).
+
+    # Inner faces of the 33 mm perimeter wall in Unity.
+    field_width: 5.572
+    field_height: 3.310
+    wall_thickness: 0.033
+
+    # Known non-perimeter surfaces: centre wall, four slalom baffles and the
+    # four physical vertical bingo posts (not a fictitious rectangular envelope).
+    wall_segment_x1: [-2.8025, -0.779, -0.779, 0.021, 0.021, 1.866, 2.166, 2.466, 2.766]
+    wall_segment_y1: [ 0.0000,  0.869, -1.669, 0.019, -0.819, -0.300, -0.300, -0.300, -0.300]
+    wall_segment_x2: [ 1.8460, -0.779, -0.779, 0.021, 0.021, 1.866, 2.166, 2.466, 2.766]
+    wall_segment_y2: [ 0.0000,  1.669, -0.869, 0.819, -0.019,  0.300,  0.300,  0.300,  0.300]
+
+    initial_x: -2.419
+    initial_y: 1.354
+    initial_theta: 0.0
+
+    # Competition notes are 150 mm diameter.
+    ball_radius_min: 0.065
+    ball_radius_max: 0.085
+    ball_fit_residual_max: 0.020
+    ball_cluster_min_points: 4
+    # ノーツ候補のscan-index連続だけでは遠方の壁ノイズまで同一クラスタになる。
+    # 候補点間が100mmを超えて空間的に飛べば別クラスタへ分け、ノーツ除外を維持する。
+    ball_exclusion_max_adjacent_gap: 0.100
+
+    # ノーツ除外の空間分割後も80mmを超える誤対応は残るため、対応候補を
+    # 80mmへ制限する。同一62秒固定bagで最大10.79mm（80mm未適用では11.18mm）。
+    scan_decimation: 2
+    accept_distance: 0.20
+    max_icp_loops: 10
+    min_wall_inliers: 20
+    wall_max_mean_residual: 0.090
+    wall_min_inlier_ratio: 0.40
+    planar_max_iterations: 10
+    planar_min_inliers: 40
+    planar_correspondence_distance: 0.08
+    planar_huber_delta: 0.025
+    planar_max_mean_residual: 0.060
+    planar_max_shift: 0.120
+    # 2026-07-30: 実ヨー回転を初めて有効化した際、この値を0.080rad(約4.6°)から
+    # 緩めても発散そのものは解消しなかった(真因はUnity側の3つのバグ、
+    # experiment_history 16番参照)。真因を修正した後の検証(bag再生)はこの
+    # 0.700radの状態で行っており、target_limits.max_yaw_rate(2π rad/s)×
+    # スキャン周期(25ms)の数周期分の遅れを許容できる値として妥当と判断し
+    # 維持している。0.080radへ戻した場合の再検証はまだ行っていない。
+    # 壁のπ反転(180°)誤ロック対策はbackend側のwall_gate_yaw_(既定1.2rad)が
+    # 別途担うため、ここは1.2radより十分小さい値に留める。
+    planar_max_yaw_shift: 0.700
+    # Unity emits per-ray Gaussian range noise.  Match it directly against finite
+    # mapped walls rather than projecting it into a point-to-line residual.
+    planar_use_ray_to_wall: true
+    planar_ray_to_wall_gate: 0.120
+    # Hokuyo UTM-30LX repeat accuracy is sigma<10mm at 0.1--10m indoors.
+    # This is the raw per-ray likelihood; wall_cov_inflation remains the
+    # deliberate estimator-side margin for geometric/model correlation.
+    wall_cov_range_sigma: 0.010
+    # planar pathの局所Hessianは誤対応・フレーム間相関を表現しない。共分散を
+    # 2倍に緩め、短時間のwall観測スパイクがfixed-lag smootherへ残留するのを防ぐ。
+    # gap=100mm/corr=80mmの固定bagで最大位置誤差9.54mmを確認。
+    wall_cov_inflation: 2.0
+    wall_use_icp_covariance: true
+    wall_prior_base_xy_sigma: 0.030
+    wall_prior_base_yaw_sigma: 0.30

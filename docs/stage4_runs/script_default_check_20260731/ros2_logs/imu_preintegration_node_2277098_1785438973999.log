@@ -1,0 +1,5 @@
+[INFO] [1785438974.043337222] [imu_preintegration_node]: imu_preintegration_node started (waiting for first /state_estimate)
+[WARN] [1785438998.866859560] [imu_preintegration_node]: IMU accel anomaly (|a|=22.27 m/s^2 > 20.00): clipping to threshold before integrating (count=1) -- likely a collision, not a modelled dynamic
+[WARN] [1785439013.810314410] [imu_preintegration_node]: IMU accel anomaly (|a|=125.87 m/s^2 > 20.00): clipping to threshold before integrating (count=4) -- likely a collision, not a modelled dynamic
+[WARN] [1785439029.380033266] [imu_preintegration_node]: IMU accel anomaly (|a|=21.27 m/s^2 > 20.00): clipping to threshold before integrating (count=8) -- likely a collision, not a modelled dynamic
+[INFO] [1785439045.094907498] [rclcpp]: signal_handler(signum=2)

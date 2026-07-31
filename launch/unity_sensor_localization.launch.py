@@ -32,7 +32,10 @@ def generate_launch_description():
             name='imu_preintegration_node', parameters=common, output='screen'),
         Node(
             package='lio_localization', executable='backend_optimizer_node',
-            name='backend_optimizer_node', parameters=[config, backend_initial], output='screen'),
+            name='backend_optimizer_node', parameters=[config, backend_initial], output='screen',
+            # パーティクル再収束(relocalization_event)時にbackendは自己終了して
+            # respawnに復帰を委ねる(docs/experiment_history/22番以降参照)。
+            respawn=True, respawn_delay=0.2),
         Node(
             package='lio_localization', executable='laser_scan_matching_node',
             name='laser_scan_matching_node', parameters=[config, initial_pose], output='screen'),

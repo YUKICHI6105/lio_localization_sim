@@ -1,0 +1,12 @@
+run_tag=sweep_bias_10x_tighter
+mode=bag_component_isolation
+with_ball=false
+with_endpoint=false
+with_stage_record=false
+play_rate=1.0
+post_play_wait=10
+scan_yaw_bias_rad=0.0
+laser_params=
+backend_params=-p wall_prior_base_yaw_sigma:=0.15 -p gyroscope_sigma:=0.001466076 -p accelerometer_sigma:=0.02059398 -p integration_sigma:=0.0003 -p bias_acc_random_walk_sigma:=0.00001 -p bias_gyro_random_walk_sigma:=0.00001
+bag=/tmp/robocon_angvel_fix_gyrosign_20260730.mcap
+started_at=2026-07-30T23:35:23+09:00

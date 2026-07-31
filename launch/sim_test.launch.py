@@ -93,7 +93,10 @@ def launch_setup(context, *args, **kwargs):
         parameters=[field_config, {
             'initial_x': s0.x, 'initial_y': s0.y, 'initial_theta': s0.yaw,
             'initial_vx': s0.vx, 'initial_vy': s0.vy}],
-        output='screen')
+        output='screen',
+        # パーティクル再収束(relocalization_event)時にbackendは自己終了して
+        # respawnに復帰を委ねる(docs/experiment_history/22番以降参照)。
+        respawn=True, respawn_delay=0.2)
     scan_matching_node = Node(
         package='lio_localization', executable='laser_scan_matching_node',
         name='laser_scan_matching_node',

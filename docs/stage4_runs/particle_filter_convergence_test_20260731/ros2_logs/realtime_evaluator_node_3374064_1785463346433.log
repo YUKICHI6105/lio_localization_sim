@@ -1,0 +1,10 @@
+[INFO] [1785463346.456875528] [realtime_evaluator_node]: C++ realtime evaluator started: measuring 60.0s from first ground truth
+[INFO] [1785463352.198080129] [realtime_evaluator_node]: first ground truth received; measurement window started
+[INFO] [1785463357.198095794] [realtime_evaluator_node]: t=5.0s  recent 5s: pos_err mean=4152.20mm max=4153.62mm samples=5158 balls=0
+[INFO] [1785463362.198101009] [realtime_evaluator_node]: t=10.0s  recent 5s: pos_err mean=4138.52mm max=4152.52mm samples=10359 balls=0
+[INFO] [1785463367.198019380] [realtime_evaluator_node]: t=15.0s  recent 5s: pos_err mean=3017.48mm max=4396.67mm samples=15558 balls=0
+[INFO] [1785463372.197978924] [realtime_evaluator_node]: t=20.0s  recent 5s: pos_err mean=2268.15mm max=2280.50mm samples=20758 balls=0
+[INFO] [1785463377.198076046] [realtime_evaluator_node]: t=25.0s  recent 5s: pos_err mean=2218.69mm max=2276.37mm samples=25958 balls=0
+[INFO] [1785463382.197935597] [realtime_evaluator_node]: t=30.0s  recent 5s: pos_err mean=1918.97mm max=2116.85mm samples=31158 balls=0
+[INFO] [1785463387.198337513] [realtime_evaluator_node]: t=35.0s  recent 5s: pos_err mean=1374.27mm max=1674.42mm samples=36358 balls=0
+[INFO] [1785463412.169255959] [rclcpp]: signal_handler(signum=2)

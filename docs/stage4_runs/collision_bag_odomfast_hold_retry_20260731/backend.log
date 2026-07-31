@@ -1,0 +1,10 @@
+[INFO] [1785436867.836256688] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[INFO] [1785436867.836585887] [backend_optimizer_node]: backend_optimizer_node started (0 cylinders registered)
+[WARN] [1785436897.806510147] [backend_optimizer_node]: slow smoother update: 23.7ms (index 851)
+[WARN] [1785436923.394434060] [backend_optimizer_node]: slow smoother update: 38.5ms (index 1826)
+[WARN] [1785436930.385184064] [backend_optimizer_node]: slow smoother update: 23.9ms (index 2094)
+[WARN] [1785436936.530368984] [backend_optimizer_node]: slow smoother update: 87.0ms (index 2325)
+[WARN] [1785436937.775104972] [backend_optimizer_node]: slow smoother update: 87.3ms (index 2367)
+[ros2run]: Received signal:  Interrupt
+[INFO] [1785436939.150166998] [rclcpp]: signal_handler(signum=2)
+[INFO] [1785436939.155868466] [backend_optimizer_node]: backend concurrency stats: imu_callbacks=60065, during_worker=3140 (5.2%), during_smoother=2328 (3.9%), callback_gap_max=201.966ms, gaps>2ms=9189, gaps>10ms=1011; stamp_gap_max=1.000ms, gaps>1ms=0; ring_enqueue_max=2.440ms, enqueues>2ms=1; callback_duration_max=18.072ms, durations>2ms=14; worker_jobs=2402 mean/max=1.484/87.818ms; smoother_updates=2402 mean/max=1.126/87.318ms; unity_audit reports=241 source_imu_last=60251 receiver_at_last_report=60013 final_receiver=60065

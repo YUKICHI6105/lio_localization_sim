@@ -1,0 +1,47 @@
+[INFO] [1785464640.199778001] [laser_scan_matching_node]: laser_scan_matching_node started (0 cylinders, 9 internal walls, field 5.572x3.310m, initial seed=(1.000, -1.000, 1.570))
+[INFO] [1785464646.318051789] [laser_scan_matching_node]: note rejection: 537/541 returns unexplained, 3 clusters -> 0 accepted, 0 points dropped (last extent=1.4531m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[WARN] [1785464647.688419983] [laser_scan_matching_node]: IMU coverage wait exceeded 0.050s, processing scan with extrapolated tail
+[ERROR] [1785464649.755046427] [laser_scan_matching_node]: PARTICLE RELOCALIZATION ACTIVATED: scattering 1000 particles across the field. This means self-localization already failed upstream -- treat every activation as a bug to root-cause, not as a working recovery path.
+[ERROR] [1785464650.655036122] [laser_scan_matching_node]: PARTICLE RELOCALIZATION CONVERGED: (0.354, -0.298, 2.9deg). Resuming normal tracking -- this recovery working does not excuse root-causing why localization was lost.
+[INFO] [1785464651.320440783] [laser_scan_matching_node]: note rejection: 59/541 returns unexplained, 1 clusters -> 0 accepted, 0 points dropped (last extent=0.7844m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[ERROR] [1785464653.489026856] [laser_scan_matching_node]: PARTICLE RELOCALIZATION ACTIVATED: scattering 1000 particles across the field. This means self-localization already failed upstream -- treat every activation as a bug to root-cause, not as a working recovery path.
+[ERROR] [1785464653.693912438] [laser_scan_matching_node]: PARTICLE RELOCALIZATION CONVERGED: (-2.471, 1.272, 8.0deg). Resuming normal tracking -- this recovery working does not excuse root-causing why localization was lost.
+[ERROR] [1785464655.836460486] [laser_scan_matching_node]: PARTICLE RELOCALIZATION ACTIVATED: scattering 1000 particles across the field. This means self-localization already failed upstream -- treat every activation as a bug to root-cause, not as a working recovery path.
+[ERROR] [1785464656.227347382] [laser_scan_matching_node]: PARTICLE RELOCALIZATION CONVERGED: (-2.403, 1.358, -1.0deg). Resuming normal tracking -- this recovery working does not excuse root-causing why localization was lost.
+[INFO] [1785464656.354943202] [laser_scan_matching_node]: note rejection: 537/541 returns unexplained, 3 clusters -> 0 accepted, 0 points dropped (last extent=1.4438m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[ERROR] [1785464658.302035794] [laser_scan_matching_node]: PARTICLE RELOCALIZATION ACTIVATED: scattering 1000 particles across the field. This means self-localization already failed upstream -- treat every activation as a bug to root-cause, not as a working recovery path.
+[ERROR] [1785464658.533904585] [laser_scan_matching_node]: PARTICLE RELOCALIZATION CONVERGED: (-2.396, 1.289, 0.6deg). Resuming normal tracking -- this recovery working does not excuse root-causing why localization was lost.
+[WARN] [1785464659.286458700] [laser_scan_matching_node]: wall match rejected by quality check: mean_residual=0.094m (<=0.090) inlier_ratio=0.62 (>=0.40)
+[INFO] [1785464661.354200960] [laser_scan_matching_node]: note rejection: 510/541 returns unexplained, 7 clusters -> 2 accepted, 18 points dropped (last extent=0.7929m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[WARN] [1785464661.380260423] [laser_scan_matching_node]: wall match rejected by quality check: mean_residual=0.092m (<=0.090) inlier_ratio=0.64 (>=0.40)
+[WARN] [1785464664.473459163] [laser_scan_matching_node]: wall match rejected by quality check: mean_residual=0.091m (<=0.090) inlier_ratio=0.42 (>=0.40)
+[INFO] [1785464666.379738941] [laser_scan_matching_node]: note rejection: 470/541 returns unexplained, 8 clusters -> 3 accepted, 24 points dropped (last extent=0.0161m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[WARN] [1785464668.087397255] [laser_scan_matching_node]: wall match rejected by quality check: mean_residual=0.094m (<=0.090) inlier_ratio=0.57 (>=0.40)
+[WARN] [1785464670.342870560] [laser_scan_matching_node]: wall match rejected by quality check: mean_residual=0.096m (<=0.090) inlier_ratio=0.51 (>=0.40)
+[INFO] [1785464671.393512989] [laser_scan_matching_node]: note rejection: 470/541 returns unexplained, 17 clusters -> 14 accepted, 202 points dropped (last extent=0.3406m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[WARN] [1785464673.552655003] [laser_scan_matching_node]: wall match rejected by quality check: mean_residual=0.091m (<=0.090) inlier_ratio=0.65 (>=0.40)
+[WARN] [1785464675.584571262] [laser_scan_matching_node]: wall match rejected by quality check: mean_residual=0.094m (<=0.090) inlier_ratio=0.62 (>=0.40)
+[INFO] [1785464676.401540366] [laser_scan_matching_node]: note rejection: 511/541 returns unexplained, 7 clusters -> 2 accepted, 17 points dropped (last extent=0.7986m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[WARN] [1785464679.526459240] [laser_scan_matching_node]: wall match rejected by quality check: mean_residual=0.102m (<=0.090) inlier_ratio=0.42 (>=0.40)
+[INFO] [1785464681.413887157] [laser_scan_matching_node]: note rejection: 522/541 returns unexplained, 6 clusters -> 2 accepted, 36 points dropped (last extent=0.0519m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[WARN] [1785464681.543514303] [laser_scan_matching_node]: wall match rejected by quality check: mean_residual=0.097m (<=0.090) inlier_ratio=0.46 (>=0.40)
+[WARN] [1785464683.740151692] [laser_scan_matching_node]: wall match rejected by quality check: mean_residual=0.099m (<=0.090) inlier_ratio=0.60 (>=0.40)
+[WARN] [1785464685.992988904] [laser_scan_matching_node]: wall match rejected by quality check: mean_residual=0.100m (<=0.090) inlier_ratio=0.44 (>=0.40)
+[INFO] [1785464686.432564977] [laser_scan_matching_node]: note rejection: 431/541 returns unexplained, 13 clusters -> 10 accepted, 150 points dropped (last extent=1.4417m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[WARN] [1785464688.200929796] [laser_scan_matching_node]: wall match rejected by quality check: mean_residual=0.079m (<=0.090) inlier_ratio=0.13 (>=0.40)
+[ERROR] [1785464688.767407286] [laser_scan_matching_node]: PARTICLE RELOCALIZATION ACTIVATED: scattering 1000 particles across the field. This means self-localization already failed upstream -- treat every activation as a bug to root-cause, not as a working recovery path.
+[ERROR] [1785464689.155545820] [laser_scan_matching_node]: PARTICLE RELOCALIZATION CONVERGED: (-2.369, 1.376, 166.0deg). Resuming normal tracking -- this recovery working does not excuse root-causing why localization was lost.
+[ERROR] [1785464689.160754124] [laser_scan_matching_node]: PARTICLE RELOCALIZATION ACTIVATED: scattering 1000 particles across the field. This means self-localization already failed upstream -- treat every activation as a bug to root-cause, not as a working recovery path.
+[WARN] [1785464690.534034515] [laser_scan_matching_node]: wall match rejected by quality check: mean_residual=0.090m (<=0.090) inlier_ratio=0.73 (>=0.40)
+[INFO] [1785464691.447449594] [laser_scan_matching_node]: note rejection: 445/541 returns unexplained, 14 clusters -> 10 accepted, 151 points dropped (last extent=0.1635m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[WARN] [1785464693.848184865] [laser_scan_matching_node]: wall match rejected by quality check: mean_residual=0.095m (<=0.090) inlier_ratio=0.48 (>=0.40)
+[INFO] [1785464696.470275928] [laser_scan_matching_node]: note rejection: 526/541 returns unexplained, 8 clusters -> 2 accepted, 40 points dropped (last extent=0.0476m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[WARN] [1785464696.725948846] [laser_scan_matching_node]: wall match rejected by quality check: mean_residual=0.099m (<=0.090) inlier_ratio=0.46 (>=0.40)
+[WARN] [1785464698.901071127] [laser_scan_matching_node]: wall match rejected by quality check: mean_residual=0.099m (<=0.090) inlier_ratio=0.58 (>=0.40)
+[WARN] [1785464701.359338509] [laser_scan_matching_node]: wall match rejected by quality check: mean_residual=0.098m (<=0.090) inlier_ratio=0.53 (>=0.40)
+[INFO] [1785464701.500255797] [laser_scan_matching_node]: note rejection: 479/541 returns unexplained, 14 clusters -> 9 accepted, 69 points dropped (last extent=1.0262m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[WARN] [1785464703.506800572] [laser_scan_matching_node]: wall match rejected by quality check: mean_residual=0.082m (<=0.090) inlier_ratio=0.30 (>=0.40)
+[WARN] [1785464705.827672012] [laser_scan_matching_node]: wall match rejected by quality check: mean_residual=0.091m (<=0.090) inlier_ratio=0.73 (>=0.40)
+[INFO] [1785464706.515115112] [laser_scan_matching_node]: note rejection: 490/541 returns unexplained, 8 clusters -> 4 accepted, 49 points dropped (last extent=1.9730m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[ERROR] [1785464706.826782026] [laser_scan_matching_node]: PARTICLE RELOCALIZATION CONVERGED: (0.332, 0.518, -149.3deg). Resuming normal tracking -- this recovery working does not excuse root-causing why localization was lost.
+[INFO] [1785464728.417153995] [rclcpp]: signal_handler(signum=2)

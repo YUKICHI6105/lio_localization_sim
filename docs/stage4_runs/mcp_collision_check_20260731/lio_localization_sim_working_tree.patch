@@ -1,0 +1,71 @@
+diff --git a/unity/Robocon2026Sim/Assets/Robocon2026/Scripts/StartToBingoValidation.cs b/unity/Robocon2026Sim/Assets/Robocon2026/Scripts/StartToBingoValidation.cs
+index b2660e2..890020c 100644
+--- a/unity/Robocon2026Sim/Assets/Robocon2026/Scripts/StartToBingoValidation.cs
++++ b/unity/Robocon2026Sim/Assets/Robocon2026/Scripts/StartToBingoValidation.cs
+@@ -601,12 +601,22 @@ namespace Robocon2026.Simulation
+     {
+         private readonly HashSet<string> collisionNames = new();
+         public string CollisionNames => string.Join(",", collisionNames);
++        // UnityRosSensorPublisherはCollisionRecorderと同じGameObjectへBuildRobot内で
++        // 後から追加されるが、Start()は同一フレームの全AddComponent完了後に呼ばれる
++        // ため、ここで取得すれば必ず見つかる(2026-07-31、衝突をbagへ残すため追加)。
++        private UnityRosSensorPublisher publisher;
++
++        private void Start()
++        {
++            publisher = GetComponent<UnityRosSensorPublisher>();
++        }
+ 
+         private void OnCollisionEnter(Collision collision)
+         {
+             if (collision.gameObject.name == "Floor") return;
+             collisionNames.Add(collision.gameObject.name);
+             Debug.LogWarning($"[StartToBingo] Collision with {collision.gameObject.name}");
++            publisher?.PublishCollision(collision.gameObject.name, collision.relativeVelocity.magnitude);
+         }
+     }
+ }
+diff --git a/unity/Robocon2026Sim/Assets/Robocon2026/Scripts/UnityRosSensorPublisher.cs b/unity/Robocon2026Sim/Assets/Robocon2026/Scripts/UnityRosSensorPublisher.cs
+index 6dda3da..1b7c69f 100644
+--- a/unity/Robocon2026Sim/Assets/Robocon2026/Scripts/UnityRosSensorPublisher.cs
++++ b/unity/Robocon2026Sim/Assets/Robocon2026/Scripts/UnityRosSensorPublisher.cs
+@@ -30,6 +30,12 @@ namespace Robocon2026.Simulation
+         // every 250 ms.  ROS receivers compare it with their own counters, so a
+         // rate probe can never be mistaken for an upstream sensor loss.
+         private const string SensorCountTopic = "/unity_sensor_publish_counts";
++        // 2026-07-31: OnCollisionEnter(CollisionRecorder)はこれまでUnity Editorの
++        // Debug.Logにしか出さず、bag再生では衝突の有無を一切確認できなかった。
++        // 旋回直後に真値速度が~200m/s^2相当で急停止する事象の原因切り分け
++        // (経路のセグメント境界問題か、衝突かを区別するため)には衝突情報が
++        // 標準的にbagへ残る必要があるため、ROSトピックとして配信する。
++        private const string CollisionTopic = "/robot_collision";
+ 
+         // Closed-loop control feedback: the localisation stack's own estimate (node ①'s
+         // /odom_fast), consumed by StartToBingoValidation instead of the ground-truth
+@@ -177,6 +183,7 @@ namespace Robocon2026.Simulation
+             ros.RegisterPublisher<LaserScanMsg>(ScanTopic, 80);
+             ros.RegisterPublisher<OdometryMsg>(GroundTruthTopic, 200);
+             ros.RegisterPublisher<StringMsg>(SensorCountTopic, 20);
++            ros.RegisterPublisher<StringMsg>(CollisionTopic, 20);
+             // Register IMU last. Registering the larger message types can briefly block the
+             // endpoint; publishing IMU before that makes the ROS watchdog see a false outage.
+             ros.RegisterPublisher<ImuMsg>(ImuTopic, 2000);
+@@ -324,6 +331,18 @@ namespace Robocon2026.Simulation
+             ros.Publish(SensorCountTopic, new StringMsg(payload));
+         }
+ 
++        // CollisionRecorder(StartToBingoValidation.cs)から呼ばれる。衝突発生時刻・
++        // 相手・衝突時の相対速度をbagへ残し、真値速度の急変が経路由来か衝突由来か
++        // をオフラインで判別できるようにする。
++        public void PublishCollision(string colliderName, float relativeSpeed)
++        {
++            var simulationTime = Time.timeAsDouble - sessionStartTime;
++            var payload = string.Format(CultureInfo.InvariantCulture,
++                "v=1;stamp_ns={0};name={1};relative_speed_mps={2:F4}",
++                (long)Math.Round(simulationTime * 1_000_000_000.0), colliderName, relativeSpeed);
++            ros.Publish(CollisionTopic, new StringMsg(payload));
++        }
++
+         private void PublishImu(TimeMsg stamp, double simulationTime)
+         {
+             // The acceleration sample spans the interval since the last published IMU value,

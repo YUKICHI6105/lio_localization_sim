@@ -1,0 +1,3 @@
+[INFO] [1785420492.588643877] [imu_preintegration_node]: imu_preintegration_node started (waiting for first /state_estimate)
+[ERROR] [1785420540.988901571] [imu_preintegration_node]: IMU signal LOST (no IMU for 2.00s > 2.00s): stopping /odom_fast. IMU is the dead-reckoning backbone; recovery is not possible, restart required.
+[INFO] [1785420549.358216936] [rclcpp]: signal_handler(signum=2)

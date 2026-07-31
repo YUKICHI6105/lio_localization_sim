@@ -1,0 +1,6 @@
+[INFO] [1785438245.603885871] [imu_preintegration_node]: imu_preintegration_node started (waiting for first /state_estimate)
+[WARN] [1785438270.443766892] [imu_preintegration_node]: IMU accel anomaly (|a|=22.27 m/s^2 > 20.00): clipping to threshold before integrating (count=1) -- likely a collision, not a modelled dynamic
+[WARN] [1785438285.386937291] [imu_preintegration_node]: IMU accel anomaly (|a|=125.87 m/s^2 > 20.00): clipping to threshold before integrating (count=4) -- likely a collision, not a modelled dynamic
+[WARN] [1785438300.956886115] [imu_preintegration_node]: IMU accel anomaly (|a|=21.27 m/s^2 > 20.00): clipping to threshold before integrating (count=8) -- likely a collision, not a modelled dynamic
+[ros2run]: Received signal:  Interrupt
+[INFO] [1785438316.639970097] [rclcpp]: signal_handler(signum=2)

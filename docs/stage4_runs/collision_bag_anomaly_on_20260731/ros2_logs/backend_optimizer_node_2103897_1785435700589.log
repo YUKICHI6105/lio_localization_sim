@@ -1,0 +1,7 @@
+[INFO] [1785435700.633182335] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[INFO] [1785435700.633861909] [backend_optimizer_node]: backend_optimizer_node started (0 cylinders registered)
+[WARN] [1785435720.629717645] [backend_optimizer_node]: slow smoother update: 26.3ms (index 462)
+[WARN] [1785435725.502161129] [backend_optimizer_node]: IMU accel anomaly detected (|a|=22.27 m/s^2 > 20.00): inflating IMU sigma 100x (count=1) -- likely a collision, not a modelled dynamic
+[WARN] [1785435740.429024173] [backend_optimizer_node]: IMU accel anomaly detected (|a|=125.87 m/s^2 > 20.00): inflating IMU sigma 100x (count=2) -- likely a collision, not a modelled dynamic
+[WARN] [1785435755.989358136] [backend_optimizer_node]: IMU accel anomaly detected (|a|=21.27 m/s^2 > 20.00): inflating IMU sigma 100x (count=3) -- likely a collision, not a modelled dynamic
+[INFO] [1785435771.699662708] [rclcpp]: signal_handler(signum=2)

@@ -1,0 +1,12 @@
+run_tag=wallsigma_diag_realcov_imu30_20260730
+mode=bag_component_isolation
+with_ball=false
+with_endpoint=false
+with_stage_record=false
+play_rate=1.0
+post_play_wait=10
+scan_yaw_bias_rad=0.0
+laser_params=
+backend_params=-p wall_prior_base_yaw_sigma:=0.15 -p diag_wall_sigma_path:=/tmp/claude-1000/-home-yukichi6105-ros2-ws/d0c71ade-5045-47b6-8a1e-14b5a3138d00/scratchpad/wall_sigma_diag.csv
+bag=/tmp/robocon_angvel_fix_gyrosign_20260730.mcap
+started_at=2026-07-30T23:58:01+09:00

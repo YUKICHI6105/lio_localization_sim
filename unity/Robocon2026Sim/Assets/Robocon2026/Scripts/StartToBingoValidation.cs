@@ -601,12 +601,22 @@ namespace Robocon2026.Simulation
     {
         private readonly HashSet<string> collisionNames = new();
         public string CollisionNames => string.Join(",", collisionNames);
+        // UnityRosSensorPublisherはCollisionRecorderと同じGameObjectへBuildRobot内で
+        // 後から追加されるが、Start()は同一フレームの全AddComponent完了後に呼ばれる
+        // ため、ここで取得すれば必ず見つかる(2026-07-31、衝突をbagへ残すため追加)。
+        private UnityRosSensorPublisher publisher;
+
+        private void Start()
+        {
+            publisher = GetComponent<UnityRosSensorPublisher>();
+        }
 
         private void OnCollisionEnter(Collision collision)
         {
             if (collision.gameObject.name == "Floor") return;
             collisionNames.Add(collision.gameObject.name);
             Debug.LogWarning($"[StartToBingo] Collision with {collision.gameObject.name}");
+            publisher?.PublishCollision(collision.gameObject.name, collision.relativeVelocity.magnitude);
         }
     }
 }

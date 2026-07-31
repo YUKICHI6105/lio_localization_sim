@@ -1,0 +1,343 @@
+[INFO] [1785466026.813667036] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[INFO] [1785466026.813927655] [backend_optimizer_node]: backend_optimizer_node started (0 cylinders registered)
+[WARN] [1785466034.896059176] [backend_optimizer_node]: LiDAR wall correction unavailable for 0.75s (> 0.75s): drifting on IMU dead-reckoning
+[ERROR] [1785466036.713421519] [backend_optimizer_node]: PARTICLE RELOCALIZATION ACCEPTED BY BACKEND: bypassing wall gate (d_xy=1.40m d_yaw=1.57rad would have been rejected), rebuilding graph at (1.48, 0.32, 3.14)
+[INFO] [1785466036.713900714] [backend_optimizer_node]: graph (re)initialized at X0=(1.485, 0.317, 3.141) V0=(0.002, -0.002)
+[ERROR] [1785466036.718155413] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=92 new_index=93 graph_size=1 values_size=3
+[ERROR] [1785466037.241523162] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466037.241818098] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[WARN] [1785466037.292783590] [backend_optimizer_node]: wall correction rejected by gate: d_xy=1.40m d_yaw=1.57rad (1 consecutive)
+[ERROR] [1785466037.292945729] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=94 new_index=95 graph_size=1 values_size=3
+[ERROR] [1785466037.756558986] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466037.756830829] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466037.796790749] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=96 new_index=97 graph_size=1 values_size=3
+[ERROR] [1785466038.302903532] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466038.303221704] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466038.348030626] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=98 new_index=99 graph_size=1 values_size=3
+[ERROR] [1785466038.841338398] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466038.841638371] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466038.867776778] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=100 new_index=101 graph_size=1 values_size=3
+[ERROR] [1785466039.361960994] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466039.362278198] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466039.391399649] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=102 new_index=103 graph_size=1 values_size=3
+[ERROR] [1785466039.876419761] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466039.876741213] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466039.904000461] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=104 new_index=105 graph_size=1 values_size=3
+[ERROR] [1785466040.428690348] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466040.429060094] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466040.468213571] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=106 new_index=107 graph_size=1 values_size=3
+[ERROR] [1785466040.950203763] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466040.950760385] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466040.970012015] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=108 new_index=109 graph_size=1 values_size=3
+[ERROR] [1785466041.495000522] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466041.495340747] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466041.523368541] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=110 new_index=111 graph_size=1 values_size=3
+[ERROR] [1785466042.026950577] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466042.027308275] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466042.053474708] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=112 new_index=113 graph_size=1 values_size=3
+[ERROR] [1785466042.559114177] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466042.559438661] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466042.592769238] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=114 new_index=115 graph_size=1 values_size=3
+[ERROR] [1785466043.060997581] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466043.061314163] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466043.086301413] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=116 new_index=117 graph_size=1 values_size=3
+[ERROR] [1785466043.573758523] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466043.574062469] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466043.598560703] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=118 new_index=119 graph_size=1 values_size=3
+[ERROR] [1785466044.087921480] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466044.088338533] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466044.122441002] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=120 new_index=121 graph_size=1 values_size=3
+[ERROR] [1785466044.604484792] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466044.604797188] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466044.638703122] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=122 new_index=123 graph_size=1 values_size=3
+[ERROR] [1785466045.105816752] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466045.106181988] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466045.146461455] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=124 new_index=125 graph_size=1 values_size=3
+[ERROR] [1785466045.670724278] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466045.671037745] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466045.711564299] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=126 new_index=127 graph_size=2 values_size=3
+[ERROR] [1785466046.201736278] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466046.202031582] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466046.218948446] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=128 new_index=129 graph_size=1 values_size=3
+[ERROR] [1785466046.727533492] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466046.727840017] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466046.733862897] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=130 new_index=131 graph_size=1 values_size=3
+[ERROR] [1785466047.225364927] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466047.225670198] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466047.246102598] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=132 new_index=133 graph_size=1 values_size=3
+[ERROR] [1785466047.730326686] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466047.730678950] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466047.748797529] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=134 new_index=135 graph_size=1 values_size=3
+[ERROR] [1785466048.235936204] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466048.236277915] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466048.277111459] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=136 new_index=137 graph_size=2 values_size=3
+[ERROR] [1785466048.786264848] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466048.786613648] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466048.807355467] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=138 new_index=139 graph_size=2 values_size=3
+[ERROR] [1785466049.298067652] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466049.298356222] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466049.326624852] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=140 new_index=141 graph_size=1 values_size=3
+[ERROR] [1785466049.814673270] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466049.815031214] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466049.845647353] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=142 new_index=143 graph_size=1 values_size=3
+[ERROR] [1785466050.313661501] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466050.314063818] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466050.337610859] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=144 new_index=145 graph_size=2 values_size=3
+[ERROR] [1785466050.830303507] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466050.830677290] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466050.853994971] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=146 new_index=147 graph_size=2 values_size=3
+[ERROR] [1785466051.332261981] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466051.332568391] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466051.379638792] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=148 new_index=149 graph_size=1 values_size=3
+[ERROR] [1785466051.931983619] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466051.932331995] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466051.967619454] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=150 new_index=151 graph_size=1 values_size=3
+[ERROR] [1785466052.429230686] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466052.429536492] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466052.454216282] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=152 new_index=153 graph_size=1 values_size=3
+[ERROR] [1785466052.946253310] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466052.946526269] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466052.968300611] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=154 new_index=155 graph_size=1 values_size=3
+[ERROR] [1785466053.459849410] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466053.460173597] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466053.466765248] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=156 new_index=157 graph_size=1 values_size=3
+[ERROR] [1785466053.954526763] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466053.954792514] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466053.977721327] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=158 new_index=159 graph_size=1 values_size=3
+[ERROR] [1785466054.455869863] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466054.456207805] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466054.487595061] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=160 new_index=161 graph_size=2 values_size=3
+[ERROR] [1785466054.980888913] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466054.981211367] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466054.992362334] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=162 new_index=163 graph_size=1 values_size=3
+[ERROR] [1785466055.480931563] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466055.481285173] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466055.524649915] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=164 new_index=165 graph_size=1 values_size=3
+[ERROR] [1785466055.989930806] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466055.990237207] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466056.018271476] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=166 new_index=167 graph_size=1 values_size=3
+[ERROR] [1785466056.499316140] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466056.499632046] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466056.521804948] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=168 new_index=169 graph_size=1 values_size=3
+[ERROR] [1785466057.017873677] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466057.018241468] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466057.061781397] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=170 new_index=171 graph_size=2 values_size=3
+[ERROR] [1785466057.616662920] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466057.616950757] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466057.635070150] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=172 new_index=173 graph_size=1 values_size=3
+[ERROR] [1785466058.118968217] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466058.119266359] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466058.140580587] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=174 new_index=175 graph_size=1 values_size=3
+[ERROR] [1785466058.630272304] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466058.630570440] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466058.652181770] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=176 new_index=177 graph_size=1 values_size=3
+[ERROR] [1785466059.136023504] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466059.136331248] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466059.169027123] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=178 new_index=179 graph_size=1 values_size=3
+[ERROR] [1785466059.676922822] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466059.677246477] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466059.717467741] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=180 new_index=181 graph_size=1 values_size=3
+[ERROR] [1785466060.205348913] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466060.205668393] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466060.218837231] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=182 new_index=183 graph_size=1 values_size=3
+[ERROR] [1785466060.704939792] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466060.705229876] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466060.727829257] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=184 new_index=185 graph_size=1 values_size=3
+[ERROR] [1785466061.203557069] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466061.203887937] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466061.231418143] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=186 new_index=187 graph_size=2 values_size=3
+[ERROR] [1785466061.714566010] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466061.714880884] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466061.739972433] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=188 new_index=189 graph_size=1 values_size=3
+[ERROR] [1785466062.243830606] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466062.244203848] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466062.281236196] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=190 new_index=191 graph_size=1 values_size=3
+[ERROR] [1785466062.733014266] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466062.733349725] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466062.759787378] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=192 new_index=193 graph_size=1 values_size=3
+[ERROR] [1785466063.260821716] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466063.261174328] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466063.282348057] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=194 new_index=195 graph_size=2 values_size=3
+[ERROR] [1785466063.826963714] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466063.827277606] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466063.845102127] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=196 new_index=197 graph_size=2 values_size=3
+[ERROR] [1785466064.328316412] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466064.328587191] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466064.349696518] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=198 new_index=199 graph_size=1 values_size=3
+[ERROR] [1785466064.841468829] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466064.841771731] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466064.872325998] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=200 new_index=201 graph_size=1 values_size=3
+[ERROR] [1785466065.357141725] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466065.357460628] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466065.397326354] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=202 new_index=203 graph_size=2 values_size=3
+[ERROR] [1785466065.941201029] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466065.941593570] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466065.975667328] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=204 new_index=205 graph_size=2 values_size=3
+[ERROR] [1785466066.406686696] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466066.406965346] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466066.445730886] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=206 new_index=207 graph_size=1 values_size=3
+[ERROR] [1785466066.923309903] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466066.923783697] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466066.964650275] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=208 new_index=209 graph_size=1 values_size=3
+[ERROR] [1785466067.477684515] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466067.478198567] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466067.483710223] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=210 new_index=211 graph_size=1 values_size=3
+[ERROR] [1785466067.958498481] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466067.958809665] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466067.994494002] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=212 new_index=213 graph_size=1 values_size=3
+[ERROR] [1785466068.478441080] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466068.478724255] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466068.507289742] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=214 new_index=215 graph_size=1 values_size=3
+[ERROR] [1785466068.988129329] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466068.988636553] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466069.009629905] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=216 new_index=217 graph_size=1 values_size=3
+[ERROR] [1785466069.542395437] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466069.542712456] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466069.569668025] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=218 new_index=219 graph_size=1 values_size=3
+[ERROR] [1785466070.050443729] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466070.050705313] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466070.097627919] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=220 new_index=221 graph_size=1 values_size=3
+[ERROR] [1785466070.607936921] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466070.608277121] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466070.637789039] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=222 new_index=223 graph_size=2 values_size=3
+[ERROR] [1785466071.176145317] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466071.176489994] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466071.190764268] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=224 new_index=225 graph_size=1 values_size=3
+[ERROR] [1785466071.673889427] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466071.674201685] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466071.704814721] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=226 new_index=227 graph_size=1 values_size=3
+[ERROR] [1785466072.187298019] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466072.187687010] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466072.211370668] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=228 new_index=229 graph_size=1 values_size=3
+[ERROR] [1785466072.694461827] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466072.694790072] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466072.715255302] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=230 new_index=231 graph_size=1 values_size=3
+[ERROR] [1785466073.215989175] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466073.216305751] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466073.229496615] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=232 new_index=233 graph_size=1 values_size=3
+[ERROR] [1785466073.725380077] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466073.725719752] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466073.744636997] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=234 new_index=235 graph_size=1 values_size=3
+[ERROR] [1785466074.229089107] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466074.229410218] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466074.270951489] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=236 new_index=237 graph_size=1 values_size=3
+[ERROR] [1785466074.747086526] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466074.747415272] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466074.790878438] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=238 new_index=239 graph_size=1 values_size=3
+[ERROR] [1785466075.320470785] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466075.320789645] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466075.343306038] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=240 new_index=241 graph_size=1 values_size=3
+[ERROR] [1785466075.847967233] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466075.848222355] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466075.892076284] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=242 new_index=243 graph_size=2 values_size=3
+[ERROR] [1785466076.378290672] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466076.378584893] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466076.407613220] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=244 new_index=245 graph_size=1 values_size=3
+[ERROR] [1785466076.884551130] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466076.884908815] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466076.910934689] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=246 new_index=247 graph_size=1 values_size=3
+[ERROR] [1785466077.397297432] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466077.397575818] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466077.432070912] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=248 new_index=249 graph_size=1 values_size=3
+[ERROR] [1785466077.938522356] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466077.938811434] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466077.979784036] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=250 new_index=251 graph_size=1 values_size=3
+[ERROR] [1785466078.435228495] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466078.435683626] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466078.447236795] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=252 new_index=253 graph_size=2 values_size=3
+[ERROR] [1785466078.949113075] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466078.949401887] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466078.984569762] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=254 new_index=255 graph_size=2 values_size=3
+[ERROR] [1785466079.463789634] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466079.464144597] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466079.486460363] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=256 new_index=257 graph_size=1 values_size=3
+[ERROR] [1785466079.973149712] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466079.973493058] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466080.015599357] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=258 new_index=259 graph_size=1 values_size=3
+[ERROR] [1785466080.501553322] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466080.501874155] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466080.527145922] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=260 new_index=261 graph_size=1 values_size=3
+[ERROR] [1785466081.109005899] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466081.109347074] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466081.144763314] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=262 new_index=263 graph_size=1 values_size=3
+[ERROR] [1785466081.626001386] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466081.626315670] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466081.667162932] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=264 new_index=265 graph_size=2 values_size=3
+[ERROR] [1785466082.138967152] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466082.139342144] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466082.181672777] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=266 new_index=267 graph_size=1 values_size=3
+[ERROR] [1785466082.667841995] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466082.668116809] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466082.686204612] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=268 new_index=269 graph_size=1 values_size=3
+[ERROR] [1785466083.188381746] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466083.188715884] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466083.216919720] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=270 new_index=271 graph_size=1 values_size=3
+[ERROR] [1785466083.710799086] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466083.711080845] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466083.721143164] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=272 new_index=273 graph_size=1 values_size=3
+[ERROR] [1785466084.220303842] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466084.220654850] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466084.243786073] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=274 new_index=275 graph_size=2 values_size=3
+[ERROR] [1785466084.740621776] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466084.740936354] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466084.765884566] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=276 new_index=277 graph_size=1 values_size=3
+[ERROR] [1785466085.259480382] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466085.259815205] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466085.288860753] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=278 new_index=279 graph_size=1 values_size=3
+[ERROR] [1785466085.856647006] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466085.856991347] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466085.895734696] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=280 new_index=281 graph_size=2 values_size=3
+[ERROR] [1785466086.456569218] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466086.457110085] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466086.469889387] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=282 new_index=283 graph_size=1 values_size=3
+[ERROR] [1785466086.964596175] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466086.964907180] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466086.990864308] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=284 new_index=285 graph_size=2 values_size=3
+[ERROR] [1785466087.467117449] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466087.467437082] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466087.501849619] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=286 new_index=287 graph_size=1 values_size=3
+[ERROR] [1785466087.973780104] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466087.974101402] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466087.999740109] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=288 new_index=289 graph_size=1 values_size=3
+[ERROR] [1785466088.504994922] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466088.505375402] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466088.534555781] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=290 new_index=291 graph_size=2 values_size=3
+[ERROR] [1785466089.044536637] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466089.044824641] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466089.055923671] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=292 new_index=293 graph_size=1 values_size=3
+[ERROR] [1785466089.531032218] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466089.531342582] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466089.547924887] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=294 new_index=295 graph_size=1 values_size=3
+[ERROR] [1785466090.025661998] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466090.025936420] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466090.057123954] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=296 new_index=297 graph_size=1 values_size=3
+[ERROR] [1785466090.574988952] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466090.575298525] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466090.596696312] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=298 new_index=299 graph_size=1 values_size=3
+[ERROR] [1785466091.107605841] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466091.107880211] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466091.121747148] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=300 new_index=301 graph_size=2 values_size=3
+[ERROR] [1785466091.621315933] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466091.621636031] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466091.642728792] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=302 new_index=303 graph_size=1 values_size=3
+[ERROR] [1785466092.122221914] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466092.122565746] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466092.163369678] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=304 new_index=305 graph_size=1 values_size=3
+[ERROR] [1785466092.720082520] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466092.720504819] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466092.752355983] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=306 new_index=307 graph_size=1 values_size=3
+[ERROR] [1785466093.242400881] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466093.242678190] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466093.279557371] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=308 new_index=309 graph_size=1 values_size=3
+[ERROR] [1785466093.747726895] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466093.748033025] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466093.782431656] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=310 new_index=311 graph_size=1 values_size=3
+[ERROR] [1785466094.264434651] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466094.264747274] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466094.290374516] [backend_optimizer_node]: exception in smoother update: [St12out_of_range] Index out of requested size range prev_index=312 new_index=313 graph_size=1 values_size=3
+[ERROR] [1785466094.779139007] [backend_optimizer_node]: divergence detected: resetting graph at last trusted (wall-corrected) pose/velocity/bias
+[INFO] [1785466094.779466690] [backend_optimizer_node]: graph (re)initialized at X0=(1.000, -1.000, 1.570) V0=(0.000, 0.000)
+[ERROR] [1785466096.814009387] [backend_optimizer_node]: IMU signal LOST (no IMU for 2.03s > 2.00s). Self-localization is the dead-reckoning backbone and cannot continue without it: entering FAIL-SAFE HALT (freezing estimate, no further graph updates).
+[ros2run]: Received signal:  Interrupt
+[INFO] [1785466115.055861621] [rclcpp]: signal_handler(signum=2)
+[INFO] [1785466115.057765749] [backend_optimizer_node]: backend concurrency stats: imu_callbacks=57777, during_worker=241 (0.4%), during_smoother=27 (0.0%), callback_gap_max=1281.010ms, gaps>2ms=9038, gaps>10ms=842; stamp_gap_max=1.000ms, gaps>1ms=0; ring_enqueue_max=0.057ms, enqueues>2ms=0; callback_duration_max=0.637ms, durations>2ms=0; worker_jobs=2312 mean/max=0.112/2.427ms; smoother_updates=90 mean/max=0.378/1.499ms; unity_audit reports=232 source_imu_last=57751 receiver_at_last_report=57740 final_receiver=57777

@@ -1,0 +1,18 @@
+[INFO] [1785437492.114001482] [laser_scan_matching_node]: laser_scan_matching_node started (0 cylinders, 9 internal walls, field 5.572x3.310m, initial seed=(-2.419, 1.354, 0.000))
+[INFO] [1785437498.285136190] [laser_scan_matching_node]: note rejection: 0/541 returns unexplained, 0 clusters -> 0 accepted, 0 points dropped (last extent=-1.0000m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[WARN] [1785437499.658611374] [laser_scan_matching_node]: IMU coverage wait exceeded 0.050s, processing scan with extrapolated tail
+[INFO] [1785437503.292613233] [laser_scan_matching_node]: note rejection: 0/541 returns unexplained, 0 clusters -> 0 accepted, 0 points dropped (last extent=-1.0000m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[INFO] [1785437508.295883384] [laser_scan_matching_node]: note rejection: 0/541 returns unexplained, 0 clusters -> 0 accepted, 0 points dropped (last extent=-1.0000m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[INFO] [1785437513.320981229] [laser_scan_matching_node]: note rejection: 20/541 returns unexplained, 2 clusters -> 2 accepted, 11 points dropped (last extent=0.0702m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[INFO] [1785437518.321724850] [laser_scan_matching_node]: note rejection: 0/541 returns unexplained, 0 clusters -> 0 accepted, 0 points dropped (last extent=-1.0000m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[INFO] [1785437523.325724668] [laser_scan_matching_node]: note rejection: 47/541 returns unexplained, 6 clusters -> 6 accepted, 47 points dropped (last extent=0.0663m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[INFO] [1785437528.370903942] [laser_scan_matching_node]: note rejection: 20/541 returns unexplained, 2 clusters -> 2 accepted, 11 points dropped (last extent=0.0690m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[INFO] [1785437533.383125566] [laser_scan_matching_node]: note rejection: 0/541 returns unexplained, 0 clusters -> 0 accepted, 0 points dropped (last extent=-1.0000m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[INFO] [1785437538.400532210] [laser_scan_matching_node]: note rejection: 52/541 returns unexplained, 6 clusters -> 6 accepted, 52 points dropped (last extent=0.0713m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[INFO] [1785437543.419258492] [laser_scan_matching_node]: note rejection: 29/541 returns unexplained, 4 clusters -> 4 accepted, 24 points dropped (last extent=0.0640m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[INFO] [1785437548.439519459] [laser_scan_matching_node]: note rejection: 0/541 returns unexplained, 0 clusters -> 0 accepted, 0 points dropped (last extent=-1.0000m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[INFO] [1785437553.469326970] [laser_scan_matching_node]: note rejection: 49/541 returns unexplained, 6 clusters -> 6 accepted, 49 points dropped (last extent=0.0722m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[INFO] [1785437558.490672733] [laser_scan_matching_node]: note rejection: 0/541 returns unexplained, 0 clusters -> 0 accepted, 0 points dropped (last extent=-1.0000m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[ros2run]: Received signal:  Interrupt
+[INFO] [1785437578.224149041] [rclcpp]: signal_handler(signum=2)
+[INFO] [1785437578.225090998] [laser_scan_matching_node]: scan pipeline stats: received=2412 processed=2412 pending_overwrite=0 pending_queue_overflow=0 fast_rotation_drop=0; unity_audit reports=242 source_scan_last=2410 receiver_at_last_report=2410 final_receiver=2412

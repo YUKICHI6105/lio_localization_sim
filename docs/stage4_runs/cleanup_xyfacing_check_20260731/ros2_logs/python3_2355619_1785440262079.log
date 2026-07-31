@@ -1,0 +1,15 @@
+[INFO] [1785440262.110296056] [rosbag2_recorder]: Press SPACE for pausing/resuming
+[INFO] [1785440262.110367287] [rosbag2_recorder]: Event publisher thread: Started
+[INFO] [1785440262.118919932] [rosbag2_recorder]: Starting recording to '/home/yukichi6105/ros2_ws/src/lio_localization_sim/docs/stage4_runs/cleanup_xyfacing_check_20260731/stage_derived'
+[WARN] [1785440262.119008449] [rosbag2_recorder]: No input serialization format specified, using default rmw serialization format: 'cdr'.
+[INFO] [1785440262.121425496] [rosbag2_recorder]: Listening for topics...
+[INFO] [1785440262.121491488] [rosbag2_recorder]: Recording...
+[INFO] [1785440262.121469425] [rosbag2_recorder]: Topics discovery started.
+[INFO] [1785440262.213432577] [rosbag2_recorder]: Subscribed to topic '/state_estimate'
+[INFO] [1785440262.216960278] [rosbag2_recorder]: Subscribed to topic '/odom_fast'
+[INFO] [1785440262.220028851] [rosbag2_recorder]: Subscribed to topic '/scan_match_result'
+[INFO] [1785440267.691618201] [rosbag2_recorder]: Subscribed to topic '/ground_truth_pose'
+[INFO] [1785440267.691704772] [rosbag2_recorder]: All requested topics are subscribed. Stopping discovery...
+[INFO] [1785440267.691716405] [rosbag2_recorder]: Topics discovery stopped.
+[INFO] [1785440327.812270724] [rosbag2_cpp]: Writing remaining messages from cache to the bag. It may take a while
+[INFO] [1785440327.815632846] [rosbag2_recorder]: Recording stopped

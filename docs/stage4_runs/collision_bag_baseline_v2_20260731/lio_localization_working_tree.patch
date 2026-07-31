@@ -1,0 +1,431 @@
+diff --git a/include/lio_localization/backend_optimizer_node.hpp b/include/lio_localization/backend_optimizer_node.hpp
+index 7622d58..f69063b 100644
+--- a/include/lio_localization/backend_optimizer_node.hpp
++++ b/include/lio_localization/backend_optimizer_node.hpp
+@@ -28,10 +28,39 @@
+ 
+ #include "lio_localization/msg/scan_match_result.hpp"
+ #include "lio_localization/msg/state_estimate.hpp"
++#include "lio_localization/diag_recorder.hpp"
+ 
+ namespace lio_localization
+ {
+ 
++// 壁PriorFactorのσ計算過程を1スキャンごとに記録する診断レコード
++// (diag_recorder.hpp参照)。空パスで無効。ヨー方向の頭打ち(20番の実験で
++// 実共分散とIMU緩和が相殺し合う現象を確認)を直接の数値で追うためのもの:
++// ヒューリスティックσ・Censiσ・DCS/高ダイナミクス適用後の最終σを
++// 同じ行に並べ、どの段でヨーが締まる/緩むかをオフラインで解析できる。
++struct WallSigmaRecord
++{
++  double t;                 // スキャン結果のスタンプ(s)
++  double n, x_n, y_n;       // 対応点数(全体, X向き, Y向き)
++  bool x_degenerate, y_degenerate, yaw_degenerate;
++  bool censi_valid;
++  double censi_yaw, censi_x, censi_y;         // ②の実共分散由来σ(無効なら0)
++  double heuristic_yaw_sigma, heuristic_x_sigma, heuristic_y_sigma;  // N数ヒューリスティックのみ
++  double final_yaw_sigma, final_x_sigma, final_y_sigma;              // DCS/imu_dynamics適用後
++  double wall_dcs_scale, imu_dynamics_scale;
++  void write(std::ostream & o) const
++  {
++    o.precision(17);
++    o << t << ',' << n << ',' << x_n << ',' << y_n << ','
++      << (x_degenerate ? 1 : 0) << ',' << (y_degenerate ? 1 : 0) << ','
++      << (yaw_degenerate ? 1 : 0) << ',' << (censi_valid ? 1 : 0) << ','
++      << censi_yaw << ',' << censi_x << ',' << censi_y << ','
++      << heuristic_yaw_sigma << ',' << heuristic_x_sigma << ',' << heuristic_y_sigma << ','
++      << final_yaw_sigma << ',' << final_x_sigma << ',' << final_y_sigma << ','
++      << wall_dcs_scale << ',' << imu_dynamics_scale << '\n';
++  }
++};
++
+ // main.md 3章③ Backend Optimizer Node（因子グラフバックエンド）。
+ // ②からのScanMatchResult到着（LiDAR到着駆動）でノードを生成し、IMU因子・
+ // 壁マップ整合PriorFactor・円柱BearingRangeFactorを組み立ててISAM2で最適化する。
+@@ -290,6 +319,23 @@ private:
+   double imu_dynamics_gyro_threshold_;
+   double imu_dynamics_gyro_sigma_scale_;
+ 
++  // 衝突対策(2026-07-31、ユーザー提案): field.yamlの経路が柱・棚・スラローム
++  // バッフルへ実際に衝突する事象を`/robot_collision`で確認した(相対速度
++  // 0.4〜1.4m/s)。衝突は物理的に~100m/s^2オーダーの瞬間加速度を生み、通常巡航
++  // (0.5G≈4.9m/s^2+重力)を大きく超えるため、生の加速度ノルムで選択的に検知
++  // できる(imu_dynamics_*の線形加速度版が旧閾値2.0m/s^2で通常巡航にも発火し
++  // 選択性を失った反省を踏まえ、閾値は衝突相当の桁に設定する)。経路修正の
++  // 根治までの緩和策として、異常検知中のサンプルだけpreint_params_の
++  // accelerometer/gyroscopeCovarianceをその場で吊り上げ、CombinedImuFactorが
++  // 衝突による生の加速度・角速度スパイクを実際の運動として信じないようにする。
++  bool imu_accel_anomaly_enabled_;
++  double imu_accel_anomaly_threshold_;   // [m/s^2] 生の加速度ノルムの閾値
++  double imu_accel_anomaly_inflation_;   // 異常検知中、σ(accel/gyro共に)へ掛ける倍率
++  double accel_sigma_base_;  // preint_params_構築時の値(異常解除時に戻すため保持)
++  double gyro_sigma_base_;
++  bool imu_accel_anomaly_active_ = false;
++  uint64_t imu_accel_anomaly_count_ = 0;  // 診断用: 異常検知に入った回数
++
+   // 壁マップ整合PriorFactorの共分散（main.md 4-2）
+   gtsam::Vector wall_prior_sigmas_;
+   // Yaw/X/Yは対応点数Nに応じて sigma_per_point/sqrt(N) で動的に計算する
+@@ -305,6 +351,13 @@ private:
+   // Censi型σに掛ける膨張係数(データアソシエーション不確実性等の未モデル分。
+   // フロアが従来ヒューリスティックσで効くため、通常フレームでは1.0で従来同等)
+   double wall_cov_inflation_;
++  // Censiクランプの上限を「ヒューリスティックσの何倍まで」に制限する
++  // (20番の実験で、旋回中にX方向の情報量が一瞬(0.35秒程度)低下した際、
++  // 従来の上限wall_prior_degenerate_sigma_(1.0m)が事実上無制限に近く、
++  // IMU緩和と組み合わせるとまさにドリフトしやすいタイミングで壁補正が
++  // 緩み、fixed-lag窓の遅延を経て誤差ピークとして現れる現象を直接確認した。
++  // 既定は大きな値にして従来動作(実質無制限)を保つ)。
++  double wall_cov_max_loosen_ratio_;
+   // 円柱観測因子の共分散（Unit3 bearing 2 + range 1、main.md 4-2）
+   gtsam::Vector cylinder_noise_sigmas_;
+   double cylinder_prior_sigma_;
+@@ -355,6 +408,11 @@ private:
+ 
+   std::string map_frame_id_;
+   std::string odom_frame_id_;
++
++  // 診断レコーダ(高速・非汚染、diag_recorder.hpp参照)。diag_wall_sigma_pathが
++  // 空なら無効。40Hz×最大200s分を事前確保しておき、ホットパスではpushのみ、
++  // 終了時に一括ダンプする。
++  std::unique_ptr<DiagRecorder<WallSigmaRecord>> diag_wall_sigma_;
+ };
+ 
+ }  // namespace lio_localization
+diff --git a/src/backend_optimizer_node.cpp b/src/backend_optimizer_node.cpp
+index 44d5c2e..17d77e4 100644
+--- a/src/backend_optimizer_node.cpp
++++ b/src/backend_optimizer_node.cpp
+@@ -133,6 +133,9 @@ BackendOptimizerNode::BackendOptimizerNode()
+   // σが連続的に膨らむ。falseで従来ヒューリスティックのみ(A/B比較用)。
+   wall_use_icp_covariance_ = this->declare_parameter<bool>("wall_use_icp_covariance", true);
+   wall_cov_inflation_ = this->declare_parameter<double>("wall_cov_inflation", 1.0);
++  // 既定1e6は事実上無制限(従来動作を保つ)。20番の実験結果を受けて
++  // ヒューリスティックσの何倍までしか緩めないかを制限できるようにする。
++  wall_cov_max_loosen_ratio_ = this->declare_parameter<double>("wall_cov_max_loosen_ratio", 1e6);
+ 
+   const double bearing_sigma = this->declare_parameter<double>("cylinder_bearing_sigma", 0.1);
+   const double range_sigma = this->declare_parameter<double>("cylinder_range_sigma", 0.1);
+@@ -148,6 +151,14 @@ BackendOptimizerNode::BackendOptimizerNode()
+   const double bias_gyro_rw_sigma = this->declare_parameter<double>("bias_gyro_random_walk_sigma", 0.0001);
+   const double gravity = this->declare_parameter<double>("gravity", 9.81);
+ 
++  accel_sigma_base_ = accel_sigma;
++  gyro_sigma_base_ = gyro_sigma;
++  imu_accel_anomaly_enabled_ = this->declare_parameter<bool>("imu_accel_anomaly_enabled", false);
++  imu_accel_anomaly_threshold_ =
++    this->declare_parameter<double>("imu_accel_anomaly_threshold", 20.0);
++  imu_accel_anomaly_inflation_ =
++    this->declare_parameter<double>("imu_accel_anomaly_inflation", 100.0);
++
+   preint_params_ = gtsam::PreintegrationCombinedParams::MakeSharedU(gravity);
+   preint_params_->accelerometerCovariance = gtsam::I_3x3 * (accel_sigma * accel_sigma);
+   preint_params_->gyroscopeCovariance = gtsam::I_3x3 * (gyro_sigma * gyro_sigma);
+@@ -215,12 +226,31 @@ BackendOptimizerNode::BackendOptimizerNode()
+ 
+   optimizer_worker_ = std::thread(&BackendOptimizerNode::optimizer_worker_loop, this);
+ 
++  // 壁σ診断レコーダ(既定は無効、パス指定時のみ記録)。20番の実験で
++  // 「ヨー方向で問題が繰り返し起きる」ことが分かったため、原因判断の前に
++  // まず標準的に取得できるようにする(ユーザー指示、2026-07-30)。
++  const std::string diag_wall_sigma_path =
++    this->declare_parameter<std::string>("diag_wall_sigma_path", "");
++  diag_wall_sigma_ = std::make_unique<DiagRecorder<WallSigmaRecord>>(
++    diag_wall_sigma_path,
++    "t,n,x_n,y_n,x_degenerate,y_degenerate,yaw_degenerate,censi_valid,"
++    "censi_yaw,censi_x,censi_y,heuristic_yaw_sigma,heuristic_x_sigma,heuristic_y_sigma,"
++    "final_yaw_sigma,final_x_sigma,final_y_sigma,wall_dcs_scale,imu_dynamics_scale",
++    10000);
++
+   RCLCPP_INFO(this->get_logger(), "backend_optimizer_node started (%zu cylinders registered)",
+     registered_cylinders_.size());
+ }
+ 
+ BackendOptimizerNode::~BackendOptimizerNode()
+ {
++  if (diag_wall_sigma_ && diag_wall_sigma_->enabled()) {
++    const size_t records = diag_wall_sigma_->size();
++    const bool overflowed = diag_wall_sigma_->overflowed();
++    const bool ok = diag_wall_sigma_->dump();
++    RCLCPP_INFO(this->get_logger(), "diag wall sigma dump: %s (%zu records%s)",
++      ok ? "ok" : "FAILED", records, overflowed ? ", BUFFER OVERFLOWED — data truncated" : "");
++  }
+   {
+     std::lock_guard<std::mutex> lock(work_mutex_);
+     worker_stop_ = true;
+@@ -632,6 +662,31 @@ void BackendOptimizerNode::integrate_imu_up_to(const rclcpp::Time & t_end)
+     last_imu_stamp_ = s.stamp;
+     last_imu_accel_ = s.accel;
+     last_imu_gyro_ = s.gyro;
++    if (imu_accel_anomaly_enabled_) {
++      // 衝突検知: 生の加速度ノルムが通常巡航(0.5G+重力、~11m/s^2)を大きく
++      // 超えたサンプルだけ、その場でIMUノイズσを吊り上げてから積分する
++      // (hppのimu_accel_anomaly_*のコメント参照)。状態遷移時のみ
++      // preint_params_を書き換える(毎サンプル無条件代入を避ける)。
++      const bool anomalous = s.accel.norm() > imu_accel_anomaly_threshold_;
++      if (anomalous && !imu_accel_anomaly_active_) {
++        const double inflated_accel = accel_sigma_base_ * imu_accel_anomaly_inflation_;
++        const double inflated_gyro = gyro_sigma_base_ * imu_accel_anomaly_inflation_;
++        preint_params_->accelerometerCovariance = gtsam::I_3x3 * (inflated_accel * inflated_accel);
++        preint_params_->gyroscopeCovariance = gtsam::I_3x3 * (inflated_gyro * inflated_gyro);
++        imu_accel_anomaly_active_ = true;
++        ++imu_accel_anomaly_count_;
++        RCLCPP_WARN(this->get_logger(),
++          "IMU accel anomaly detected (|a|=%.2f m/s^2 > %.2f): inflating IMU sigma %.0fx "
++          "(count=%lu) -- likely a collision, not a modelled dynamic",
++          s.accel.norm(), imu_accel_anomaly_threshold_, imu_accel_anomaly_inflation_,
++          static_cast<unsigned long>(imu_accel_anomaly_count_));
++      } else if (!anomalous && imu_accel_anomaly_active_) {
++        preint_params_->accelerometerCovariance =
++          gtsam::I_3x3 * (accel_sigma_base_ * accel_sigma_base_);
++        preint_params_->gyroscopeCovariance = gtsam::I_3x3 * (gyro_sigma_base_ * gyro_sigma_base_);
++        imu_accel_anomaly_active_ = false;
++      }
++    }
+     accumulator_->integrateMeasurement(s.accel, s.gyro, dt);
+   }
+ 
+@@ -1054,6 +1109,12 @@ void BackendOptimizerNode::process_scan_result(
+     const bool yaw_degenerate = msg->wall.x_axis_degenerate || msg->wall.y_axis_degenerate;
+     double yaw_sigma = yaw_degenerate ?
+       wall_prior_degenerate_yaw_sigma_ : (wall_prior_base_yaw_sigma_ / std::sqrt(n));
++    // 診断用: ICP共分散クランプ前のヒューリスティックσをそのまま保持しておく
++    const double heuristic_x_sigma = x_sigma;
++    const double heuristic_y_sigma = y_sigma;
++    const double heuristic_yaw_sigma = yaw_sigma;
++    bool censi_valid = false;
++    double censi_x = 0.0, censi_y = 0.0, censi_yaw = 0.0;
+ 
+     // ICP共分散伝播: ②のCensi型共分散(yaw,x,y の3x3、body frame接空間)の
+     // 対角σを、上記の従来ヒューリスティックσを下限・縮退σを上限として
+@@ -1066,20 +1127,24 @@ void BackendOptimizerNode::process_scan_result(
+     // 下限/上限クランプという用途ではこの差は許容する。
+     // 縮退フラグが立った軸は従来通り縮退σを直接使う(クランプ対象外)。
+     if (wall_use_icp_covariance_ && msg->wall.covariance_valid) {
+-      const double censi_yaw =
+-        wall_cov_inflation_ * std::sqrt(std::max(msg->wall.covariance[0], 0.0));
+-      const double censi_x =
+-        wall_cov_inflation_ * std::sqrt(std::max(msg->wall.covariance[4], 0.0));
+-      const double censi_y =
+-        wall_cov_inflation_ * std::sqrt(std::max(msg->wall.covariance[8], 0.0));
++      censi_valid = true;
++      censi_yaw = wall_cov_inflation_ * std::sqrt(std::max(msg->wall.covariance[0], 0.0));
++      censi_x = wall_cov_inflation_ * std::sqrt(std::max(msg->wall.covariance[4], 0.0));
++      censi_y = wall_cov_inflation_ * std::sqrt(std::max(msg->wall.covariance[8], 0.0));
+       if (!msg->wall.x_axis_degenerate) {
+-        x_sigma = std::min(std::max(x_sigma, censi_x), wall_prior_degenerate_sigma_);
++        const double x_ceiling =
++          std::min(heuristic_x_sigma * wall_cov_max_loosen_ratio_, wall_prior_degenerate_sigma_);
++        x_sigma = std::min(std::max(x_sigma, censi_x), x_ceiling);
+       }
+       if (!msg->wall.y_axis_degenerate) {
+-        y_sigma = std::min(std::max(y_sigma, censi_y), wall_prior_degenerate_sigma_);
++        const double y_ceiling =
++          std::min(heuristic_y_sigma * wall_cov_max_loosen_ratio_, wall_prior_degenerate_sigma_);
++        y_sigma = std::min(std::max(y_sigma, censi_y), y_ceiling);
+       }
+       if (!yaw_degenerate) {
+-        yaw_sigma = std::min(std::max(yaw_sigma, censi_yaw), wall_prior_degenerate_yaw_sigma_);
++        const double yaw_ceiling = std::min(
++          heuristic_yaw_sigma * wall_cov_max_loosen_ratio_, wall_prior_degenerate_yaw_sigma_);
++        yaw_sigma = std::min(std::max(yaw_sigma, censi_yaw), yaw_ceiling);
+       }
+       // 準縮退フレーム(二値の縮退フラグでは拾えず、共分散がフロアを大きく
+       // 超えて膨らんだ観測)の発生を可視化する(発生頻度の較正データ用)
+@@ -1110,6 +1175,15 @@ void BackendOptimizerNode::process_scan_result(
+       sigmas(3) *= imu_dynamics_scale;
+       sigmas(4) *= imu_dynamics_scale;
+     }
++    if (diag_wall_sigma_) {
++      diag_wall_sigma_->push(WallSigmaRecord{
++        t_now, n, x_n, y_n,
++        msg->wall.x_axis_degenerate, msg->wall.y_axis_degenerate, yaw_degenerate,
++        censi_valid, censi_yaw, censi_x, censi_y,
++        heuristic_yaw_sigma, heuristic_x_sigma, heuristic_y_sigma,
++        sigmas(2), sigmas(3), sigmas(4),
++        wall_dcs_scale, imu_dynamics_scale});
++    }
+     const auto wall_noise = gtsam::noiseModel::Diagonal::Sigmas(sigmas);
+     graph.emplace_shared<gtsam::PriorFactor<gtsam::Pose3>>(
+       X(new_index), wall_pose, make_robust(wall_noise));
+diff --git a/src/laser_scan_matching_node.cpp b/src/laser_scan_matching_node.cpp
+index 3a228db..0cccf8d 100644
+--- a/src/laser_scan_matching_node.cpp
++++ b/src/laser_scan_matching_node.cpp
+@@ -841,12 +841,15 @@ void LaserScanMatchingNode::process_scan(
+ 
+   size_t planar_inliers = 0;
+   double planar_abs_residual = 0.0;
++  // 最終反復のGauss-Newton情報行列(x,y,yaw順、Huber重み込み、正則化前)。
++  // Censi型共分散(cov = wall_cov_range_sigma_^2 * h^-1)をここから直接出す。
++  Eigen::Matrix3d planar_h = Eigen::Matrix3d::Zero();
+   // Each Unity beam is generated as a range measurement with Gaussian noise.  In the
+   // planar point-to-line objective, the same range error is multiplied by the angle
+   // between ray and wall normal.  This direct finite-segment ray model instead uses
+   // residual = measured_range - predicted_range, so it is the matching likelihood.
+   const auto solve_planar_ray_to_wall =
+-    [&](const std::vector<bool> & excluded, const Pose2D & seed) {
++    [&](const std::vector<bool> & excluded, const Pose2D & seed, double gate) {
+       Pose2D pose = seed;
+       for (int iteration = 0; iteration < planar_max_iterations_; ++iteration) {
+         Eigen::Matrix3d h = Eigen::Matrix3d::Zero();
+@@ -889,7 +892,7 @@ void LaserScanMatchingNode::process_scan(
+           if (!std::isfinite(predicted_range)) continue;
+           const double residual = measured_range - predicted_range;
+           const double abs_residual = std::abs(residual);
+-          if (abs_residual > planar_ray_to_wall_gate_) continue;
++          if (abs_residual > gate) continue;
+           const double denominator = chosen_normal.dot(ray_direction);
+           const double numerator = chosen_normal.dot(chosen_a - Eigen::Vector2d{pose.x, pose.y});
+           // d(measured - predicted)/d(x,y,yaw)
+@@ -904,6 +907,7 @@ void LaserScanMatchingNode::process_scan(
+           ++planar_inliers;
+           planar_abs_residual += abs_residual;
+         }
++        planar_h = h;
+         if (planar_inliers < static_cast<size_t>(planar_min_inliers_)) break;
+         h.diagonal().array() += 1e-6;
+         const Eigen::Vector3d delta = -h.ldlt().solve(g);
+@@ -914,7 +918,7 @@ void LaserScanMatchingNode::process_scan(
+       }
+       return pose;
+     };
+-  const auto solve_planar = [&](const std::vector<bool> & excluded, const Pose2D & seed) {
++  const auto solve_planar = [&](const std::vector<bool> & excluded, const Pose2D & seed, double gate) {
+       Pose2D pose = seed;
+       for (int iteration = 0; iteration < planar_max_iterations_; ++iteration) {
+         Eigen::Matrix3d h = Eigen::Matrix3d::Zero();
+@@ -932,7 +936,7 @@ void LaserScanMatchingNode::process_scan(
+           Eigen::Vector2d best_projection = Eigen::Vector2d::Zero();
+           Eigen::Vector2d best_tangent;
+           const double best_d2 = nearest_segment(world, best_projection, best_tangent);
+-          if (best_d2 > planar_correspondence_distance_ * planar_correspondence_distance_) continue;
++          if (best_d2 > gate * gate) continue;
+           const Eigen::Vector2d normal{-best_tangent.y(), best_tangent.x()};
+           const double residual = normal.dot(world - best_projection);
+           const Eigen::Vector2d d_yaw{-s * local.x() - c * local.y(),
+@@ -946,6 +950,7 @@ void LaserScanMatchingNode::process_scan(
+           ++planar_inliers;
+           planar_abs_residual += abs_residual;
+         }
++        planar_h = h;
+         if (planar_inliers < static_cast<size_t>(planar_min_inliers_)) break;
+         h.diagonal().array() += 1e-6;
+         const Eigen::Vector3d delta = -h.ldlt().solve(g);
+@@ -957,6 +962,29 @@ void LaserScanMatchingNode::process_scan(
+       return pose;
+     };
+ 
++  // 粗→細のゲート探索(2026-07-30、ICP改造)。位置側の汎用3D ICPが既に持つ
++  // coarse-to-fine(kCoarseAcceptDistances)と同じ考え方を平面ソルバーにも
++  // 導入した。旋回中にシードのヨーが数度ズレると、最初から最終ゲート
++  // (`planar_correspondence_distance_`/`planar_ray_to_wall_gate_`)で対応点を
++  // 探すと、遠い壁の点(距離×角度誤差で大きくズレる)がゲート外に落ちて
++  // 対応点数が減り、収束が遅れる/浅い局所解に留まる。まず広いゲートで大まかに
++  // 合わせてから徐々に絞ることで、同じ反復回数予算のまま収束半径を広げる
++  // (experiment_history 16番で確認した「旋回中の一過性ピーク」への対処)。
++  static constexpr std::array<double, 2> kPlanarCoarseGateScale{4.0, 2.0};
++  const auto solve_planar_coarse_to_fine =
++    [&](const std::vector<bool> & excluded, const Pose2D & seed) {
++      const double final_gate =
++        planar_use_ray_to_wall_ ? planar_ray_to_wall_gate_ : planar_correspondence_distance_;
++      Pose2D pose = seed;
++      for (const double scale : kPlanarCoarseGateScale) {
++        pose = planar_use_ray_to_wall_ ?
++          solve_planar_ray_to_wall(excluded, pose, final_gate * scale) :
++          solve_planar(excluded, pose, final_gate * scale);
++      }
++      return planar_use_ray_to_wall_ ?
++        solve_planar_ray_to_wall(excluded, pose, final_gate) : solve_planar(excluded, pose, final_gate);
++    };
++
+   // First pass uses every return. Its pose is only needed to decide which returns the map
+   // cannot explain -- it is biased by the very notes we are about to reject, but a ~15 mm
+   // bias does not change whether a return is 120 mm off the map.
+@@ -971,12 +999,11 @@ void LaserScanMatchingNode::process_scan(
+   if (enable_yaw_lost_mode_ && consecutive_planar_invalid_ >= kYawLostModeThreshold) {
+     Pose2D flipped_seed = pose_start;
+     flipped_seed.yaw = wrap_angle_diff(pose_start.yaw + M_PI);
+-    const Pose2D normal_result = planar_use_ray_to_wall_ ?
+-      solve_planar_ray_to_wall({}, pose_start) : solve_planar({}, pose_start);
++    const Pose2D normal_result = solve_planar_coarse_to_fine({}, pose_start);
+     const size_t normal_inliers = planar_inliers;
+     const double normal_residual_sum = planar_abs_residual;
+-    const Pose2D flipped_result = planar_use_ray_to_wall_ ?
+-      solve_planar_ray_to_wall({}, flipped_seed) : solve_planar({}, flipped_seed);
++    const Eigen::Matrix3d normal_h = planar_h;
++    const Pose2D flipped_result = solve_planar_coarse_to_fine({}, flipped_seed);
+     const size_t flipped_inliers = planar_inliers;
+     const double flipped_residual_sum = planar_abs_residual;
+     const bool flipped_wins = flipped_inliers > normal_inliers ||
+@@ -991,14 +1018,14 @@ void LaserScanMatchingNode::process_scan(
+       active_seed = flipped_seed;
+       planar_pose = flipped_result;
+     } else {
+-      // 最後に呼んだのはflipped側なので、採用するoriginal側の値へ復元する。
++      // 最後に呼んだのはflipped側なので、採用するoriginal側の値(hも含め)へ復元する。
+       planar_inliers = normal_inliers;
+       planar_abs_residual = normal_residual_sum;
++      planar_h = normal_h;
+       planar_pose = normal_result;
+     }
+   } else {
+-    planar_pose = planar_use_ray_to_wall_ ?
+-      solve_planar_ray_to_wall({}, active_seed) : solve_planar({}, active_seed);
++    planar_pose = solve_planar_coarse_to_fine({}, active_seed);
+   }
+ 
+   std::vector<bool> planar_excluded;
+@@ -1065,8 +1092,7 @@ void LaserScanMatchingNode::process_scan(
+     flush_cluster();
+ 
+     if (excluded_points > 0) {
+-      planar_pose = planar_use_ray_to_wall_ ?
+-        solve_planar_ray_to_wall(planar_excluded, active_seed) : solve_planar(planar_excluded, active_seed);
++      planar_pose = solve_planar_coarse_to_fine(planar_excluded, active_seed);
+     }
+     RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 5000,
+       "note rejection: %zu/%zu returns unexplained, %zu clusters -> %zu accepted, "
+@@ -1101,7 +1127,6 @@ void LaserScanMatchingNode::process_scan(
+   result.wall.covariance_valid = false;
+   if (planar_valid) {
+     result.wall.valid = true;
+-    result.wall.covariance_valid = true;
+     result.wall.degenerate = false;
+     result.wall.x_axis_degenerate = false;
+     result.wall.y_axis_degenerate = false;
+@@ -1115,7 +1140,33 @@ void LaserScanMatchingNode::process_scan(
+     result.wall.corrected_pose.orientation.y = 0.0;
+     result.wall.corrected_pose.orientation.z = std::sin(planar_pose.yaw * 0.5);
+     result.wall.corrected_pose.orientation.w = std::cos(planar_pose.yaw * 0.5);
+-    result.wall.covariance = {1e-5, 0.0, 0.0, 0.0, 1e-5, 0.0, 0.0, 0.0, 1e-5};
++
++    // --- 平面ソルバーの実共分散(2026-07-30、Censi 2007型) ---
++    // 汎用3D ICP側(上記772行付近)と同じ考え方: 最終反復のGauss-Newton情報行列
++    // planar_h(x,y,yaw順、Huber重み込み、正則化前)から Cov = wall_cov_range_sigma_^2
++    // * h^-1 で共分散を得る。ここのhは各点で `weight * J Jᵀ` を正規化なしに
++    // 積算したもの(標準的な重み付き最小二乗の情報行列そのもの)なので、
++    // 3D ICP側のような追加の /N 補正は不要。backend側(backend_optimizer_node.cpp、
++    // wall_use_icp_covariance_)は既にこの値を「従来のN数ヒューリスティックσを
++    // 下限、縮退σを上限」とするクランプで緩める方向にのみ使うため、旋回中に
++    // ヨー方向の見える壁の向きが偏って情報量が落ちても、③へその劣化がそのまま
++    // 伝わり、固定1e-5の人工値では出せなかった適応的な信頼度調整が働く。
++    Eigen::SelfAdjointEigenSolver<Eigen::Matrix3d> planar_es(planar_h);
++    if (planar_es.info() == Eigen::Success && planar_es.eigenvalues().minCoeff() > 1e-6) {
++      const Eigen::Matrix3d cov_xyyaw =
++        (wall_cov_range_sigma_ * wall_cov_range_sigma_) * planar_h.inverse();
++      // メッセージはcovariance[0]=yaw分散,[4]=x分散,[8]=y分散の(yaw,x,y)対角順を
++      // 期待する(backend_optimizer_node.cppで確認済み)。hは(x,y,yaw)順なので、
++      // メッセージのrow/col i を order[i]でhのindexへ変換する。
++      static constexpr std::array<int, 3> kYawXYOrder{2, 0, 1};
++      for (int r = 0; r < 3; ++r) {
++        for (int c = 0; c < 3; ++c) {
++          result.wall.covariance[static_cast<size_t>(r * 3 + c)] =
++            cov_xyyaw(kYawXYOrder[r], kYawXYOrder[c]);
++        }
++      }
++      result.wall.covariance_valid = true;
++    }
+   }
+ 
+   // --- 円柱観測の抽出 ---

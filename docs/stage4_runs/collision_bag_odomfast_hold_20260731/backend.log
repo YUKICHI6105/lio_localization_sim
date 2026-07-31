@@ -1,0 +1,6 @@
+[INFO] [1785436702.642879892] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[INFO] [1785436702.643175047] [backend_optimizer_node]: backend_optimizer_node started (0 cylinders registered)
+[ERROR] [1785436775.293266834] [backend_optimizer_node]: IMU signal LOST (no IMU for 2.00s > 2.00s). Self-localization is the dead-reckoning backbone and cannot continue without it: entering FAIL-SAFE HALT (freezing estimate, no further graph updates).
+[ros2run]: Received signal:  Interrupt
+[INFO] [1785436788.518931260] [rclcpp]: signal_handler(signum=2)
+[INFO] [1785436788.520479610] [backend_optimizer_node]: backend concurrency stats: imu_callbacks=60286, during_worker=1955 (3.2%), during_smoother=1484 (2.5%), callback_gap_max=1279.182ms, gaps>2ms=9433, gaps>10ms=910; stamp_gap_max=1.000ms, gaps>1ms=0; ring_enqueue_max=0.056ms, enqueues>2ms=0; callback_duration_max=2.135ms, durations>2ms=1; worker_jobs=2412 mean/max=0.976/5.917ms; smoother_updates=2411 mean/max=0.755/5.326ms; unity_audit reports=242 source_imu_last=60251 receiver_at_last_report=60240 final_receiver=60286

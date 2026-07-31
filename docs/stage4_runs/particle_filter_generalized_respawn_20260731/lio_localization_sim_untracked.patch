@@ -1,0 +1,902 @@
+diff --git a/docs/experiment_history/17_rotation_error_stage_decomposition_20260730.md b/docs/experiment_history/17_rotation_error_stage_decomposition_20260730.md
+new file mode 100644
+index 0000000..891d7f8
+--- /dev/null
++++ b/docs/experiment_history/17_rotation_error_stage_decomposition_20260730.md
+@@ -0,0 +1,90 @@
++# 実験履歴: 旋回時過渡誤差の3段分解と原因確定・対策方針 (2026-07-30)
++
++## 目的
++
++符号バグ修正後(16番)も残る「旋回時に位置誤差が一時的に10〜28mmへ上がり、数秒で
++1mm前後へ回復する」過渡誤差について、どの段(②壁マッチング / ③因子グラフ融合 /
++①IMU外挿)が誤差を持っているかをbag再生の3段分解で確定し、新目標
++「どんな動きをしても最大位置誤差5mm以内」への対策方針を決める。
++
++実験はSonnetサブエージェントが実施(bag再生のみ、Unity起動なし、ソース変更なし)。
++使用bag: `/tmp/robocon_angvel_fix_gyrosign_20260730.mcap`(旋回込み約40秒、
++ジャイロ符号修正済み)。`bag_component_isolation.sh --record-stages`で
++`/ground_truth_pose` `/scan_match_result` `/state_estimate` `/odom_fast` を記録し、
++各ストリームを真値と自スタンプで比較した。
++
++## 実験A: 3段誤差分解の結果
++
++run: `docs/stage4_runs/stage_decomp_rotation_20260730/`
++(サニティ: evaluator t=15窓 mean=10.31/max=28.21mm、既知基準と整合)
++
++| stream | 窓 | pos最大[mm] | ピーク時刻[s] | pos平均[mm] | yaw最大[deg] |
++|---|---|---:|---:|---:|---:|
++| ②wall(validのみ) | 旋回[9.5,12] | 2.77 | 11.83 | 0.72 | 0.10 |
++| ②wall(validのみ) | 直後[12,16] | 2.18 | 13.25 | 0.63 | 0.24 |
++| ②wall(validのみ) | 全体[3,38] | **2.77** | — | 0.66 | 0.25 |
++| ③state_estimate | 旋回[9.5,12] | 5.18 | 11.98 | 0.94 | 1.38 |
++| ③state_estimate | 直後[12,16] | **24.91** | 13.40 | 13.24 | **2.72** |
++| ①odom_fast | 直後[12,16] | **28.21** | 12.59 | 13.71 | 2.73 |
++
++補助データ: DCSダウンウェイト 0件 / 壁補正unavailable 0件 / 品質reject 0件
++(run全体)。つまり壁補正は**全スキャンがフル重みで受理されている**。
++
++## 実験B: ①のLPF群遅延アブレーション
++
++lpf_tau 0.005→0.001で全窓とも変化±5%以内(t=15窓 max 27.65→26.38mm)。
++**LPF仮説は棄却**。
++
++## 確定した結論
++
++1. **②(壁マッチング測定)は旋回中・直後も含め最大2.8mm/0.25°でほぼ真値**。
++   ICP側の仮説(旋回時測定バイアス、粗探索不足、ノーツ、deskew)はすべて棄却。
++   測定チェーンは既に5mm目標を満たす品質を持っている。
++2. **誤差は③の融合で生まれる**。毎秒40回、~1mm/~0.1°精度の絶対観測(壁prior)を
++   フル重みで受理しながら、事後推定は25mm/2.7°までズレ、回復に4〜6秒かかる。
++   ①は③の上に~3mmの外挿誤差を足すだけ(28.2 vs 24.9mm)。
++3. メカニズム: **CombinedImuFactor(相対拘束)の剛性が壁prior(絶対拘束)に対して
++   桁違いに高すぎる**。ジャイロノイズ密度はデータシート白色雑音値
++   (4.9e-5 rad/s/√Hz)をそのまま使っており、25ms区間の相対回転σは~8e-6 radと
++   非現実的にタイト。一方壁priorのyaw σは0.3/√N≈0.77°で、実測品質(平均0.05°)
++   より約15倍緩い。高角加速度中にIMUモデル外の誤差(有限差分加速度、代入
++   タイミングのジッタ等)が入ると、グラフは緩い側の変数(バイアス・状態)を曲げて
++   矛盾を吸収し、その汚染が固定ラグ窓の時定数で数秒間抜けない —
++   観測された「旋回直後にピーク、ゆっくり減衰」の署名と一致する。
++4. これはLIO系の既知の失敗様式で、データシート値のIMUノイズは因子グラフでは
++   ほぼ常に楽観的すぎる。LIO-SAM自身の既定config(imuGyrNoise=0.01)は
++   データシート比~200倍に膨らませてある。
++
++## 対策の提案(優先順)
++
++1. **剛性バランスの是正(パラメータのみ、bag再生でA/B検証可能)**
++   - ③のIMUノイズ(gyroscope_sigma / accelerometer_sigma / integration_sigma)を
++     現実的な総合値へ膨張(データシート比10〜50倍から探索)
++   - 壁priorのyaw σを実測品質へ接近(wall_prior_base_yaw_sigma 0.3→0.05程度)
++   - 期待効果: 事後推定の権威が「実測2.8mm/0.25°の壁観測」側へ移り、
++     旋回直後の尾引きが消える。②が2.8mmである以上、**融合の是正だけで
++     5mm目標に届く見込みが高い**
++2. **②の実共分散配信**: planar solverが既に組むGauss-Newton Hessianから
++   H⁻¹ベース(Censi型)の共分散を配信し、固定1e-5・軸別折半・縮退フラグ常時false
++   という人工値を置換する。手調整グローバル値ではなく、スキャンごとの実情報量
++   (旋回中の異方性を含む)が③へ伝わる恒久解
++3. (1)(2)で不足する場合のみ: バイアスのランダムウォークσ・事前分布の見直し
++4. **密結合化(点対線残差をGTSAMカスタム因子として③へ直接入れる、LIO-SAM系譜の
++   構造的終着点)は現時点では不要**と判断。測定が既に2.8mmであり、対策1が
++   パラメータのみで済むため、コスト対効果が合わない
++
++## 方針
++
++- 次の一手は対策1のA/Bスイープ(bag再生のみ、Unity不要)。IMUノイズ膨張率
++  {10x, 30x, 50x} × 壁yaw σ {0.3, 0.1, 0.05} 程度の小グリッドで、旋回窓の
++  max位置誤差が5mm未満になる組を探す
++- 対策2はその結果を見てから着手判断(対策1で5mmに届けば優先度は下がるが、
++  実機移行時のロバスト性のため中期的には実施推奨)
++- 実験生成物: `docs/stage4_runs/stage_decomp_rotation_20260730/`、
++  `docs/stage4_runs/lpf_ablation_tau0p001_20260730/`(いずれも未コミット)
++
++## 対応状態
++
++- 本レポート時点で実装変更なし(分析・方針のみ)
++- ヨー版迷子モード(16番)は既定無効のまま
++- coarse-to-fine平面ソルバー(前セッションで実装済み・効果中立)は無害のため維持
+diff --git a/docs/experiment_history/18_sigma_sweep_and_full_run_scan_20260730.md b/docs/experiment_history/18_sigma_sweep_and_full_run_scan_20260730.md
+new file mode 100644
+index 0000000..bb98ff5
+--- /dev/null
++++ b/docs/experiment_history/18_sigma_sweep_and_full_run_scan_20260730.md
+@@ -0,0 +1,85 @@
++# 実験履歴: σスイープと全区間旋回走査(2026-07-30、進行中)
++
++17番の方針(IMUノイズ/壁yaw事前分布のσ調整で旋回時過渡誤差を5mm以内へ)の
++検証結果。bag再生のみ、Unity起動なし。
++
++## 1. 使用bagの実態(想定と異なっていた)
++
++`stage_decomp_rotation_20260730/stage_derived`の全区間(約40秒)を走査した結果、
++このbagには**旋回イベントが1回しか含まれていない**ことが判明した。
++
++- t=0〜10.06s: 完全静止
++- t=10.06〜12.8s: 唯一の移動区間(該当の旋回 t≈10.1-11.1s、ヨー変化約-56.2°、
++  峰ヨーレート1.49rad/s)
++- t=12.8〜39.74s: 再び完全静止
++
++周回走行(複数回旋回)を想定していたが、実際は「静止→1回の移動+旋回→静止」の
++単発プロファイルだった。したがって**「毎回の旋回で同程度悪化するか」はこの
++bagだけでは判定できない**(比較対象の旋回が他に無いため)。参考として:
++
++| 区間 | 峰位置誤差[mm] |
++|---|---:|
++| 旋回イベント(t=9.8-14.1窓) | 24.907 @t=13.401s |
++| 静止区間S0(t=25.3-28.6) | 1.332 |
++| 静止区間S1(t=3.3-6.6) | 1.173 |
++
++旋回時は静止時の約19〜21倍。グローバル最大も同じ24.907mm@13.401sで、
++report 17の実測(状態推定24.91mm@13.40s)と完全一致(解析の妥当性を確認)。
++
++## 2. σスイープ結果
++
++baseline(yaw_sigma=0.30, IMU等倍): t=15 mean=10.2/max=27.7mm(report 17記載値)。
++
++| run | wall_prior_base_yaw_sigma | IMU倍率 | t=15 mean/max[mm] | t=20 | t=25 | t=30 |
++|---|---:|---:|---:|---:|---:|---:|
++| sweep_yawsigma_015 | 0.15 | 1x | 11.22/30.48 | 3.88/8.57 | 1.34/1.82 | 0.77/1.36 |
++| sweep_yawsigma_008 | 0.08 | 1x | 11.20/30.56 | 3.93/8.59 | 1.34/1.82 | 0.77/1.36 |
++| sweep_yawsigma_005 | 0.05 | 1x | 11.27/30.60 | 3.90/8.55 | 1.34/1.81 | 0.76/1.36 |
++| sweep_imuinflate_10x | (best上記) | **10x** | **4.04/18.29** | 0.61/1.63 | 0.41/0.93 | 0.28/0.80 |
++
++### 所見(想定と逆だった点)
++
++**壁yaw事前分布を締める(0.30→0.05)だけでは改善せず、むしろ悪化した**
++(t=15 max 27.7→30.5mm、0.15/0.08/0.05の3値でほぼ差が無い)。壁補正の重みを
++機械的に強めても、旋回中に壁観測自体に乗る短時間のノイズ(平均では小さくても
++瞬間的にはある)をより強く状態へ注入するだけで、逆効果になったと考えられる。
++
++**IMUノイズを膨らませる(10倍)方が明確に効いた**。t=15 maxが27.7→18.3mmへ
++34%減。さらに旋回と無関係なt=20〜30の定常区間も軒並み改善しており
++(t=30 max 1.45→0.80mm)、IMU拘束を緩めることが旋回時だけでなく全体の
++精度にもプラスに働くことを示している。これは「IMU相対拘束が壁の絶対拘束
++より硬すぎて、旋回中の予測を過信し、fixed-lag窓の時定数でしか解消しない」
++という17番の機序仮説と整合する。
++
++### 続き(30x/50x、完了)
++
++| run | 倍率 | t=15 mean/max[mm] | t=20 | t=25 | t=30 | t=35 |
++|---|---:|---:|---:|---:|---:|---:|
++| sweep_imuinflate_30x | 30x | 1.32/**12.06** | 0.26/0.60 | 0.22/0.68 | 0.22/0.65 | 0.21/0.64 |
++| sweep_imuinflate_50x | 50x | 0.74/**11.95** | 0.27/0.60 | 0.23/0.86 | 0.25/0.77 | 0.23/0.65 |
++
++10x→30xでt=15 maxが18.3→12.1mmへさらに改善するが、30x→50xでは12.06→11.95mm
++とほぼ横ばい(収穫逓減、頭打ち)。定常区間(t=20〜35)はいずれの倍率でも
++baselineより明確に改善しており、悪化は一切無い。
++
++## 3. 結論と採用パラメータ
++
++**`wall_prior_base_yaw_sigma=0.15` + IMUノイズ(gyroscope/accelerometer/
++integration sigma)×30倍**を採用する。50倍はt=15 maxがほぼ同値(誤差範囲内)
++で定常窓がわずかに悪化するため、より小さい摂動で同等効果の30倍を選ぶ。
++
++| 指標 | baseline | 採用(yaw_sigma=0.15, IMU×30) |
++|---|---:|---:|
++| t=15 max(旋回時) | 27.7〜28.2mm | **12.06mm**(57%減) |
++| t=30 max(定常) | 1.45mm | 0.65mm(改善) |
++
++**5mm目標には未達**(旋回時maxの下限は30x/50xとも約12mmで頭打ち)。計画通り
++ここで本方向のσ調整は打ち切る。
++
++## 対応状態
++
++- コード変更なし。パラメータ調整の効果測定のみ(未適用、yamlへの反映は未実施)
++- `wall_prior_base_yaw_sigma`単独調整は効果薄と確認、以後の候補から除外
++- IMUノイズ膨張は有効だが単独では5mm目標に届かず頭打ち。次の焦点は
++  17番が提案した対策2(②のGauss-Newton Hessianベース実共分散配信、
++  固定1e-5・軸別機械的折半・縮退フラグ常時falseの解消)
+diff --git a/docs/experiment_history/19_rotation_error_root_cause_summary_20260730.md b/docs/experiment_history/19_rotation_error_root_cause_summary_20260730.md
+new file mode 100644
+index 0000000..5c961d1
+--- /dev/null
++++ b/docs/experiment_history/19_rotation_error_root_cause_summary_20260730.md
+@@ -0,0 +1,84 @@
++# 実験履歴: 旋回時過渡誤差の原因整理(2026-07-30時点)
++
++15〜18番の結果を1枚に整理する。個々の実験詳細は各番号を参照。
++
++## 確定した原因(証拠あり)
++
++### A. 3つのバグ(修正済み、16番)
++
++実旋回を初めて有効化した際の壊滅的破綻(最大159m、ヨー誤差180°)の原因。
++いずれも「yaw=0では無症状」なため、この検証まで一度も発現していなかった。
++
++1. `/odom_fast`のtwistがワールド座標系のまま配信(ボディ座標系であるべき)
++2. `body.MoveRotation()`が非kinematic Rigidbodyの`angularVelocity`を更新しない
++3. **(真因)** ジャイロが擬ベクトルとして正しく変換されていない
++   (`UnityVectorToRos`の鏡映変換に符号反転が抜けていた)
++
++3つとも修正済み。修正後、壊滅的破綻(541/541点非対応等)は再現しなくなった。
++
++### B. 残る過渡誤差は②ではなく③で生まれる(17番)
++
++3段分解(②wall / ③state_estimate / ①odom_fast、真値との突き合わせ)の結果:
++
++- ②(壁マッチング測定)は旋回中も含め**最大2.8mm/0.25°**とほぼ真値
++- ③(因子グラフ融合)で最大24.9mm、①はその上に外挿誤差を足して最大28.2mm
++- この間、DCSダウンウェイト0件・壁補正拒否0件・unavailable 0件
++  (壁補正は**毎回フル重みで受理**されている)
++
++→ 誤差は測定(②)の質ではなく、③の融合の仕方で生まれている。
++
++### C. 融合側の機序: IMU拘束が壁の絶対拘束より硬すぎる(17・18番)
++
++18番のσスイープで機序を実証した。
++
++| 操作 | t=15旋回窓 max[mm] | 判定 |
++|---|---:|---|
++| baseline | 27.7〜28.2 | — |
++| 壁yaw事前分布を締める(0.30→0.05) | 30.5〜30.6 | **悪化**(効果なし) |
++| IMUノイズ×10 | 18.3 | 改善 |
++| IMUノイズ×30 | **12.1** | 改善(最良) |
++| IMUノイズ×50 | 12.0 | 頭打ち(30xと同値) |
++
++「壁を締めても悪化し、IMUを緩めると改善する」という非対称な結果は、
++**問題が"壁を信じていないこと"ではなく"IMU(CombinedImuFactor)の相対拘束が
++硬すぎて、旋回中の予測を過信すること"**であることを直接裏付ける。データ
++シート値のIMUノイズは無回転時は問題にならないが、旋回中の未モデル化誤差
++(有限差分加速度・タイミングジッタ等)を吸収する余地が無い。
++
++## まだ特定できていない点
++
++**IMUノイズをいくら緩めても12mm前後で頭打ちになり、5mm目標に届かない。**
++つまりIMU拘束の硬さは主要因の一つだが、それだけでは説明しきれない
++「もう1つの下限要因」が別に存在する。候補(いずれも未検証):
++
++1. **バイアスのランダムウォークσ**(`bias_acc_random_walk_sigma`/
++   `bias_gyro_random_walk_sigma`)は今回のスイープで触っていない。旋回中に
++   一時的に誤差を吸収したバイアスが、真値へ戻るのに数秒かかっている
++   (=バイアス自身の遅い時定数)可能性がある。18番でスイープしたのは
++   加速度計・ジャイロ・積分の「測定」σのみ。
++2. **②の共分散が固定値・ヒューリスティックであること**(アーキテクチャ文書
++   で以前から指摘済み、17番の対策2)。壁位置の残差は小さくても、旋回中は
++   見える壁面の法線方向の分布が変わり、**ヨー方向の真の情報量(観測可能性)
++   だけが一時的に落ちている**可能性がある。現状の共分散は対応点数のみに
++   基づく(固定1e-5、軸別は機械的折半)ため、この種の幾何学的な劣化を
++   反映できない。実際のGauss-Newton Hessianから共分散を出せば、旋回中に
++   σが自動的に(必要な分だけ)緩み、③が正しく重みを調整できる可能性がある。
++3. ISAM2の`relinearize_threshold_`が、旋回による大きな非線形性の下で
++   最適化の質を落としている可能性(未検証)。
++
++## 追加検証: バイアスランダムウォークσ(候補1)は除外
++
++`bias_acc_random_walk_sigma`/`bias_gyro_random_walk_sigma`を既定値の0.1倍〜100倍
++(1000倍のレンジ)で振っても、t=15旋回窓のmax誤差は12.06〜12.13mmで**完全に
++不変**だった(mean誤差はk=100で1.32→0.57mmまで下がるが、maxには効かない)。
++候補1は12mmの下限要因ではないと確定。次の焦点は候補2(②の実共分散配信)に
++絞られた。
++
++## 現時点の結論
++
++- 破綻(バグ)と過渡誤差(残差)は別問題。バグは解消済み
++- 過渡誤差の所在(③の融合)と機序の方向性(IMU拘束過硬)は実証済み
++- ただしIMU側のパラメータ調整だけでは5mm目標の下限(~12mm)を越えられない
++- 次に切り分けるべきは上記候補1(バイアスσ)と候補2(②の実共分散)のどちらが
++  12mmの下限を作っているか。候補2は17番で「大改造は不要」と判断していたが、
++  今回IMU調整だけでは頭打ちになったことを踏まえ、再評価が必要かもしれない
+diff --git a/docs/experiment_history/20_planar_real_covariance_implementation_20260730.md b/docs/experiment_history/20_planar_real_covariance_implementation_20260730.md
+new file mode 100644
+index 0000000..e2c3f50
+--- /dev/null
++++ b/docs/experiment_history/20_planar_real_covariance_implementation_20260730.md
+@@ -0,0 +1,162 @@
++# 実験履歴: ②の実共分散(Censi型)実装と検証 (2026-07-30)
++
++19番で候補1(バイアスσ)を除外した後の、候補2(②の実共分散配信)の実装結果。
++
++## 実装内容
++
++`lio_localization/src/laser_scan_matching_node.cpp`の平面ソルバー
++(`solve_planar`/`solve_planar_ray_to_wall`)で、最終反復のGauss-Newton情報行列
++`h`(x,y,yaw順、Huber重み込み、正則化前)を新しい外側変数`planar_h`として捕捉し、
++
++```
++Cov(x,y,yaw) = wall_cov_range_sigma_^2 * planar_h^-1
++```
++
++をbackendが期待する(yaw,x,y)対角順に並べ替えて`result.wall.covariance`へ配信する
++ように変更した。固有値(縮退判定)が1e-6以下ならconvariance_validをfalseにし、
++従来のヒューリスティックのみへフォールバックする。固定値`{1e-5,0,0,...}`だった
++箇所を置換。backend側(`wall_use_icp_covariance_`)は既存のクランプ(ヒューリス
++ティックσを下限、縮退σを上限として緩める方向にのみ反映)をそのまま使うため、
++backend側の変更は不要だった。ビルド成功。
++
++## 検証(bag再生、`/tmp/robocon_angvel_fix_gyrosign_20260730.mcap`)
++
++realtime_evaluator_nodeの5秒窓ログ(`t=15.0s recent 5s`が旋回直後窓に相当、
++以前のレポートと同じ定義)で比較。
++
++| 条件 | t=15 mean[mm] | t=15 max[mm] |
++|---|---:|---:|
++| 旧baseline(実共分散なし、17/18番) | 10.2 | 27.7〜28.2 |
++| **実共分散のみ(σ調整なし)** | 5.82 | **22.18** |
++| IMU×30のみ(σ調整、実共分散なし、18番) | 1.32 | **12.06** |
++| 実共分散 + IMU×30 + yaw_sigma=0.15 | 6.17 | **22.99** |
++
++## 所見
++
++1. **実共分散単体はbaselineより明確に改善**(max 27.7→22.18mm、約20%減、
++   mean半減)。②の実共分散配信自体は無害どころか有効に働いている。
++2. **しかしIMU×30単体(12.06mm)には遠く及ばない**。
++3. **重ね合わせても加算的に効かない**: 実共分散+IMU×30の組み合わせ(22.99mm)は
++   実共分散単体(22.18mm)とほぼ同値で、IMU×30単体(12.06mm)より明確に悪い。
++   つまり実共分散を有効にした状態では、IMU側をいくら緩めてもその恩恵が
++   ほぼ消えてしまう。
++4. backendの`wall prior loosened by ICP covariance`診断ログ(x/y並進のみ監視)は
++   両runとも0件 — ただしこの診断はyaw方向の緩みを見ていないため、yaw_sigmaが
++   Censi値で押し上げられているかどうかはこのログからは判定できない
++   (yaw方向の直接ログは未実装)。
++5. 仮説: 旋回中は見える壁面の法線方向分布が偏り、平面ソルバーのyaw方向
++   情報量(Hessianのyaw対角/相関)が一時的に低下する可能性がある。実共分散は
++   これを正しく検出して「まさにIMUを信じるべきでない旋回中に」壁priorのyaw
++   σを緩めてしまい、IMU緩和策の効果を打ち消している可能性がある
++   (未確認、直接のyaw_sigma値ログが必要)。
++
++## 追加: 標準診断(wall_sigma_diag)の追加と直接確認 (2026-07-31)
++
++「ヨー方向で問題が繰り返し起きる」という指摘を受け、憶測で次の一手を決めず、
++まずbackend側のσ計算過程を毎スキャン記録する標準診断を追加した
++(`lio_localization/include/lio_localization/backend_optimizer_node.hpp`の
++`WallSigmaRecord`、`diag_wall_sigma_path`パラメータ、既定は空文字列=無効、
++`DiagRecorder`と同じ低オーバーヘッド設計)。記録項目: 対応点数(全体/X/Y)、
++縮退フラグ、Censiσ(x,y,yaw)、ICPクランプ前のヒューリスティックσ、DCS/高
++ダイナミクス適用後の最終σ。
++
++`wallsigma_diag_realcov_imu30_20260730`(実共分散+IMU×30+yaw_sigma=0.15の
++組み合わせ)で記録・解析した結果:
++
++1. **ヨー方向の「実共分散が緩めてしまう」という前セクションの仮説は誤りだった**。
++   旋回窓(t=9.5〜16.0s)の全サンプルで`censi_yaw`(0.0009〜0.0027rad)は
++   ヒューリスティック`heuristic_yaw_sigma`(0.00645rad、yaw_sigma=0.15/√541)を
++   一度も超えず、`final_yaw_sigma`はこの区間ずっとヒューリスティックのまま
++   (clampの`max(heuristic, censi)`で常にheuristic側が勝つ)。ヨーは無関係。
++2. **実際に緩んでいたのはX方向**。t=11.801〜12.151sの約0.35秒間、
++   `censi_x`(0.00195〜0.00205)がヒューリスティック`heuristic_x_sigma`
++   (≈0.00186)をわずかに上回り、`final_x_sigma`が0.00183→0.00205へ
++   約12%緩む。この直後(約1.2〜1.6秒遅れ、fixed-lag smootherの伝播遅延と
++   整合)、17番で確認したstate_estimateの誤差ピーク(t=13.40s、24.9mm)が
++   現れる。同じ区間でY方向は逆に`censi_y`が0.00101から最低0.00056まで
++   **下がり**(ヒューリスティックを一度も超えない)、Yは常にヒューリスティック
++   のまま緩んでいない。
++3. 解釈: 旋回中は見える壁面の構成が変わり、X方向の対応点由来の情報量が
++   一瞬だけ実際に低下する(これ自体は物理的に妥当な検出)。しかし実共分散は
++   これを検出して「まさにIMU予測がX方向にドリフトし始めるタイミングで」
++   壁のX補正を12%緩めてしまい、IMU×30で既に緩めてある予測がその隙に
++   さらにドリフトし、smootherが1.5秒後に気づいて戻すまでの間に大きな
++   ピークとして現れている、という筋が最も辻褄が合う(ただし因果の完全な
++   証明ではなく、タイミングの一致による強い状況証拠)。
++
++## 訂正: 上記の「実共分散とIMU緩和が排他的」という結論は検証手順のミスだった (2026-07-31)
++
++X方向クランプ(`wall_cov_max_loosen_ratio`)を追加してA/Bテストしたところ、
++クランプの有無で結果が変わらなかった(ratio=1.0でも22.98mm、無制限でも
++22.99mm)。おかしいと考えて`--imu-param`と`--backend-param`の運用を洗い直した
++結果、**`accelerometer_sigma`/`gyroscope_sigma`/`integration_sigma`は
++`imu_preintegration_node`と`backend_optimizer_node`の両方が同名パラメータを
++宣言しており、実際の③因子グラフ融合に使われるのはbackend側の値**である
++ところ、本セクション(「実共分散+IMU×30」等)の検証はすべて`--imu-param`
++(①の診断用/odom_fastにしか効かない)で渡していたため、③のIMUノイズは
++実際には一度も緩んでいなかったことが判明した(18番の元マニフェストを
++確認し、`sweep_imuinflate_30x`が`--backend-param`で渡していたことと対比して
++特定)。
++
++正しく`--backend-param`で渡して再検証(`realcov_imu30_correctparam_20260731`):
++
++| 条件 | t=15 max[mm] |
++|---|---:|
++| 18番: IMU×30のみ(旧固定共分散1e-5、backend-param) | 12.06 |
++| **本実装の実共分散 + IMU×30(backend-param、正しい配線)** | **11.85** |
++
++**実共分散とIMU緩和は排他的ではなく、正しく組み合わせれば旧結果と同等以上**。
++上記のX方向クランプ・「censi_xが旋回中に緩む」という観測自体(wallsigma_diag
++の生データ)は事実として残るが、「それがIMU緩和の効果を打ち消す」という
++因果の結論は誤りだった(IMU緩和がそもそも③に届いていなかったため、
++「打ち消す対象」自体が無かった)。`wall_cov_max_loosen_ratio`パラメータは
++実害のない安全弁として残すが、確認された不具合の修正ではなく予防的な
++安全マージンという位置づけに変更する。
++
++## 結論と次の一手(2026-07-31 訂正版)
++
++候補2(実共分散)と候補C(IMU緩和)は排他的ではなく、正しく組み合わせれば
++**11.85mm**(18番の12.06mmと同等以上)。ただし**5mm目標にはまだ届かない**。
++候補1(バイアスσ)・候補2単体の効果・候補Cの機序はいずれも実証済みで、
++組み合わせても12mm前後が下限になっている。次の選択肢:
++
++- (a) 候補3(ISAM2 relinearize_threshold)を検証する — 未着手の唯一の主要候補
++- (b) X方向の一時的な情報量低下(wallsigma_diagで観測、censi_xが旋回中の
++  0.35秒だけヒューリスティックの1.12倍まで上昇)がなぜ起きるかを②側で
++  直接確認する(実害は今のところ確認されていないが、原理的な弱点ではある)
++- (c) `wall_prior_base_yaw_sigma=0.15`+IMU×30をyamlへ正式反映し、5mm未達を
++  前提に別の切り分け軸(smoother_lag_sec等)を探す
++
++いずれも未着手。ユーザー判断待ち。
++
++## 候補3: ISAM2 relinearize_thresholdの検証(2026-07-31、除外)
++
++正しい配線(11.85mmのbackend-param構成)の上で`relinearize_threshold`を
++0.001/0.01(既定)/0.03/0.1と100倍のレンジで振ったが、t=15 maxは全て
++**11.85mmで完全に同一**だった。2026-07-28の別文脈での既存の知見
++(0.001への締め込みで改善なし)と整合し、旋回時の過渡誤差についても
++候補3は下限要因ではないと確定した。
++
++これでバイアスσ(候補1)・②の実共分散(候補2)・ISAM2 relinearize閾値
++(候補3)の3候補すべてが「効果なし、または既にIMU緩和+実共分散に
++組み込み済み」で出尽くした。5mm目標(11.85mm、未達)に対して、これ以上の
++既知候補が無い状態。次の方向性はユーザー判断が必要
++(未探索の軸: smoother_lag_sec、DCS/imu_dynamicsゲートの旋回時挙動、
++または17番で一度「コスト対効果が合わない」と判断した密結合化の再検討等)。
++
++## 対応状態
++
++- `lio_localization/src/laser_scan_matching_node.cpp`変更・ビルド済み(未コミット)
++- `lio_localization/include/lio_localization/backend_optimizer_node.hpp`・
++  `src/backend_optimizer_node.cpp`に`diag_wall_sigma_path`診断機能と
++  `wall_cov_max_loosen_ratio`(既定1e6=実質無制限、安全弁として保持)を追加・
++  ビルド済み(いずれも既定で無効/無変化、未コミット)
++- 実験生成物: `docs/stage4_runs/realcov_baseline_20260730/`、
++  `docs/stage4_runs/realcov_plus_imu30_20260730/`、
++  `docs/stage4_runs/wallsigma_diag_realcov_imu30_20260730/`、
++  `docs/stage4_runs/realcov_imu30_correctparam_20260731/`(いずれも未コミット)
++- yamlへのσ変更は未反映(検証時の`--backend-param`一時上書きのみ)
++- **教訓**: `accelerometer_sigma`/`gyroscope_sigma`/`integration_sigma`は
++  `imu_preintegration_node`と`backend_optimizer_node`の両方が同名パラメータを
++  持つ。③の融合結果に効かせたい場合は必ず`--backend-param`で渡すこと
++  (`--imu-param`は①の診断用/odom_fastにしか効かない)。
+diff --git a/docs/experiment_history/21_opus_math_review_and_huber_disproof_20260731.md b/docs/experiment_history/21_opus_math_review_and_huber_disproof_20260731.md
+new file mode 100644
+index 0000000..7379b03
+--- /dev/null
++++ b/docs/experiment_history/21_opus_math_review_and_huber_disproof_20260731.md
+@@ -0,0 +1,148 @@
++# 実験履歴: Opusによる数学的健全性レビューとHuber仮説の反証 (2026-07-31)
++
++20番で候補1〜3(バイアスσ・実共分散・ISAM2 relinearize閾値)が出尽くした後、
++ユーザー指示でOpusサブエージェントに推定器の数学的妥当性を独立レビューさせた。
++並行してユーザーが別AIにも一部資料を渡して分析させており、その報告(壁
++PriorFactorへの外側Huberロバスト核が疑わしい、という指摘)も踏まえて
++Opusへの示唆とせず独立に評価させた。
++
++## Opusの結論(要約)
++
++Opusは「12mm前後の頭打ちは重みの調整不足ではなく構造的欠陥」と結論し、
++2つの最有力候補を挙げた。
++
++1. **壁PriorFactorへの外側Huberロバスト核(`make_robust(wall_noise)`,
++   backend_optimizer_node.cpp:357-362, huber_k既定1.345)**。GTSAMの
++   `mEstimator::Huber`既定`ReweightScheme::Block`は、Pose3の6次元
++   whitened残差ノルムから単一スカラー重みを計算し6次元全部に一律で
++   掛けるため、doc17のピーク時刻(t=13.40s)の実測値から逆算すると
++   whitenedノルム≥12.5、Huber重みw=1.345/12.5≈0.108、つまり
++   **σ_xyが実質1.8mm→5.6mmまで3.04倍緩められている**と試算。これは
++   「壁yaw σを締めたら悪化した」という17/18番の非対称な実験結果を
++   説明する初めての仮説だとした。
++2. **fixed-lag smootherの周辺化事前分布(marginalization prior)**。
++   周辺化時点の線形化点でヤコビアンが固定され二度と再線形化されない。
++   relinearize_thresholdを100倍レンジで振ってt=15 maxが**ビット単位で
++   完全同一(11.85mm)**だった20番の結果を、「再線形化は無関係」ではなく
++   「支配的な拘束が再線形化不可能な因子(=周辺化prior)であることの
++   直接証拠」と読み替えた。
++
++その他、以下も具体的なバグ・改善点として指摘した(詳細はOpusの原文
++参照、要点のみ記録):
++- **F-1(フレーム不一致、実バグ)**: 20番で実装したplanar版Censi共分散の
++  並進ブロックはmapフレームのヤコビアンから来ているが、backendの
++  PriorFactor<Pose3>のDiagonalノイズはbodyフレーム接ベクトルを期待する。
++  ヨー角ぶんの回転が missing。現状は`max(heuristic, censi)`クランプで
++  実害が隠れているが、クランプを外す・フル3×3を投入する際は一次の誤差になる。
++- **F-2**: `max(heuristic, censi)`クランプはヒューリスティック床がCensi値の
++  約30倍あるため構造的に外れず、実共分散は事実上no-op(20番の観測と整合)。
++- **F-3(実バグ・デッドコード)**: planar経路は`x_axis_correspondence_count`
++  =n/2、`y_axis_correspondence_count`=n-n/2という**捏造値**を送っており、
++  縮退フラグも常にfalse固定。backendの軸別σ・縮退分岐は**実際に使われて
++  いる経路では完全なデッドコード**。
++- **F-4**: ray-to-wallのヤコビアン`normal/denominator`にgrazing incidence
++  ガードが`|denominator|>1e-9`しかなく、入射角89.9°のビームが正面入射の
++  ~570倍(H寄与3×10^5倍)を持ちうる。旋回中は入射角分布が系統的に変わるため、
++  20番で観測した「censi_xが旋回中0.35秒だけ12%緩む」もこれで自然に説明できる
++  とした。
++- **F-5**: `wall_dcs_scale`は正式なDCS(Agarwal et al. 2013、χ²正規化された
++  有界重み)ではなく、上限のない線形σ倍率。
++- **F-6**: ゲートがχ²統計量ではなく生の閾値(d_xy/d_yaw)。
++- **F-7**: `realtime_evaluator_node`は`/odom_fast`(①)を購読しており、
++  報告している11.85mm等の数値には①の外挿誤差(doc17実測で③24.9mm、
++  ①28.2mm)が混入している。③単体の誤差を分離する作業を推奨。
++- Cov=σ_r²·H⁻¹(Huber重み込み)はM推定量の漸近共分散として厳密には誤り
++  (正しくはサンドイッチ形式A⁻¹BA⁻¹)だが、方向は過信寄りで大きさは
++  数%〜数十%程度、12mmの説明には全く足りないと試算(F-2で実質no-opなので
++  なおさら無関係)。
++
++## 私による反証実験: Huber仮説(推奨1)は棄却
++
++Opusの報告受信**前**に、ユーザーが別途取得した「壁PriorFactorのHuber
++ロバスト核が疑わしい」という指摘を検証するため、`huber_k`を既定1.345から
++1000.0へ引き上げる(Huber閾値を実質無限大にし、ロバストダウンウェイトを
++無効化するのと等価)A/Bテストを既に実行済みだった
++(`docs/stage4_runs/huberk_disabled_20260731/`)。
++
++Opus自身の試算(ピーク時whitenedノルム≈12.5)を踏まえれば、k=1000は
++その約80倍で、Huber重みが常に1(ダウンウェイト無し)になるのに十分な値の
++はずである。しかし実測結果は:
++
++| huber_k | t=15 max[mm] |
++|---|---:|
++| 1.345(既定) | 11.85 |
++| **1000.0(実質無効化)** | **11.85(ビット単位で同一)** |
++
++**全く変化しなかった**。Opusの推奨1が正しければ、無効化した瞬間に
++過渡が大きく縮み(σ_xyが5.6mm→1.8mmへ戻る分)、かつ「壁yaw σを締めると
++改善に転じる」という反証可能な予測が立てられていたが、そのテストの
++前提となる「Huberが実際に効いている」という部分がこの結果で否定された。
++
++**解釈**: Opusの数式自体(GTSAM Blockリウェイトの機構、σ³倍という試算)は
++恐らく正しいが、その入力である「whitenedノルム≥12.5」という見積もりが
++実態と乖離している可能性が高い。ISAM2は40Hzで逐次的に補正しており、
++各更新時点でのwall_pose残差は「真値からの最終的な25mmズレ」ではなく
++「直前の(既にある程度補正済みの)グラフ状態との差」であるため、
++Opusが③段の対真値誤差から逆算した残差よりも実際は遥かに小さく、
++Huberが強く発火する領域に達していない可能性がある(F-7の指摘とも
++整合: 評価対象は①=/odom_fastで、③の内部残差そのものではない)。
++
++**結論**: 推奨1(外側Huberの除去)は棄却。推奨2(周辺化事前分布/
++smoother_lag_sec)は既存の実験(relinearize閾値が無感応だったこと)と
++矛盾せず、唯一まだ直接検証していない主要候補として残る。F-1(フレーム
++バグ)・F-3(捏造値/デッドコード)は12mmの原因である証拠はまだ無いが、
++独立に修正すべき実バグとして記録しておく。
++
++## 追加検証: smoother_lag_secスイープも無効、③/①分離で真因を特定 (2026-07-31)
++
++Opus推奨2(`smoother_lag_sec`スイープ)を正しいbackend-param条件で実行。
++{0.15, 0.3, 0.5(既定), 1.0, 2.0}の13倍レンジで振ったが、t=15 maxは
++**11.85mmで完全に不変**(`docs/stage4_runs/lag_sweep_*_20260731/`)。
++推奨2も棄却。
++
++ここまでバイアスσ・ISAM2 relinearize閾値・huber_k・smoother_lag_secの
++4つ全てが11.85mmに対してビット単位で無感応だったことから、「評価している
++11.85mmはそもそも③(因子グラフ融合)の内部パラメータで動かない何かでは
++ないか」という疑いが強まった。F-7(評価対象は`/odom_fast`=①であり、
++③そのものではない)を直接検証するため、`--record-stages`で
++`/ground_truth_pose /scan_match_result /state_estimate /odom_fast`を
++記録し、正しいbackend-param条件(実共分散+IMU×30+yaw_sigma=0.15)下で
++オフライン3段分解を実施した(`docs/stage4_runs/stage_decomp_correctparam_20260731/`、
++解析スクリプトはスクラッチパッドの`stage_decomp_offline.py`、rosbag2_pyで
++`/ground_truth_pose`を線形補間し各ストリームと自スタンプで突き合わせ)。
++
++| 段 | t=[9.5,16]s窓 最大誤差 |
++|---|---:|
++| ②wall(scan_match_result, validのみ) | 2.768mm @t=11.826 |
++| **③state_estimate** | **2.509mm @t=12.826** |
++| **①odom_fast(評価対象)** | **11.848mm @t=11.873** |
++
++**③は真値に対して最大2.5mmしかずれていない**。17番のbaseline(③24.9mm)から
++比べ、実共分散+IMU×30の組み合わせは③に対して劇的に効いており、③はほぼ
++②の測定精度(2.77mm)まで改善されている。バイアスσ・relinearize閾値・
++huber_k・smoother_lag_secが軒並み無感応だったのは当然で、**これらは全て
++③内部のパラメータであり、評価対象の11.85mmはそもそも③の誤差ではなく
++①(IMU外挿)の誤差そのもの**だったため。
++
++**結論**: 問題の所在が③(融合)から①(IMU外挿/`imu_preintegration_node`の
++`/odom_fast`)へ完全に移った。今後の候補3つ(周辺化prior・Huber・ISAM2
++パラメータ)の検証はいずれも③側を見ており、①側の問題には最初から
++無関係だった。次の一手は①の外挿誤差の機序解明(確定状態からの外挿時間・
++レバーアーム効果・高角速度時の外挿モデルの妥当性等)に絞られる。
++
++## 次の一手(旧、③側の候補。現在は優先度低)
++
++- (a) `smoother_lag_sec`のスイープ{0.15, 0.3, 0.5, 1.0, 2.0}を正しい
++  backend-param条件(実共分散+IMU×30+yaw_sigma=0.15)で実行する
++  (Opus推奨2、未着手)
++- (b) F-7: ③(state_estimate)とodom_fast(①)を分離した評価を行い、
++  11.85mmのうちどれだけが①の外挿由来かを切り分ける(30分程度の作業と
++  Opusは見積もっている)
++- (c) F-1・F-3は12mm原因としては未確認だが、実バグとして別途修正を検討
++
++いずれも未着手。ユーザー判断待ち。
++
++## 対応状態
++
++- コード変更なし(本レポートは分析・検証結果のみ)
++- 実験生成物: `docs/stage4_runs/huberk_disabled_20260731/`(未コミット)
+diff --git a/docs/experiment_history/22_collision_robustness_20260731.md b/docs/experiment_history/22_collision_robustness_20260731.md
+new file mode 100644
+index 0000000..4846993
+--- /dev/null
++++ b/docs/experiment_history/22_collision_robustness_20260731.md
+@@ -0,0 +1,126 @@
++# 実験履歴: 衝突ロバスト性の実装 (2026-07-31)
++
++21番までで①(`imu_preintegration_node`のodom_fast外挿)が評価対象の誤差の
++正体であること、その原因が衝突である可能性が高いことを確認した。本番でも
++衝突(あるいは類似の外乱)は容易に起こりうるため、安全上この経路の頑健性は
++必須要件としてユーザーから明示された。
++
++## 前提: 衝突の実在確認
++
++Unity側`CollisionRecorder`(既存、`Debug.Log`のみで未配信)に`/robot_collision`
++トピック配信を追加(`UnityRosSensorPublisher.PublishCollision`)。MCP経由で
++ライブ実行し確認したところ、実際に**11件の衝突**(Post_2、Shelf_0、
++baffle_left_2、相対速度0.4〜1.4m/s)を検出した。
++
++## 試行1: backend側でCombinedImuFactorのσを吊り上げる方式(失敗、削除済み)
++
++生の加速度ノルムが閾値を超えたIMUサンプルについて、`preint_params_`の
++accelerometer/gyroscopeCovarianceをその場で吊り上げてから積分する方式を
++`backend_optimizer_node`に実装。検知自体は正しく動作した(22.3・125.9・
++21.3 m/s^2で発火)が、**位置誤差への効果はほぼゼロ**だった。理由: ③
++(因子グラフ融合)は壁補正が毎スキャン効くため元々問題が無く、そもそも
++「効かせる先」が間違っていた。①(単純なIMU外挿)には因子グラフも共分散も
++無いため、この実装は的外れだったと判断し、コードごと削除した。
++
++## 試行2: ①で積分を止めて外挿値を保持する方式(失敗、逆効果)
++
++問題は①だけにあるため、`imu_preintegration_node`側で衝突検知時に
++`integrateMeasurement`とpublishを両方スキップし、直前の外挿値を凍結する
++方式を実装。しかし**`/odom_fast`はUnity側のPDサーボが実際の閉ループ制御
++フィードバックとして使っている**ため、値を凍結すると制御側が古い推定値との
++誤差を蓄積させたまま急に復帰し、衝突が連続する区間(t=30.9〜34.1s、4件)で
++かえって悪化した(最大5.27mm→18.37mm)。単純な「情報が無いから止める」は、
++推定値が同時に物理挙動を駆動する閉ループの中では危険という教訓。
++
++## 試行3: 生の加速度ノルムを閾値へ切り詰めて積分する方式(採用)
++
++配信は止めず、積分に使う加速度だけ方向を保ったままノルムを閾値
++(既定20.0 m/s^2)へ切り詰める。`imu_callback`内で生の加速度により検知し、
++`imu_buffer_`へ積む値自体を切り詰め済みにすることで、③確定到着時の
++再積分(`state_estimate_callback`)でも同じ切り詰め後の値が一貫して使われる。
++
++検証(`mcp_collision_check_20260731/live_capture`、正しいbackend-param
++IMU×30 + wall_prior_base_yaw_sigma=0.15構成、`--imu-param
++imu_accel_anomaly_enabled:=true imu_accel_anomaly_threshold:=20.0`):
++
++| 窓 | 緩和策なし | clip方式 |
++|---|---:|---:|
++| t=16.5s | 2.64mm | 2.57mm |
++| t=26.1s | 1.44mm | 1.34mm |
++| t=30.9s | 2.65mm | 2.83mm |
++| **t=35.6s(最悪点)** | **5.27mm** | **4.39mm** |
++| t=45.2s | 1.87mm | 1.87mm |
++| t=49.9s | 2.80mm | 2.83mm |
++
++hold方式のような閉ループ悪化は無く、最悪点で約17%改善(他はほぼ横ばい)。
++劇的ではないが副作用なく安全側に効く。
++
++## 検証時の環境メモ
++
++このテスト中、システムメモリ逼迫(空き1GB程度、スワップ2GB近く使用)により
++evaluatorの初回マッチングが環境要因で複数回フレーキーに失敗した
++(`imu_accel_anomaly_enabled`の有無に関わらず発生することを確認済み、
++コード起因ではない)。再現しない場合は再試行で問題ない。
++
++## 追加: 無意味な補正器の削除・縮退検出の実装し直し (2026-07-31)
++
++ユーザー指示により、これまでの調査で「発動しない/効果がない」と確認済みの
++機構を削除し、1つだけ「本来重要だが正しく実装されていなかった」ものを
++修正した。
++
++### 削除したもの
++
++1. **未使用3D ICPのCensi共分散コード**(`laser_scan_matching_node.cpp`):
++   汎用3D ICP経路が組んでいたresult.wall.covariance等一式。Unityフィールド
++   では必ず後続のplanarソルバーの値で上書きされ、一度も使われていなかった。
++   壁マッチ品質判定(wall_valid・迷子モード用consecutive_invalid_results_)
++   は、ノーツ/ボール抽出の点分類に間接的に影響するため残した。
++2. **wall_dcs_scale(DCS風スケーリング)**(`backend_optimizer_node.cpp`):
++   物理的にあり得ない位置への補正が来た際にσを連続的に緩める機構。全検証を
++   通じて一度も発火しなかった(d_xyが常にmm規模)ため削除。
++3. **imu_dynamics_\*(高ダイナミクス検知)**(同上): 加速度版・ジャイロ版とも
++   既定無効。Opusレビューで方向が逆(壁を締めてIMUを相対的に硬いままにする)
++   と指摘済みで、有効化すると悪化するリスクがあった。
++4. **zupt_enabled_(ZUPT疑似観測)**(同上): 2026-07-28に試した閾値0.1m/s
++   (効果薄)・0.5m/s(まだ動いているのに速度=0を強制し27.92mmスパイクを
++   誘発)のいずれも不採用のまま既定無効で放置されていた。imu_dynamics_*と
++   同じ基準(試したが効かない・既定無効のまま)でコードごと削除した。
++
++### 修正したもの(削除ではなく実装し直し)
++
++**x/y軸別対応点数・縮退フラグ**: 「消すべきではなく直すべき」というユーザー
++指摘を受け、削除ではなく本来の設計(main.md ②-2)通りに実装し直した。
++`solve_planar`/`solve_planar_ray_to_wall`の各対応点で使っている法線ベクトル
++から、実際にX向き壁由来かY向き壁由来かを分類する`planar_count_x_facing`/
++`planar_count_y_facing`を追加し、以前の`planar_inliers/2`という機械的な
++折半・常時false固定だった縮退フラグを、実データに基づく判定へ置き換えた。
++
++検証(`diag_wall_sigma_path`で確認): x_n=87〜249、y_n=227〜434と、以前は
++常に同値だった二軸が明確に異なる実測値を示すようになった。このbagでは
++縮退は一度も発火しなかった(両方向とも常時十分見えている)。回帰確認
++(`cleanup_regression_check_20260731`)でt=15 max=11.73mm、既存の11.85mmと
++同水準で悪化なし。
++
++## 対応状態
++
++- `backend_optimizer_node.hpp`/`.cpp`: 試行1のコードは削除済み(コミット無し)
++- `imu_preintegration_node.hpp`/`.cpp`: 試行3(clip方式)を実装・ビルド済み。
++  `imu_accel_anomaly_enabled`(既定false)、`imu_accel_anomaly_threshold`
++  (既定20.0 m/s^2)
++- Unity: `/robot_collision`配信を追加(`UnityRosSensorPublisher.cs`、
++  `StartToBingoValidation.cs`のCollisionRecorder)、ライブUnityプロジェクトへ
++  反映・コンパイル確認済み
++- `bag_component_isolation.sh`: `--playback-duration`オプション追加、
++  再生対象トピックを生センサ+真値のみに制限(推定器出力トピックとの衝突回避)
++- `tools/consolidate_stage_log.py`: 位置/姿勢のみ記録し速度は解析時に数値
++  微分する標準診断ツールを新規作成
++- いずれも未コミット
++- yamlへの`imu_accel_anomaly_enabled`反映(既定有効化)は未実施、ユーザー
++  判断待ち
++- `laser_scan_matching_node.cpp`: 未使用3D ICPのCensi共分散・縮退検出コード
++  削除、x/y軸別対応点数の実分類実装(`planar_count_x_facing`/
++  `planar_count_y_facing`)。ビルド・回帰確認済み(未コミット)
++- `backend_optimizer_node.hpp`/`.cpp`: `wall_dcs_scale`・`imu_dynamics_*`
++  (加速度版・ジャイロ版)を削除。`WallSigmaRecord`から関連フィールド削除。
++  ビルド・回帰確認済み(未コミット)
++- `config/robocon2026_unity.yaml`: `imu_dynamics_enabled`削除(未コミット)
+diff --git a/tools/consolidate_stage_log.py b/tools/consolidate_stage_log.py
+new file mode 100644
+index 0000000..8fa481f
+--- /dev/null
++++ b/tools/consolidate_stage_log.py
+@@ -0,0 +1,165 @@
++#!/usr/bin/env python3
++"""Consolidate a --record-stages bag into flat, analysis-ready CSVs.
++
++Design principle (2026-07-31, per user direction): raw recordings should only carry
++information that cannot be reconstructed by calculus (position/orientation, bias states,
++node bookkeeping, sigma/covariance, discrete events). Velocity is NOT stored by the
++recorder -- it is derived here, once, by central-difference numerical differentiation of
++position, and saved alongside position in the same row so repeat analyses never need to
++re-derive it. This also sidesteps the two frame-convention bugs hit today when a raw
++twist/velocity field with an ambiguous frame (body vs world) was compared directly.
++
++Usage: consolidate_stage_log.py <stage_derived_bag_dir> <out_dir>
++
++Writes, under <out_dir>:
++  ground_truth.csv, scan_match_wall.csv, state_estimate.csv, odom_fast.csv
++    each with: t,x,y,yaw,vx,vy,yaw_rate (vx/vy/yaw_rate central-differenced from x,y,yaw)
++    state_estimate.csv additionally carries accel_bias_x/y/z, gyro_bias_x/y/z, node_index,
++    wall_factor_valid (none of these are derivable from position, so they are read directly)
++  collisions.csv: t,name,relative_speed_mps (from /robot_collision, if present in the bag)
++"""
++import csv
++import math
++import sys
++
++import rosbag2_py
++from rclpy.serialization import deserialize_message
++from nav_msgs.msg import Odometry
++from std_msgs.msg import String as StringMsg
++from lio_localization.msg import ScanMatchResult, StateEstimate
++
++
++def yaw_from_quat(q):
++    return math.atan2(2.0 * (q.w * q.z + q.x * q.y), 1.0 - 2.0 * (q.y * q.y + q.z * q.z))
++
++
++def read_bag(path):
++    so = rosbag2_py.StorageOptions(uri=path, storage_id='mcap')
++    co = rosbag2_py.ConverterOptions('', '')
++    reader = rosbag2_py.SequentialReader()
++    reader.open(so, co)
++    type_map = {
++        '/ground_truth_pose': Odometry,
++        '/scan_match_result': ScanMatchResult,
++        '/state_estimate': StateEstimate,
++        '/odom_fast': Odometry,
++        '/robot_collision': StringMsg,
++    }
++    out = {k: [] for k in type_map}
++    while reader.has_next():
++        topic, data, _ = reader.read_next()
++        if topic not in type_map:
++            continue
++        msg = deserialize_message(data, type_map[topic])
++        out[topic].append(msg)
++    return out
++
++
++def central_diff_series(rows):
++    """rows: list of (t, x, y, yaw), sorted by t. Returns list of
++    (t, x, y, yaw, vx, vy, yaw_rate) using central differences (one-sided at the ends)."""
++    n = len(rows)
++    out = []
++    for i in range(n):
++        t, x, y, yaw = rows[i]
++        if n == 1:
++            vx = vy = yaw_rate = 0.0
++        elif i == 0:
++            t1, x1, y1, yaw1 = rows[i + 1]
++            dt = t1 - t
++            vx = (x1 - x) / dt if dt > 0 else 0.0
++            vy = (y1 - y) / dt if dt > 0 else 0.0
++            yaw_rate = wrap(yaw1 - yaw) / dt if dt > 0 else 0.0
++        elif i == n - 1:
++            t0, x0, y0, yaw0 = rows[i - 1]
++            dt = t - t0
++            vx = (x - x0) / dt if dt > 0 else 0.0
++            vy = (y - y0) / dt if dt > 0 else 0.0
++            yaw_rate = wrap(yaw - yaw0) / dt if dt > 0 else 0.0
++        else:
++            t0, x0, y0, yaw0 = rows[i - 1]
++            t1, x1, y1, yaw1 = rows[i + 1]
++            dt = t1 - t0
++            vx = (x1 - x0) / dt if dt > 0 else 0.0
++            vy = (y1 - y0) / dt if dt > 0 else 0.0
++            yaw_rate = wrap(yaw1 - yaw0) / dt if dt > 0 else 0.0
++        out.append((t, x, y, yaw, vx, vy, yaw_rate))
++    return out
++
++
++def wrap(d):
++    return (d + math.pi) % (2.0 * math.pi) - math.pi
++
++
++def stamp_of(msg):
++    return msg.header.stamp.sec + msg.header.stamp.nanosec * 1e-9
++
++
++def write_pose_csv(path, rows_with_extra, extra_header, extra_getter):
++    with open(path, 'w', newline='') as f:
++        w = csv.writer(f)
++        w.writerow(['t', 'x', 'y', 'yaw', 'vx', 'vy', 'yaw_rate'] + extra_header)
++        for row, extra in rows_with_extra:
++            w.writerow(list(row) + extra_getter(extra))
++
++
++def main():
++    bag_path, out_dir = sys.argv[1], sys.argv[2]
++    data = read_bag(bag_path)
++
++    def gt_key(m):
++        return (stamp_of(m), m.pose.pose.position.x, m.pose.pose.position.y,
++                yaw_from_quat(m.pose.pose.orientation))
++    gt_raw = sorted(data['/ground_truth_pose'], key=stamp_of)
++    gt_rows = central_diff_series([gt_key(m) for m in gt_raw])
++    write_pose_csv(f'{out_dir}/ground_truth.csv',
++                   [(r, None) for r in gt_rows], [], lambda _: [])
++
++    odom_raw = sorted(data['/odom_fast'], key=stamp_of)
++    odom_rows = central_diff_series([gt_key(m) for m in odom_raw])
++    write_pose_csv(f'{out_dir}/odom_fast.csv',
++                   [(r, None) for r in odom_rows], [], lambda _: [])
++
++    se_raw = sorted(data['/state_estimate'], key=stamp_of)
++
++    def se_key(m):
++        return (stamp_of(m), m.pose.position.x, m.pose.position.y,
++                yaw_from_quat(m.pose.orientation))
++    se_pos_rows = central_diff_series([se_key(m) for m in se_raw])
++    write_pose_csv(
++        f'{out_dir}/state_estimate.csv',
++        list(zip(se_pos_rows, se_raw)),
++        ['node_index', 'wall_factor_valid', 'accel_bias_x', 'accel_bias_y', 'accel_bias_z',
++         'gyro_bias_x', 'gyro_bias_y', 'gyro_bias_z'],
++        lambda m: [m.node_index, int(m.wall_factor_valid),
++                   m.accel_bias.x, m.accel_bias.y, m.accel_bias.z,
++                   m.gyro_bias.x, m.gyro_bias.y, m.gyro_bias.z])
++
++    wall_raw = [m for m in sorted(data['/scan_match_result'], key=stamp_of) if m.wall.valid]
++
++    def wall_key(m):
++        return (stamp_of(m), m.wall.corrected_pose.position.x, m.wall.corrected_pose.position.y,
++                yaw_from_quat(m.wall.corrected_pose.orientation))
++    wall_pos_rows = central_diff_series([wall_key(m) for m in wall_raw])
++    write_pose_csv(
++        f'{out_dir}/scan_match_wall.csv',
++        list(zip(wall_pos_rows, wall_raw)),
++        ['correspondence_count', 'covariance_valid'],
++        lambda m: [m.wall.correspondence_count, int(m.wall.covariance_valid)])
++
++    with open(f'{out_dir}/collisions.csv', 'w', newline='') as f:
++        w = csv.writer(f)
++        w.writerow(['t', 'name', 'relative_speed_mps'])
++        for m in sorted(data['/robot_collision'], key=lambda m: m.data):
++            # payload: "v=1;stamp_ns=...;name=...;relative_speed_mps=..."
++            parts = dict(kv.split('=', 1) for kv in m.data.split(';') if '=' in kv)
++            t = float(parts.get('stamp_ns', 0)) * 1e-9
++            w.writerow([t, parts.get('name', ''), parts.get('relative_speed_mps', '')])
++
++    print(f"wrote ground_truth.csv ({len(gt_rows)}), odom_fast.csv ({len(odom_rows)}), "
++          f"state_estimate.csv ({len(se_pos_rows)}), scan_match_wall.csv ({len(wall_pos_rows)}), "
++          f"collisions.csv ({len(data['/robot_collision'])}) to {out_dir}")
++
++
++if __name__ == '__main__':
++    main()

@@ -1,7 +1,7 @@
 #!/bin/bash
 # Replay the reproducible Unity bag with only selected non-core components.
 # Usage: bag_component_isolation.sh <tag> [--bag path] [--ball] [--endpoint]
-#        [--record-stages] [--play-rate N] [--post-play-wait N]
+#        [--no-record-stages] [--play-rate N] [--post-play-wait N]
 #        [--scan-yaw-bias-rad N]
 #        [--laser-param name:=value] [--backend-param name:=value] [--imu-param name:=value]
 set -euo pipefail
@@ -12,9 +12,13 @@ WS=/home/yukichi6105/ros2_ws
 BAG=/tmp/robocon_unity_88s_20260729.mcap
 WITH_BALL=false
 WITH_ENDPOINT=false
-WITH_STAGE_RECORD=false
+# 2026-07-31(ユーザー指示): ②(壁マッチング)と③(state_estimate)を真値と
+# 突き合わせた誤差は毎回の検証に必要な標準データなので、既定で常時記録する。
+# 必要な場合のみ--no-record-stagesで無効化できる。
+WITH_STAGE_RECORD=true
 PLAY_RATE=1.0
 POST_PLAY_WAIT=10
+PLAYBACK_DURATION=62
 SCAN_YAW_BIAS_RAD=0.0
 LASER_PARAMS=()
 BACKEND_PARAMS=()
@@ -28,10 +32,16 @@ while [ "$#" -gt 0 ]; do
       ;;
     --ball) WITH_BALL=true; shift ;;
     --endpoint) WITH_ENDPOINT=true; shift ;;
-    --record-stages) WITH_STAGE_RECORD=true; shift ;;
+    --record-stages) WITH_STAGE_RECORD=true; shift ;;  # 既定で有効なので明示指定は不要(後方互換で残す)
+    --no-record-stages) WITH_STAGE_RECORD=false; shift ;;
     --play-rate)
       [ "$#" -ge 2 ] || { echo "--play-rate requires a numeric rate" >&2; exit 2; }
       PLAY_RATE="$2"
+      shift 2
+      ;;
+    --playback-duration)
+      [ "$#" -ge 2 ] || { echo "--playback-duration requires seconds" >&2; exit 2; }
+      PLAYBACK_DURATION="$2"
       shift 2
       ;;
     --post-play-wait)
@@ -122,6 +132,36 @@ start_node() {
   "$@" > "$OUT/$log" 2>&1 &
   PIDS+=("$!")
 }
+# backend_optimizer_nodeはパーティクル再収束(relocalization_event)受信時、
+# GTSAM/TBB内部のクラッシュを避けるため終了コード42でプロセスごと自己終了する
+# (docs/experiment_history/22番以降参照)。実運用ではros2 launchのrespawn=Trueが
+# これを拾うが、このスクリプトはros2 runで直接起動するため、同じ役割を果たす
+# 簡易respawnラッパーをここで用意する。42以外の終了(=本物のクラッシュ)では
+# 通常通り終了させ、テストの異常終了を隠さない。
+start_node_respawn() {
+  local log="$1"
+  shift
+  (
+    set +e
+    child_pid=""
+    forward_signal() {
+      [ -n "$child_pid" ] && kill "-$1" "$child_pid" 2>/dev/null || true
+    }
+    trap 'forward_signal INT' INT
+    trap 'forward_signal TERM' TERM
+    while true; do
+      "$@" &
+      child_pid=$!
+      wait "$child_pid"
+      rc=$?
+      if [ "$rc" -ne 42 ]; then
+        exit "$rc"
+      fi
+      echo "[respawn] backend exited 42 (particle relocalization handoff): restarting immediately"
+    done
+  ) > "$OUT/$log" 2>&1 &
+  PIDS+=("$!")
+}
 cleanup() {
   [ "${#PIDS[@]}" -gt 0 ] || return
   kill -INT "${PIDS[@]}" 2>/dev/null || true
@@ -155,10 +195,11 @@ cleanup() {
 }
 trap cleanup EXIT
 
-start_node backend.log ros2 run lio_localization backend_optimizer_node --ros-args \
+start_node_respawn backend.log ros2 run lio_localization backend_optimizer_node --ros-args \
   --params-file "$OUT/robocon2026_unity.yaml" -p use_sim_time:=true \
   -p initial_x:=-2.419 -p initial_y:=1.354 -p initial_theta:=0.0 \
-  -p initial_vx:=0.0 -p initial_vy:=0.0 "${BACKEND_PARAMS[@]}"
+  -p initial_vx:=0.0 -p initial_vy:=0.0 \
+  -p relocalization_handoff_path:="$OUT/relocalization_handoff.txt" "${BACKEND_PARAMS[@]}"
 start_node imu_preintegration.log ros2 run lio_localization imu_preintegration_node --ros-args \
   --params-file "$OUT/robocon2026_unity.yaml" -p use_sim_time:=true "${IMU_PARAMS[@]}"
 start_node scan_matching.log ros2 run lio_localization laser_scan_matching_node --ros-args \
@@ -198,8 +239,15 @@ fi
 # its initial scan while IMU and ground-truth already stream, which is not a valid
 # localization trial.
 sleep 6
-ros2 bag play "$BAG" --clock 250 --rate "$PLAY_RATE" --playback-duration 62 --disable-keyboard-controls \
-  "${BAG_REMAP_ARGS[@]}" \
+# Only replay raw sensor/truth topics. Some bags (e.g. a live --topics capture used to
+# check ground truth against the estimator's own live output) also contain the
+# estimator's OUTPUT topics (/odom_fast, /scan_match_result, /state_estimate). Replaying
+# those too would collide with the freshly-launched nodes started above, which publish
+# the same topic names from scratch -- the evaluator then sees an interleaved mix of the
+# bag's old recorded values and this run's newly computed ones and its ground-truth
+# matching breaks silently (observed 2026-07-31: "No /odom_fast samples were matched").
+ros2 bag play "$BAG" --clock 250 --rate "$PLAY_RATE" --playback-duration "$PLAYBACK_DURATION" --disable-keyboard-controls \
+  "${BAG_REMAP_ARGS[@]}" --topics /clock /imu/data /scan /ground_truth_pose /unity_sensor_publish_counts \
   --progress-bar-update-rate 0 > "$OUT/bag_play.log" 2>&1
 
 # Allow the C++ evaluator to flush its bounded CSV before signalling the
@@ -216,5 +264,13 @@ cp "$EVAL_OUT/diag_raw_errors.csv" "$OUT/" 2>/dev/null || true
 if [ -f "$OUT/diag_raw_errors.csv" ]; then
   python3 "$WS/src/lio_localization_sim/tools/render_eval_plot.py" \
     "$OUT/diag_raw_errors.csv" "$OUT/sim_eval_plot.png"
+fi
+# ②/③(と①)を真値と突き合わせた標準比較データを毎回自動生成する
+# (2026-07-31、ユーザー指示: 常時記録・評価できるようにする)。
+if "$WITH_STAGE_RECORD" && [ -d "$OUT/stage_derived" ]; then
+  mkdir -p "$OUT/consolidated"
+  python3 "$WS/src/lio_localization_sim/tools/consolidate_stage_log.py" \
+    "$OUT/stage_derived" "$OUT/consolidated" > "$OUT/consolidate.log" 2>&1 || \
+    echo "WARNING: consolidate_stage_log.py failed, see $OUT/consolidate.log" >&2
 fi
 echo "DONE: $OUT"

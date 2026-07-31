@@ -1,0 +1,9 @@
+?? docs/experiment_history/17_rotation_error_stage_decomposition_20260730.md
+?? docs/stage4_runs/coarse_to_fine_yaw_check_20260730/
+?? docs/stage4_runs/lpf_ablation_tau0p001_20260730/
+?? docs/stage4_runs/stage_decomp_rotation_20260730/
+?? docs/stage4_runs/sweep_imuinflate_10x/
+?? docs/stage4_runs/sweep_imuinflate_30x/
+?? docs/stage4_runs/sweep_yawsigma_005/
+?? docs/stage4_runs/sweep_yawsigma_008/
+?? docs/stage4_runs/sweep_yawsigma_015/

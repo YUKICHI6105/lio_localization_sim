@@ -1,0 +1,20 @@
+[INFO] [1785466833.610003470] [laser_scan_matching_node]: laser_scan_matching_node started (0 cylinders, 9 internal walls, field 5.572x3.310m, initial seed=(1.000, -1.000, 1.570))
+[INFO] [1785466839.359178794] [laser_scan_matching_node]: note rejection: 537/541 returns unexplained, 3 clusters -> 0 accepted, 0 points dropped (last extent=1.4531m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[WARN] [1785466840.730025209] [laser_scan_matching_node]: IMU coverage wait exceeded 0.050s, processing scan with extrapolated tail
+[ERROR] [1785466842.797034192] [laser_scan_matching_node]: PARTICLE RELOCALIZATION ACTIVATED: scattering 1000 particles across the field. This means self-localization already failed upstream -- treat every activation as a bug to root-cause, not as a working recovery path.
+[ERROR] [1785466842.891694854] [laser_scan_matching_node]: PARTICLE RELOCALIZATION CONVERGED: (-2.434, 1.327, -2.8deg). Resuming normal tracking -- this recovery working does not excuse root-causing why localization was lost.
+[INFO] [1785466844.391027572] [laser_scan_matching_node]: note rejection: 0/541 returns unexplained, 0 clusters -> 0 accepted, 0 points dropped (last extent=-1.0000m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[INFO] [1785466849.394085742] [laser_scan_matching_node]: note rejection: 0/541 returns unexplained, 0 clusters -> 0 accepted, 0 points dropped (last extent=-1.0000m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[INFO] [1785466854.420178325] [laser_scan_matching_node]: note rejection: 19/541 returns unexplained, 2 clusters -> 2 accepted, 10 points dropped (last extent=0.0638m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[INFO] [1785466859.451670525] [laser_scan_matching_node]: note rejection: 0/541 returns unexplained, 0 clusters -> 0 accepted, 0 points dropped (last extent=-1.0000m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[INFO] [1785466864.462389922] [laser_scan_matching_node]: note rejection: 48/541 returns unexplained, 6 clusters -> 6 accepted, 48 points dropped (last extent=0.0679m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[INFO] [1785466869.484051451] [laser_scan_matching_node]: note rejection: 19/541 returns unexplained, 1 clusters -> 1 accepted, 7 points dropped (last extent=0.0701m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[INFO] [1785466874.482503806] [laser_scan_matching_node]: note rejection: 0/541 returns unexplained, 0 clusters -> 0 accepted, 0 points dropped (last extent=-1.0000m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[INFO] [1785466879.489733220] [laser_scan_matching_node]: note rejection: 52/541 returns unexplained, 6 clusters -> 6 accepted, 52 points dropped (last extent=0.0834m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[INFO] [1785466884.489698996] [laser_scan_matching_node]: note rejection: 29/541 returns unexplained, 4 clusters -> 4 accepted, 24 points dropped (last extent=0.0640m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[INFO] [1785466889.508399487] [laser_scan_matching_node]: note rejection: 0/541 returns unexplained, 0 clusters -> 0 accepted, 0 points dropped (last extent=-1.0000m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[INFO] [1785466894.540036244] [laser_scan_matching_node]: note rejection: 49/541 returns unexplained, 6 clusters -> 6 accepted, 49 points dropped (last extent=0.0722m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[INFO] [1785466899.561305593] [laser_scan_matching_node]: note rejection: 0/541 returns unexplained, 0 clusters -> 0 accepted, 0 points dropped (last extent=-1.0000m; extent gate <=0.350m, adjacent gap <=0.100m, min 4 points)
+[ros2run]: Received signal:  Interrupt
+[INFO] [1785466921.496898834] [rclcpp]: signal_handler(signum=2)
+[INFO] [1785466921.498029547] [laser_scan_matching_node]: scan pipeline stats: received=2312 processed=2312 pending_overwrite=0 pending_queue_overflow=0 fast_rotation_drop=0; unity_audit reports=232 source_scan_last=2310 receiver_at_last_report=2310 final_receiver=2312

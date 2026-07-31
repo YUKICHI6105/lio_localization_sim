@@ -1,0 +1,7 @@
+[ERROR] [1785467730.144223386] [backend_optimizer_node]: resuming from relocalization/reset handoff at (-2.419, 1.354, 0.000)
+[INFO] [1785467730.146687323] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.002, -0.002)
+[INFO] [1785467730.146923837] [backend_optimizer_node]: backend_optimizer_node started (0 cylinders registered)
+[WARN] [1785467730.279956239] [backend_optimizer_node]: skipping scan: only 0.0000s of IMU integrated since last node (need >= 0.0050s)
+[WARN] [1785467730.280598006] [backend_optimizer_node]: LiDAR wall correction unavailable for 3.03s (> 0.75s): drifting on IMU dead-reckoning
+[ERROR] [1785467789.497328471] [backend_optimizer_node]: IMU signal LOST (no IMU for 2.01s > 2.00s). Self-localization is the dead-reckoning backbone and cannot continue without it: entering FAIL-SAFE HALT (freezing estimate, no further graph updates).
+[INFO] [1785467807.780146883] [rclcpp]: signal_handler(signum=2)

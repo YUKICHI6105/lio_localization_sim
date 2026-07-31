@@ -1,0 +1,105 @@
+diff --git a/src/laser_scan_matching_node.cpp b/src/laser_scan_matching_node.cpp
+index 3a228db..350c1c4 100644
+--- a/src/laser_scan_matching_node.cpp
++++ b/src/laser_scan_matching_node.cpp
+@@ -846,7 +846,7 @@ void LaserScanMatchingNode::process_scan(
+   // between ray and wall normal.  This direct finite-segment ray model instead uses
+   // residual = measured_range - predicted_range, so it is the matching likelihood.
+   const auto solve_planar_ray_to_wall =
+-    [&](const std::vector<bool> & excluded, const Pose2D & seed) {
++    [&](const std::vector<bool> & excluded, const Pose2D & seed, double gate) {
+       Pose2D pose = seed;
+       for (int iteration = 0; iteration < planar_max_iterations_; ++iteration) {
+         Eigen::Matrix3d h = Eigen::Matrix3d::Zero();
+@@ -889,7 +889,7 @@ void LaserScanMatchingNode::process_scan(
+           if (!std::isfinite(predicted_range)) continue;
+           const double residual = measured_range - predicted_range;
+           const double abs_residual = std::abs(residual);
+-          if (abs_residual > planar_ray_to_wall_gate_) continue;
++          if (abs_residual > gate) continue;
+           const double denominator = chosen_normal.dot(ray_direction);
+           const double numerator = chosen_normal.dot(chosen_a - Eigen::Vector2d{pose.x, pose.y});
+           // d(measured - predicted)/d(x,y,yaw)
+@@ -914,7 +914,7 @@ void LaserScanMatchingNode::process_scan(
+       }
+       return pose;
+     };
+-  const auto solve_planar = [&](const std::vector<bool> & excluded, const Pose2D & seed) {
++  const auto solve_planar = [&](const std::vector<bool> & excluded, const Pose2D & seed, double gate) {
+       Pose2D pose = seed;
+       for (int iteration = 0; iteration < planar_max_iterations_; ++iteration) {
+         Eigen::Matrix3d h = Eigen::Matrix3d::Zero();
+@@ -932,7 +932,7 @@ void LaserScanMatchingNode::process_scan(
+           Eigen::Vector2d best_projection = Eigen::Vector2d::Zero();
+           Eigen::Vector2d best_tangent;
+           const double best_d2 = nearest_segment(world, best_projection, best_tangent);
+-          if (best_d2 > planar_correspondence_distance_ * planar_correspondence_distance_) continue;
++          if (best_d2 > gate * gate) continue;
+           const Eigen::Vector2d normal{-best_tangent.y(), best_tangent.x()};
+           const double residual = normal.dot(world - best_projection);
+           const Eigen::Vector2d d_yaw{-s * local.x() - c * local.y(),
+@@ -957,6 +957,29 @@ void LaserScanMatchingNode::process_scan(
+       return pose;
+     };
+ 
++  // 粗→細のゲート探索(2026-07-30、ICP改造)。位置側の汎用3D ICPが既に持つ
++  // coarse-to-fine(kCoarseAcceptDistances)と同じ考え方を平面ソルバーにも
++  // 導入した。旋回中にシードのヨーが数度ズレると、最初から最終ゲート
++  // (`planar_correspondence_distance_`/`planar_ray_to_wall_gate_`)で対応点を
++  // 探すと、遠い壁の点(距離×角度誤差で大きくズレる)がゲート外に落ちて
++  // 対応点数が減り、収束が遅れる/浅い局所解に留まる。まず広いゲートで大まかに
++  // 合わせてから徐々に絞ることで、同じ反復回数予算のまま収束半径を広げる
++  // (experiment_history 16番で確認した「旋回中の一過性ピーク」への対処)。
++  static constexpr std::array<double, 2> kPlanarCoarseGateScale{4.0, 2.0};
++  const auto solve_planar_coarse_to_fine =
++    [&](const std::vector<bool> & excluded, const Pose2D & seed) {
++      const double final_gate =
++        planar_use_ray_to_wall_ ? planar_ray_to_wall_gate_ : planar_correspondence_distance_;
++      Pose2D pose = seed;
++      for (const double scale : kPlanarCoarseGateScale) {
++        pose = planar_use_ray_to_wall_ ?
++          solve_planar_ray_to_wall(excluded, pose, final_gate * scale) :
++          solve_planar(excluded, pose, final_gate * scale);
++      }
++      return planar_use_ray_to_wall_ ?
++        solve_planar_ray_to_wall(excluded, pose, final_gate) : solve_planar(excluded, pose, final_gate);
++    };
++
+   // First pass uses every return. Its pose is only needed to decide which returns the map
+   // cannot explain -- it is biased by the very notes we are about to reject, but a ~15 mm
+   // bias does not change whether a return is 120 mm off the map.
+@@ -971,12 +994,10 @@ void LaserScanMatchingNode::process_scan(
+   if (enable_yaw_lost_mode_ && consecutive_planar_invalid_ >= kYawLostModeThreshold) {
+     Pose2D flipped_seed = pose_start;
+     flipped_seed.yaw = wrap_angle_diff(pose_start.yaw + M_PI);
+-    const Pose2D normal_result = planar_use_ray_to_wall_ ?
+-      solve_planar_ray_to_wall({}, pose_start) : solve_planar({}, pose_start);
++    const Pose2D normal_result = solve_planar_coarse_to_fine({}, pose_start);
+     const size_t normal_inliers = planar_inliers;
+     const double normal_residual_sum = planar_abs_residual;
+-    const Pose2D flipped_result = planar_use_ray_to_wall_ ?
+-      solve_planar_ray_to_wall({}, flipped_seed) : solve_planar({}, flipped_seed);
++    const Pose2D flipped_result = solve_planar_coarse_to_fine({}, flipped_seed);
+     const size_t flipped_inliers = planar_inliers;
+     const double flipped_residual_sum = planar_abs_residual;
+     const bool flipped_wins = flipped_inliers > normal_inliers ||
+@@ -997,8 +1018,7 @@ void LaserScanMatchingNode::process_scan(
+       planar_pose = normal_result;
+     }
+   } else {
+-    planar_pose = planar_use_ray_to_wall_ ?
+-      solve_planar_ray_to_wall({}, active_seed) : solve_planar({}, active_seed);
++    planar_pose = solve_planar_coarse_to_fine({}, active_seed);
+   }
+ 
+   std::vector<bool> planar_excluded;
+@@ -1065,8 +1085,7 @@ void LaserScanMatchingNode::process_scan(
+     flush_cluster();
+ 
+     if (excluded_points > 0) {
+-      planar_pose = planar_use_ray_to_wall_ ?
+-        solve_planar_ray_to_wall(planar_excluded, active_seed) : solve_planar(planar_excluded, active_seed);
++      planar_pose = solve_planar_coarse_to_fine(planar_excluded, active_seed);
+     }
+     RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 5000,
+       "note rejection: %zu/%zu returns unexplained, %zu clusters -> %zu accepted, "

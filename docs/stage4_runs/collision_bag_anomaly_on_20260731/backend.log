@@ -1,0 +1,9 @@
+[INFO] [1785435700.633182335] [backend_optimizer_node]: graph (re)initialized at X0=(-2.419, 1.354, 0.000) V0=(0.000, 0.000)
+[INFO] [1785435700.633861909] [backend_optimizer_node]: backend_optimizer_node started (0 cylinders registered)
+[WARN] [1785435720.629717645] [backend_optimizer_node]: slow smoother update: 26.3ms (index 462)
+[WARN] [1785435725.502161129] [backend_optimizer_node]: IMU accel anomaly detected (|a|=22.27 m/s^2 > 20.00): inflating IMU sigma 100x (count=1) -- likely a collision, not a modelled dynamic
+[WARN] [1785435740.429024173] [backend_optimizer_node]: IMU accel anomaly detected (|a|=125.87 m/s^2 > 20.00): inflating IMU sigma 100x (count=2) -- likely a collision, not a modelled dynamic
+[WARN] [1785435755.989358136] [backend_optimizer_node]: IMU accel anomaly detected (|a|=21.27 m/s^2 > 20.00): inflating IMU sigma 100x (count=3) -- likely a collision, not a modelled dynamic
+[ros2run]: Received signal:  Interrupt
+[INFO] [1785435771.699662708] [rclcpp]: signal_handler(signum=2)
+[INFO] [1785435771.700790776] [backend_optimizer_node]: backend concurrency stats: imu_callbacks=60065, during_worker=2192 (3.6%), during_smoother=1684 (2.8%), callback_gap_max=119.806ms, gaps>2ms=9484, gaps>10ms=921; stamp_gap_max=1.000ms, gaps>1ms=0; ring_enqueue_max=0.112ms, enqueues>2ms=0; callback_duration_max=3.264ms, durations>2ms=2; worker_jobs=2402 mean/max=1.016/27.439ms; smoother_updates=2402 mean/max=0.786/26.326ms; unity_audit reports=241 source_imu_last=60251 receiver_at_last_report=60018 final_receiver=60065

@@ -1,0 +1,12 @@
+run_tag=cleanup_regression_check_20260731
+mode=bag_component_isolation
+with_ball=false
+with_endpoint=false
+with_stage_record=true
+play_rate=1.0
+post_play_wait=15
+scan_yaw_bias_rad=0.0
+laser_params=
+backend_params=-p gyroscope_sigma:=0.0014660760 -p accelerometer_sigma:=0.02059398 -p integration_sigma:=0.0003 -p wall_prior_base_yaw_sigma:=0.15
+bag=/tmp/robocon_angvel_fix_gyrosign_20260730.mcap
+started_at=2026-07-31T04:36:15+09:00
