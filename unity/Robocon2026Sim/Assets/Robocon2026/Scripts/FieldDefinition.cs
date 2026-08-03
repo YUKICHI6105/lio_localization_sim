@@ -29,8 +29,9 @@ namespace Robocon2026.Simulation
             if (Bingo.Columns != 3 || Bingo.Rows != 3) throw new InvalidOperationException("The competition bingo must be 3 x 3.");
             if (Robot.Chassis.Side <= 0 || Robot.Chassis.Height <= 0)
                 throw new InvalidOperationException("Robot chassis dimensions must be positive.");
-            if (Missions.StartToBingoLeft.Pickup.Count != 2 || Missions.StartToBingoLeft.Finish.Count != 2)
-                throw new InvalidOperationException("Mission pickup and finish poses require x/y pairs.");
+            foreach (var m in Missions.AllPairMissions)
+                if (m.Pickup.Count != 2 || m.Finish.Count != 2)
+                    throw new InvalidOperationException("Mission pickup and finish poses require x/y pairs.");
 
             RequireNear(3 * Bingo.ClearCell + 4 * Bingo.VerticalFrame, Bingo.Width, "bingo width");
             RequireNear(Bingo.BottomClearance + 3 * Bingo.ClearCell + 4 * Bingo.ShelfThickness,
@@ -60,7 +61,7 @@ namespace Robocon2026.Simulation
 
     [Serializable] public sealed class RulesDefinition
     {
-        [JsonProperty("note_diameter")] public double NoteDiameter;
+        [JsonProperty("note_size")] public double NoteSize;
         [JsonProperty("note_mass")] public double NoteMass;
         [JsonProperty("notes_per_team")] public int NotesPerTeam;
     }
@@ -108,6 +109,17 @@ namespace Robocon2026.Simulation
     [Serializable] public sealed class MissionsDefinition
     {
         [JsonProperty("start_to_bingo_left")] public MissionDefinition StartToBingoLeft = new();
+        // 2026-07-31追加: ノーツ6個を2個ずつ回収する残り4組(1-indexedでの
+        // 1-2/2-3/3-4/4-5。5-6はStartToBingoLeftが既に相当する)。ILC学習を
+        // ノーツ列のどの位置のpickupにも対応できるようにするための練習用ミッション。
+        [JsonProperty("start_to_bingo_pair_1_2")] public MissionDefinition Pair12 = new();
+        [JsonProperty("start_to_bingo_pair_2_3")] public MissionDefinition Pair23 = new();
+        [JsonProperty("start_to_bingo_pair_3_4")] public MissionDefinition Pair34 = new();
+        [JsonProperty("start_to_bingo_pair_4_5")] public MissionDefinition Pair45 = new();
+
+        // 5組すべてを、ノーツ列の端から順に並べたもの(1-2,2-3,3-4,4-5,5-6)。
+        public IReadOnlyList<MissionDefinition> AllPairMissions =>
+            new[] { Pair12, Pair23, Pair34, Pair45, StartToBingoLeft };
     }
 
     [Serializable] public sealed class MissionDefinition

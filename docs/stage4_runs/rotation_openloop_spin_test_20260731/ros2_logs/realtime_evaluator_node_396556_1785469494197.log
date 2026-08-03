@@ -1,0 +1,43 @@
+[INFO] [1785469494.272027012] [realtime_evaluator_node]: C++ realtime evaluator started: measuring 90.0s from first ground truth
+[INFO] [1785469534.132986798] [realtime_evaluator_node]: first ground truth received; measurement window started
+[INFO] [1785469538.993128092] [realtime_evaluator_node]: t=5.0s  recent 5s: pos_err mean=0.33mm max=6.22mm samples=4759 balls=0
+[INFO] [1785469544.148979860] [realtime_evaluator_node]: t=10.0s  recent 5s: pos_err mean=0.28mm max=0.78mm samples=9953 balls=0
+[INFO] [1785469549.256512979] [realtime_evaluator_node]: t=15.0s  recent 5s: pos_err mean=0.43mm max=1.48mm samples=15155 balls=0
+[INFO] [1785469554.437325848] [realtime_evaluator_node]: t=20.0s  recent 5s: pos_err mean=0.63mm max=1.67mm samples=20355 balls=0
+[INFO] [1785469559.622559648] [realtime_evaluator_node]: t=25.0s  recent 5s: pos_err mean=0.93mm max=2.25mm samples=25537 balls=0
+[INFO] [1785469564.796997499] [realtime_evaluator_node]: t=30.0s  recent 5s: pos_err mean=2.05mm max=5.95mm samples=30690 balls=0
+[INFO] [1785469569.971800304] [realtime_evaluator_node]: t=35.0s  recent 5s: pos_err mean=0.57mm max=1.16mm samples=35886 balls=0
+[INFO] [1785469575.071205746] [realtime_evaluator_node]: t=40.0s  recent 5s: pos_err mean=0.84mm max=1.65mm samples=41085 balls=0
+[INFO] [1785469580.229291299] [realtime_evaluator_node]: t=45.0s  recent 5s: pos_err mean=0.83mm max=3.62mm samples=46238 balls=0
+[INFO] [1785469585.409087809] [realtime_evaluator_node]: t=50.0s  recent 5s: pos_err mean=0.89mm max=2.79mm samples=51459 balls=0
+[INFO] [1785469590.474789039] [realtime_evaluator_node]: t=55.0s  recent 5s: pos_err mean=0.59mm max=1.55mm samples=56635 balls=0
+[INFO] [1785469595.611979401] [realtime_evaluator_node]: t=60.0s  recent 5s: pos_err mean=0.91mm max=4.80mm samples=61835 balls=0
+[INFO] [1785469600.741078311] [realtime_evaluator_node]: t=65.0s  recent 5s: pos_err mean=1.84mm max=6.90mm samples=66983 balls=0
+[INFO] [1785469605.867198540] [realtime_evaluator_node]: t=70.0s  recent 5s: pos_err mean=0.81mm max=2.04mm samples=72139 balls=0
+[INFO] [1785469611.015021225] [realtime_evaluator_node]: t=75.0s  recent 5s: pos_err mean=0.51mm max=1.30mm samples=77324 balls=0
+[INFO] [1785469616.087944466] [realtime_evaluator_node]: t=80.0s  recent 5s: pos_err mean=1.29mm max=3.65mm samples=82527 balls=0
+[INFO] [1785469621.194575167] [realtime_evaluator_node]: t=85.0s  recent 5s: pos_err mean=0.84mm max=1.56mm samples=87727 balls=0
+[INFO] [1785469626.329460399] [realtime_evaluator_node]: t=90.0s  recent 5s: pos_err mean=0.75mm max=2.03mm samples=92913 balls=0
+[INFO] [1785469626.354476123] [realtime_evaluator_node]: 
+============================================================
+main.md 6-A-1 シミュレーション評価レポート (C++ realtime evaluator)
+============================================================
+総サンプル数: 92924  (定常区間 t>=3.0s: 90234)
+真値未着のまま評価できなかったサンプル: 2
+
+--- 全体（要件A: 定常RMSE<=10mm, 最大位置誤差<=10mm） ---
+  位置誤差: mean=0.87mm  RMSE=1.21mm  max=6.90mm
+  ヨー誤差: mean=0.308deg  RMSE=0.390deg  max=0.992deg
+  判定: 定常誤差(RMSE<=10mm) PASS / 最大位置誤差(<=10mm) PASS
+
+--- 高G旋回スピンバースト中 ---
+  位置誤差: mean=nanmm  RMSE=nanmm  max=nanmm
+
+--- ボール横切り中 vs 非横切り中 ---
+  横切り中   : mean=nanmm  RMSE=nanmm  max=nanmm
+  非横切り中 : mean=nanmm  RMSE=nanmm  max=nanmm
+  判定: ボール横切りによる自己位置無影響 PASS
+  (参考) 横切り中の検出ボール数(最新): 0
+============================================================
+
+[INFO] [1785469626.515034386] [realtime_evaluator_node]: Saved report and raw error CSV in /home/yukichi6105/ros2_ws/src/lio_localization_sim/docs/stage4_runs/rotation_openloop_spin_test_20260731

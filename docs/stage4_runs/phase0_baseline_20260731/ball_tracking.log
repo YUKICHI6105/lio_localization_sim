@@ -1,0 +1,3 @@
+[INFO] [1785480027.286377613] [ball_tracking_node]: ball_tracking_node started
+[ros2run]: Received signal:  Interrupt
+[INFO] [1785480148.667373378] [rclcpp]: signal_handler(signum=2)

@@ -19,3 +19,12 @@ Recordings/
 *.VC.db
 __pycache__/
 *.pyc
+
+# 実行時に生成される生センサーCSV(数十GB級、ソースではない)
+SensorRecordings/
+
+# ローカルの実行時トグル(committerの実行環境依存、プロジェクトソースではない)
+*.flag
+*.flag.disabled
+*.flag.disabled.*
+.robocon2026-managed

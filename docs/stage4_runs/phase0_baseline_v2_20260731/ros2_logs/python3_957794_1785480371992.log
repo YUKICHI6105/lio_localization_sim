@@ -1,0 +1,26 @@
+[INFO] [1785480372.212629535] [rosbag2_recorder]: Event publisher thread: Started
+[INFO] [1785480372.212889161] [rosbag2_recorder]: Press SPACE for pausing/resuming
+[INFO] [1785480372.235034754] [rosbag2_recorder]: Starting recording to '/home/yukichi6105/ros2_ws/src/lio_localization_sim/docs/stage4_runs/phase0_baseline_v2_20260731/live_capture/live'
+[WARN] [1785480372.235122272] [rosbag2_recorder]: No input serialization format specified, using default rmw serialization format: 'cdr'.
+[INFO] [1785480372.239655062] [rosbag2_recorder]: Subscribed to topic '/events/write_split'
+[INFO] [1785480372.241316937] [rosbag2_recorder]: Subscribed to topic '/rosout'
+[INFO] [1785480372.243266204] [rosbag2_recorder]: Subscribed to topic '/events/rosbag2_messages_lost'
+[INFO] [1785480372.243500697] [rosbag2_recorder]: Listening for topics...
+[INFO] [1785480372.243526152] [rosbag2_recorder]: Recording...
+[INFO] [1785480372.243562040] [rosbag2_recorder]: Topics discovery started.
+[INFO] [1785480372.305875953] [rosbag2_recorder]: Subscribed to topic '/state_estimate'
+[INFO] [1785480372.307661812] [rosbag2_recorder]: Subscribed to topic '/ball_candidates'
+[INFO] [1785480372.309177121] [rosbag2_recorder]: Subscribed to topic '/detected_balls'
+[INFO] [1785480372.311457776] [rosbag2_recorder]: Subscribed to topic '/odom_fast'
+[INFO] [1785480372.316728568] [rosbag2_recorder]: Subscribed to topic '/scan_match_result'
+[INFO] [1785480372.320834353] [rosbag2_recorder]: Subscribed to topic '/tf'
+[INFO] [1785480372.323097143] [rosbag2_recorder]: Subscribed to topic '/parameter_events'
+[INFO] [1785480402.106447134] [rosbag2_recorder]: Subscribed to topic '/clock'
+[INFO] [1785480402.398221752] [rosbag2_recorder]: Subscribed to topic '/scan'
+[INFO] [1785480402.429510033] [rosbag2_recorder]: Subscribed to topic '/ground_truth_pose'
+[INFO] [1785480402.504625127] [rosbag2_recorder]: Subscribed to topic '/unity_sensor_publish_counts'
+[INFO] [1785480402.533082383] [rosbag2_recorder]: Subscribed to topic '/robot_collision'
+[INFO] [1785480402.567970711] [rosbag2_recorder]: Subscribed to topic '/imu/data'
+[INFO] [1785480504.063593427] [rosbag2_recorder]: Topics discovery stopped.
+[INFO] [1785480504.064049826] [rosbag2_cpp]: Writing remaining messages from cache to the bag. It may take a while
+[INFO] [1785480504.080760912] [rosbag2_recorder]: Recording stopped

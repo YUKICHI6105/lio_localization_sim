@@ -1,0 +1,73 @@
+/opt/ros/lyrical/lib/python3.14/site-packages/rclpy/executors.py:1073: UserWarning: MultiThreadedExecutor is used with a single thread.
+Use the SingleThreadedExecutor instead.
+  warnings.warn(
+[INFO] [1785469493.290733829] [UnityEndpoint]: Starting server on 0.0.0.0:10000
+[INFO] [1785469533.323488409] [UnityEndpoint]: Connection from 127.0.0.1
+[INFO] [1785469533.650927941] [UnityEndpoint]: RegisterSubscriber(/odom_fast, <class 'nav_msgs.msg._odometry.Odometry'>) OK
+[INFO] [1785469533.710203188] [UnityEndpoint]: RegisterSubscriber(/tf, <class 'tf2_msgs.msg._tf_message.TFMessage'>) OK
+[INFO] [1785469533.744503697] [UnityEndpoint]: RegisterPublisher(/clock, <class 'rosgraph_msgs.msg._clock.Clock'>) OK
+[INFO] [1785469533.946861681] [UnityEndpoint]: RegisterPublisher(/scan, <class 'sensor_msgs.msg._laser_scan.LaserScan'>) OK
+[INFO] [1785469533.981543875] [UnityEndpoint]: RegisterPublisher(/ground_truth_pose, <class 'nav_msgs.msg._odometry.Odometry'>) OK
+[INFO] [1785469534.023258657] [UnityEndpoint]: RegisterPublisher(/unity_sensor_publish_counts, <class 'std_msgs.msg._string.String'>) OK
+[INFO] [1785469534.093047860] [UnityEndpoint]: RegisterPublisher(/robot_collision, <class 'std_msgs.msg._string.String'>) OK
+[INFO] [1785469534.130750534] [UnityEndpoint]: RegisterPublisher(/imu/data, <class 'sensor_msgs.msg._imu.Imu'>) OK
+[WARN] [1785469534.141287326] [rcl.logging_rosout]: Publisher already registered for node name: 'clock_RosPublisher'. If this is due to multiple nodes with the same name then all logs for the logger named 'clock_RosPublisher' will go out over the existing publisher. As soon as any node with that name is destructed it will unregister the publisher, preventing any further logs for that name from being published on the rosout topic.
+[INFO] [1785469534.217229629] [UnityEndpoint]: RegisterPublisher(/clock, <class 'rosgraph_msgs.msg._clock.Clock'>) OK
+[WARN] [1785469534.226630351] [rcl.logging_rosout]: Publisher already registered for node name: 'scan_RosPublisher'. If this is due to multiple nodes with the same name then all logs for the logger named 'scan_RosPublisher' will go out over the existing publisher. As soon as any node with that name is destructed it will unregister the publisher, preventing any further logs for that name from being published on the rosout topic.
+[INFO] [1785469534.293473003] [UnityEndpoint]: RegisterPublisher(/scan, <class 'sensor_msgs.msg._laser_scan.LaserScan'>) OK
+[WARN] [1785469534.295150749] [rcl.logging_rosout]: Publisher already registered for node name: 'ground_truth_pose_RosPublisher'. If this is due to multiple nodes with the same name then all logs for the logger named 'ground_truth_pose_RosPublisher' will go out over the existing publisher. As soon as any node with that name is destructed it will unregister the publisher, preventing any further logs for that name from being published on the rosout topic.
+[INFO] [1785469534.326775075] [UnityEndpoint]: RegisterPublisher(/ground_truth_pose, <class 'nav_msgs.msg._odometry.Odometry'>) OK
+[WARN] [1785469534.330160129] [rcl.logging_rosout]: Publisher already registered for node name: 'unity_sensor_publish_counts_RosPublisher'. If this is due to multiple nodes with the same name then all logs for the logger named 'unity_sensor_publish_counts_RosPublisher' will go out over the existing publisher. As soon as any node with that name is destructed it will unregister the publisher, preventing any further logs for that name from being published on the rosout topic.
+[INFO] [1785469534.365065940] [UnityEndpoint]: RegisterPublisher(/unity_sensor_publish_counts, <class 'std_msgs.msg._string.String'>) OK
+[WARN] [1785469534.370664753] [rcl.logging_rosout]: Publisher already registered for node name: 'robot_collision_RosPublisher'. If this is due to multiple nodes with the same name then all logs for the logger named 'robot_collision_RosPublisher' will go out over the existing publisher. As soon as any node with that name is destructed it will unregister the publisher, preventing any further logs for that name from being published on the rosout topic.
+[INFO] [1785469534.413166866] [UnityEndpoint]: RegisterPublisher(/robot_collision, <class 'std_msgs.msg._string.String'>) OK
+[WARN] [1785469534.415432717] [rcl.logging_rosout]: Publisher already registered for node name: 'imudata_RosPublisher'. If this is due to multiple nodes with the same name then all logs for the logger named 'imudata_RosPublisher' will go out over the existing publisher. As soon as any node with that name is destructed it will unregister the publisher, preventing any further logs for that name from being published on the rosout topic.
+[INFO] [1785469534.449386455] [UnityEndpoint]: RegisterPublisher(/imu/data, <class 'sensor_msgs.msg._imu.Imu'>) OK
+[ros2run]: Received signal:  Interrupt
+[INFO] [1785469631.888512185] [UnityEndpoint]: Disconnected from 127.0.0.1
+Failed to publish log message to rosout: publisher's context is invalid, at ./src/rcl/publisher.c:427
+Exception in thread Thread-2:
+[ERROR] [1785469631.894965711] [UnityEndpoint]: Exception [Errno 9] Bad file descriptor
+Failed to publish log message to rosout: publisher's context is invalid, at ./src/rcl/publisher.c:427
+Traceback (most recent call last):
+  File "/usr/lib/python3.14/threading.py", line 1082, in _bootstrap_inner
+    self._context.run(self.run)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/home/yukichi6105/ros2_ws/build/ros_tcp_endpoint/ros_tcp_endpoint/client.py", line 216, in run
+    ros_communicator.send(data)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/home/yukichi6105/ros2_ws/build/ros_tcp_endpoint/ros_tcp_endpoint/publisher.py", line 57, in send
+    self.pub.publish(data)
+    ~~~~~~~~~~~~~~~~^^^^^^
+  File "/opt/ros/lyrical/lib/python3.14/site-packages/rclpy/publisher.py", line 69, in publish
+    self.__publisher.publish_raw(msg)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+rclpy._rclpy_pybind11.RCLError: Failed to publish: publisher's context is invalid, at ./src/rcl/publisher.c:427
+Traceback (most recent call last):
+  File "/home/yukichi6105/ros2_ws/install/ros_tcp_endpoint/lib/ros_tcp_endpoint/default_server_endpoint", line 33, in <module>
+    sys.exit(load_entry_point('ros-tcp-endpoint', 'console_scripts', 'default_server_endpoint')())
+             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/yukichi6105/ros2_ws/build/ros_tcp_endpoint/ros_tcp_endpoint/default_server_endpoint.py", line 14, in main
+    tcp_server.setup_executor()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/yukichi6105/ros2_ws/build/ros_tcp_endpoint/ros_tcp_endpoint/server.py", line 167, in setup_executor
+    executor.spin()
+    ~~~~~~~~~~~~~^^
+  File "/opt/ros/lyrical/lib/python3.14/site-packages/rclpy/executors.py", line 400, in spin
+    self._spin_once_impl()
+    ~~~~~~~~~~~~~~~~~~~~^^
+  File "/opt/ros/lyrical/lib/python3.14/site-packages/rclpy/executors.py", line 1086, in _spin_once_impl
+    handler, entity, node = self.wait_for_ready_callbacks(
+                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        timeout_sec, None, wait_condition)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/ros/lyrical/lib/python3.14/site-packages/rclpy/executors.py", line 970, in wait_for_ready_callbacks
+    return next(self._cb_iter)
+  File "/opt/ros/lyrical/lib/python3.14/site-packages/rclpy/executors.py", line 848, in _wait_for_ready_callbacks
+    wait_set = _rclpy.WaitSet(
+        entity_count.num_subscriptions,
+    ...<4 lines>...
+        entity_count.num_events,
+        self._context.handle)
+rclpy._rclpy_pybind11.RCLError: failed to initialize wait set: the given context is not valid, either rcl_init() was not called or rcl_shutdown() was called., at ./src/rcl/wait.c:110
+[ros2run]: Process exited with failure 1

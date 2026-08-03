@@ -527,8 +527,9 @@ namespace Robocon2026.Simulation
 
         private double FieldYaw()
         {
-            var forward = transform.forward;
-            return Math.Atan2(-forward.x, forward.z);
+            // 2026-08-01: FieldCoordinates.YawFromForwardへ一本化(元の実装はこの式の
+            // ままここにあった。PathplanningCmdVelBridgeも同じ式を必要としたため共有化)。
+            return FieldCoordinates.YawFromForward(transform.forward);
         }
 
         private static TimeMsg ToRosTime(double seconds)

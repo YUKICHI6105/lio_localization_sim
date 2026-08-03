@@ -1,0 +1,66 @@
+==============================================================================
+Phase 0 ベースライン計測レポート
+  対象run_dir     : /home/yukichi6105/ros2_ws/src/lio_localization_sim/docs/stage4_runs/phase0_baseline_20260731
+  コンソールログ  : /tmp/claude-1000/-home-yukichi6105-ros2-ws/d0c71ade-5045-47b6-8a1e-14b5a3138d00/scratchpad/no_capture_console.log
+==============================================================================
+
+-- ラップ別 Unity計測値 (StartToBingoValidation.Complete() の Debug.Log) --
+  [StartToBingo RESULT ...] 行はコンソールログ内に0件でした。
+  -> ラップは実行されなかったか、コンソール出力がこのログに含まれていません。
+
+-- 自己位置推定 誤差 (対 ground_truth.csv, 最近傍時刻マッチング) --
+  ※ これは上記の tracking_rmse/tracking_max（目標軌道への追従誤差=制御性能の指標）
+     とも、wheel_odom_rmse/wheel_odom_max（Unity内部の車輪デッドレコニング自己診断）
+     とも別の指標です。ここではROS側 /state_estimate, /odom_fast を
+     /ground_truth_pose と比較した「自己位置推定そのものの実誤差」を計測します。
+
+  [state_estimate vs ground_truth]
+    サンプル数(最近傍マッチ): 3815
+    位置誤差 平均: 2.33 mm
+    位置誤差 RMSE: 3.35 mm
+    位置誤差 最大: 11.48 mm
+    (参考) yaw誤差 平均/RMSE/最大: 0.170 / 0.221 / 0.737 deg
+
+  [odom_fast vs ground_truth]
+    サンプル数(最近傍マッチ): 95593
+    位置誤差 平均: 2.39 mm
+    位置誤差 RMSE: 3.36 mm
+    位置誤差 最大: 15.61 mm
+    (参考) yaw誤差 平均/RMSE/最大: 0.197 / 0.281 / 1.354 deg
+
+-- 最小壁クリアランス (参考値) --
+  最小クリアランス（ロボット中心点基準）: 232.3 mm  (t=60.890s, wall=bingo_end)
+  ※ ロボット中心点と壁セグメント間の最短距離であり、シャーシ（一辺0.5mの
+     正三角形）の半径分は差し引いていない。実際の車体端-壁クリアランスは
+     これより小さい可能性がある点に注意。
+
+-- 衝突ログ (consolidated/collisions.csv) --
+  件数: 24
+    t=16.554s  name=Post_2  relative_speed=0.8171mps
+    t=16.554s  name=Shelf_0  relative_speed=0.8171mps
+    t=16.821s  name=Post_2  relative_speed=0.3679mps
+    t=19.454s  name=baffle_left_2  relative_speed=1.4207mps
+    t=30.888s  name=Post_2  relative_speed=0.5618mps
+    t=30.888s  name=Shelf_0  relative_speed=0.5618mps
+    t=31.150s  name=Post_2  relative_speed=0.1947mps
+    t=31.150s  name=Shelf_0  relative_speed=0.1947mps
+    t=33.896s  name=baffle_left_2  relative_speed=1.4717mps
+    t=45.720s  name=Post_2  relative_speed=1.3333mps
+    t=45.720s  name=Shelf_0  relative_speed=1.3333mps
+    t=46.126s  name=Shelf_0  relative_speed=0.6744mps
+    t=46.195s  name=Post_2  relative_speed=0.5244mps
+    t=60.590s  name=Post_2  relative_speed=1.7623mps
+    t=60.590s  name=Shelf_0  relative_speed=1.7623mps
+    t=61.156s  name=Shelf_0  relative_speed=0.9642mps
+    t=61.207s  name=Post_2  relative_speed=0.7297mps
+    t=64.415s  name=baffle_left_2  relative_speed=1.4763mps
+    t=75.873s  name=Shelf_0  relative_speed=0.6115mps
+    t=75.874s  name=Post_2  relative_speed=0.6069mps
+    ... 他 4 件
+
+-- 過去基準との比較 (参考情報のみ。Phase 0 は「今日の実測値」を確立する工程であり、
+   旧基準への一致は合否判定条件ではない) --
+  今回のcompletion_timeデータなし（比較不能）
+  注記: 経路追従.md §19 に「現行6.53 s基準」と記載されているが、この数値は docs/start_to_bingo_baseline_and_algorithm_survey.md の "Final baseline test" 表には 出現しない（同表は completion time を明示的に "no measured completion timestamp" と している）。6.53s の出典は経路追従.md本文のみであり、実測値として検証できていない。
+
+==============================================================================

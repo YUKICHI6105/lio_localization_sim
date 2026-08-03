@@ -13,7 +13,7 @@
   "field": {"length": 5.638, "width": 3.376, "floor_z": 0.0},
   "rules": {
     "match_duration_s": 300,
-    "note_diameter": 0.150,
+    "note_size": 0.150,
     "note_mass": 0.200,
     "notes_per_team": 6,
     "max_notes_in_slalom": 2
@@ -39,21 +39,69 @@
   },
   "missions": {
     "start_to_bingo_left": {
-      "interpretation": "The field-deep pair means the two orange notes nearest the slalom.",
+      "interpretation": "The field-deep pair means the two orange notes nearest the slalom. This is note pair 5-6 (1-indexed); pairs 1-2/2-3/3-4/4-5 are the sibling missions below, added 2026-07-31 for ILC training across the whole note row.",
       "surface_clearance": 0.050,
       "yaw": 0.0,
       "start": [-2.419, 1.354],
       "pickup": [-1.799, 0.394337567],
       "slalom_waypoints": [[-0.450, 0.500], [-0.300, 1.060], [0.350, 1.060]],
-      "finish": [2.316, 0.494337567],
+      "finish": [2.0325, 0.494337567],
       "pickup_note_indices": [4, 5],
+      "pickup_dwell_s": 0.400,
+      "required_zero_speed_points": ["start", "pickup", "finish"]
+    },
+    "start_to_bingo_pair_1_2": {
+      "interpretation": "Note pair 1-2 (1-indexed), farthest from the slalom. Same start/slalom/finish as start_to_bingo_left. Pickup is NOT the exact note-pair midpoint (-2.599): the chassis (0.289 m circumradius) overlaps the start_end wall (x=-2.8025) there by 2.64 cm (measured via Physics.ComputePenetration, 2026-07-31). Shifted +0.06 m toward the field centre for clearance; verified zero overlap with margin.",
+      "surface_clearance": 0.050,
+      "yaw": 0.0,
+      "start": [-2.419, 1.354],
+      "pickup": [-2.539, 0.394337567],
+      "slalom_waypoints": [[-0.450, 0.500], [-0.300, 1.060], [0.350, 1.060]],
+      "finish": [2.0325, 0.494337567],
+      "pickup_note_indices": [0, 1],
+      "pickup_dwell_s": 0.400,
+      "required_zero_speed_points": ["start", "pickup", "finish"]
+    },
+    "start_to_bingo_pair_2_3": {
+      "interpretation": "Note pair 2-3 (1-indexed). Same start/slalom/finish as start_to_bingo_left, pickup shifted to this pair's midpoint.",
+      "surface_clearance": 0.050,
+      "yaw": 0.0,
+      "start": [-2.419, 1.354],
+      "pickup": [-2.399, 0.394337567],
+      "slalom_waypoints": [[-0.450, 0.500], [-0.300, 1.060], [0.350, 1.060]],
+      "finish": [2.0325, 0.494337567],
+      "pickup_note_indices": [1, 2],
+      "pickup_dwell_s": 0.400,
+      "required_zero_speed_points": ["start", "pickup", "finish"]
+    },
+    "start_to_bingo_pair_3_4": {
+      "interpretation": "Note pair 3-4 (1-indexed). Same start/slalom/finish as start_to_bingo_left, pickup shifted to this pair's midpoint.",
+      "surface_clearance": 0.050,
+      "yaw": 0.0,
+      "start": [-2.419, 1.354],
+      "pickup": [-2.199, 0.394337567],
+      "slalom_waypoints": [[-0.450, 0.500], [-0.300, 1.060], [0.350, 1.060]],
+      "finish": [2.0325, 0.494337567],
+      "pickup_note_indices": [2, 3],
+      "pickup_dwell_s": 0.400,
+      "required_zero_speed_points": ["start", "pickup", "finish"]
+    },
+    "start_to_bingo_pair_4_5": {
+      "interpretation": "Note pair 4-5 (1-indexed), nearest the slalom besides pair 5-6. Same start/slalom/finish as start_to_bingo_left, pickup shifted to this pair's midpoint.",
+      "surface_clearance": 0.050,
+      "yaw": 0.0,
+      "start": [-2.419, 1.354],
+      "pickup": [-1.999, 0.394337567],
+      "slalom_waypoints": [[-0.450, 0.500], [-0.300, 1.060], [0.350, 1.060]],
+      "finish": [2.0325, 0.494337567],
+      "pickup_note_indices": [3, 4],
       "pickup_dwell_s": 0.400,
       "required_zero_speed_points": ["start", "pickup", "finish"]
     }
   },
   "zones": [
-    {"id": "start_left", "x_min": -2.819, "x_max": -2.019, "y_min": 1.069, "y_max": 1.669, "colour": "#15d12e", "confidence": "overhead_drawing_dimensions"},
-    {"id": "start_right", "x_min": -2.819, "x_max": -2.019, "y_min": -1.669, "y_max": -1.069, "colour": "#15d12e", "confidence": "overhead_drawing_dimensions"},
+    {"id": "start_left", "x_min": -2.819, "x_max": -1.579, "y_min": 1.069, "y_max": 1.669, "colour": "#15d12e", "confidence": "rulebook_ver0731_diagram_pixel_measurement", "note": "2026-08-02: corrected from x_max=-2.019 (800mm depth). Rulebook glossary text says start zone is 1600x800mm, but the ver0731 CAD top-down diagram (measured directly from the embedded raster image) shows each start zone as 600mm(width)x1240mm(depth), flush against the field's end wall and sharing its depth with the adjacent notes zone. x_max=-1.579 matches the existing notes_left/notes_right/slalom x-boundary exactly."},
+    {"id": "start_right", "x_min": -2.819, "x_max": -1.579, "y_min": -1.669, "y_max": -1.069, "colour": "#15d12e", "confidence": "rulebook_ver0731_diagram_pixel_measurement", "note": "2026-08-02: see start_left note."},
     {"id": "notes_left", "x_min": -2.819, "x_max": -1.579, "y_min": 0.0165, "y_max": 0.2665, "colour": "#0852f2", "confidence": "overhead_drawing_dimensions"},
     {"id": "notes_right", "x_min": -2.819, "x_max": -1.579, "y_min": -0.2665, "y_max": -0.0165, "colour": "#0852f2", "confidence": "overhead_drawing_dimensions"},
     {"id": "slalom", "x_min": -1.579, "x_max": 0.919, "y_min": -1.6715, "y_max": 1.6715, "colour": "#bf0a0a", "confidence": "overhead_drawing_dimensions"},
@@ -70,15 +118,23 @@
       {"id": "bingo_end", "x1": 2.8025, "y1": -1.688, "x2": 2.8025, "y2": 1.688, "confidence": "overhead_drawing_dimensions"},
       {"id": "left_side", "x1": -2.8025, "y1": 1.6715, "x2": 2.8025, "y2": 1.6715, "confidence": "overhead_drawing_dimensions"},
       {"id": "right_side", "x1": -2.8025, "y1": -1.6715, "x2": 2.8025, "y2": -1.6715, "confidence": "overhead_drawing_dimensions"},
-      {"id": "centre_to_bingo", "x1": -2.8025, "y1": 0.0, "x2": 1.846, "y2": 0.0, "confidence": "overhead_drawing_alignment"},
-      {"id": "baffle_left_1", "x1": -0.779, "y1": 0.869, "x2": -0.779, "y2": 1.669, "confidence": "overhead_drawing_dimensions"},
-      {"id": "baffle_right_1", "x1": -0.779, "y1": -1.669, "x2": -0.779, "y2": -0.869, "confidence": "overhead_drawing_dimensions"},
-      {"id": "baffle_left_2", "x1": 0.021, "y1": 0.019, "x2": 0.021, "y2": 0.819, "confidence": "overhead_drawing_dimensions"},
-      {"id": "baffle_right_2", "x1": 0.021, "y1": -0.819, "x2": 0.021, "y2": -0.019, "confidence": "overhead_drawing_dimensions"}
+      {"id": "centre_to_bingo", "x1": -2.8025, "y1": 0.0, "x2": 1.5625, "y2": 0.0, "confidence": "overhead_drawing_alignment", "note": "2026-08-02: x2 corrected from 1.846 (which exactly matched the OLD bingo shelf front edge, centre.x-width/2 = 2.316-0.47). Now matches the corrected shelf front edge (centre.x-width/2 = 2.0325-0.47 = 1.5625) so this centre-line wall still stops flush against the shelf instead of overshooting into it or leaving a gap."},
+      {"id": "baffle_left_1", "x1": -0.821, "y1": 0.800, "x2": -0.821, "y2": 1.6715, "confidence": "user_rulebook_readout_20260802", "note": "2026-08-02: corrected from x=-0.779, y:[0.869,1.669]. User read the ver0731 rulebook diagram directly: this baffle hangs from the top outer wall (y=1.6715), and the gap it creates with baffle_right_1 is 1600mm total, centred on y=0 (i.e. the gap spans y:[-0.800,0.800], confirmed by the user as perfectly line-symmetric). Length = 1.6715-0.800 = 0.8715m, close to this session's own pixel measurement (~840mm) of the same wall in the diagram, cross-validating the reading."},
+      {"id": "baffle_right_1", "x1": -0.821, "y1": -1.6715, "x2": -0.821, "y2": -0.800, "confidence": "user_rulebook_readout_20260802", "note": "2026-08-02: mirror of baffle_left_1, see its note."},
+      {"id": "notes_start_boundary_top_outer", "x1": -1.579, "y1": 1.069, "x2": -1.579, "y2": 1.669, "confidence": "user_rulebook_readout_20260802", "note": "2026-08-02 NEW: previously missing entirely. The notes/slalom boundary (x=-1.579, already correct as the depth of zones[start_left/notes_left/slalom]) is not an open boundary: it has wall segments exactly covering the start_left zone's y-range (600mm, hangs from the top outer wall), leaving the ~800mm gap next to it (aligned with the gray floor between start_left and notes_left) as the actual passage a robot uses to enter the slalom."},
+      {"id": "notes_start_boundary_bottom_outer", "x1": -1.579, "y1": -1.669, "x2": -1.579, "y2": -1.069, "confidence": "user_rulebook_readout_20260802", "note": "2026-08-02 NEW: mirror of notes_start_boundary_top_outer, covers start_right's y-range."},
+      {"id": "notes_start_boundary_top_inner", "x1": -1.579, "y1": 0.0165, "x2": -1.579, "y2": 0.2665, "confidence": "user_rulebook_readout_20260802", "note": "2026-08-02 NEW: same boundary (x=-1.579), covers the notes_left zone's y-range (250mm, hangs from the centre_to_bingo wall at y=0) so a robot cannot cut straight from notes_left into the slalom at that y either; it must use the gray-floor gap."},
+      {"id": "notes_start_boundary_bottom_inner", "x1": -1.579, "y1": -0.2665, "x2": -1.579, "y2": -0.0165, "confidence": "user_rulebook_readout_20260802", "note": "2026-08-02 NEW: mirror of notes_start_boundary_top_inner, covers notes_right's y-range."},
+      {"id": "baffle_left_2", "x1": 0.021, "y1": 0.019, "x2": 0.021, "y2": 0.819, "confidence": "overhead_drawing_dimensions", "note": "2026-08-02: NOT yet re-verified against the ver0731 diagram the way baffle_left_1/right_1 and the notes/slalom boundary were this session (see [[project_field_start_zone_fix_20260802]]) -- user was unsure which wall this id referred to. Treat as unconfirmed; re-check before trusting for tight-clearance routing (this is the wall pickup1_to_bingo collided with earlier this session)."},
+      {"id": "baffle_right_2", "x1": 0.021, "y1": -0.819, "x2": 0.021, "y2": -0.019, "confidence": "overhead_drawing_dimensions", "note": "2026-08-02: unconfirmed, see baffle_left_2 note."},
+      {"id": "goal_slalom_boundary_left", "x1": 0.821, "y1": 0.800, "x2": 0.821, "y2": 1.6715, "confidence": "user_rulebook_readout_20260802", "note": "2026-08-02 NEW: previously missing entirely, matching the user's report that the goal/slalom boundary (x=0.919) had no wall generated. User confirmed this baffle mirrors baffle_left_1's structure (wall hangs from the top outer wall, ~840-870mm, then an 800mm gap toward the centreline) but positioned near the goal-side entrance instead: x=+0.821 (100mm short of the goal/slalom boundary at x=0.919), same gap y:[-0.800,0.800] centred on y=0, same length 0.8715m."},
+      {"id": "goal_slalom_boundary_right", "x1": 0.821, "y1": -1.6715, "x2": 0.821, "y2": -0.800, "confidence": "user_rulebook_readout_20260802", "note": "2026-08-02 NEW: mirror of goal_slalom_boundary_left, see its note."},
+      {"id": "bingo_pocket_centre", "x1": 2.5025, "y1": 0.0, "x2": 2.8025, "y2": 0.0, "confidence": "session_inference_20260802", "note": "2026-08-02 NEW: not read from the rulebook -- this session's own addition, corrected from an earlier two-side-wall attempt (bingo_pocket_side_top/bottom) that the user rejected in favour of a single centre wall. Moving the bingo shelf's centre.x (see bingo.centre_note) opened a 300mm-deep pocket directly behind the shelf (x:[2.5025,2.8025]) that didn't exist when the shelf sat flush against bingo_end. This continues the centre_to_bingo wall's y=0 divider on past the shelf's back face to the bingo_end wall, keeping the two teams' back-pocket space separated the same way centre_to_bingo separates them everywhere else. Re-check against the rulebook if an authoritative dimension for this ever turns up."}
     ]
   },
   "bingo": {
-    "centre": {"x": 2.316, "y": 0.0},
+    "centre": {"x": 2.0325, "y": 0.0},
+    "centre_note": "2026-08-02: x corrected from 2.316. BuildBingo() derives far_edge_x = centre.x + width/2 (not the stored far_edge_x field below, which is unused by code and only kept as documentation); the old centre.x put the shelf's back face only 16.5mm from the bingo_end wall (x=2.8025), which the user confirmed in Unity Play was wrong. Set so the shelf's back face sits 300mm off the wall (far_edge_x = 2.8025-0.300 = 2.5025, centre.x = 2.5025-width/2). This assumes the rulebook's '300' dimension applies to wall clearance as well as the shelf's own lateral depth (depth_each_side) -- the user only confirmed the latter meaning directly; the wall-clearance reuse is this session's best-effort inference, not independently confirmed. Re-verify against the rulebook if this matters for scoring/collision precision.",
     "grid_plane": "x-z",
     "team_approach_axes": ["+y", "-y"],
     "columns": 3,
@@ -91,7 +147,8 @@
     "depth_each_side": 0.300,
     "total_depth": 0.600,
     "height": 0.900,
-    "far_edge_x": 2.786,
+    "far_edge_x": 2.5025,
+    "far_edge_x_note": "2026-08-02: this field is NOT read by RoboconFieldBuilder.BuildBingo() (it derives the shelf's back face itself from centre.x + width/2); kept here only as documentation and updated to stay consistent with the corrected centre.x above.",
     "confidence": "overhead_and_elevation_drawings"
   },
   "notes": {

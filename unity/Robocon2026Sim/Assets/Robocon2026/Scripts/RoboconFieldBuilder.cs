@@ -155,12 +155,12 @@ namespace Robocon2026.Simulation
             for (var i = 0; i < notes.Count; ++i)
             {
                 if (notes[i].Count < 2) throw new InvalidDataException($"{team} note {i} has no x/y pair.");
-                var go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                var go = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 go.name = $"{team}Note_{i}";
                 go.transform.SetParent(root, false);
                 go.transform.position = FieldCoordinates.ToUnity(
-                    notes[i][0], notes[i][1], Definition.Rules.NoteDiameter / 2);
-                go.transform.localScale = Vector3.one * (float)Definition.Rules.NoteDiameter;
+                    notes[i][0], notes[i][1], Definition.Rules.NoteSize / 2);
+                go.transform.localScale = Vector3.one * (float)Definition.Rules.NoteSize;
                 go.GetComponent<Renderer>().sharedMaterial = GetMaterial(colour);
                 go.GetComponent<Collider>().sharedMaterial = fieldPhysicsMaterial;
 

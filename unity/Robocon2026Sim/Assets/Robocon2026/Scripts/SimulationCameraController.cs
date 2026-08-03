@@ -25,12 +25,27 @@ namespace Robocon2026.Simulation
         public bool FollowingRobot => followingRobot;
         public float Distance => distance;
 
+        [SerializeField] private bool startOverheadOnRobot = true;
+        [SerializeField] private float overheadPitch = 88f;
+        [SerializeField] private float overheadDistance = 4f;
+
         private void Awake()
         {
             initialPosition = transform.position;
             initialRotation = transform.rotation;
             initialFieldFocus = fieldFocusPoint;
             CaptureOrbitFromCurrentTransform(fieldFocusPoint);
+
+            if (startOverheadOnRobot)
+            {
+                // Robot GameObject may not exist yet (built in another script's Start());
+                // LateUpdate() already retries FindRobotTarget() every frame while
+                // followingRobot is true, so it picks the robot up as soon as it spawns.
+                followingRobot = true;
+                pitch = overheadPitch;
+                yaw = 0f;
+                distance = Mathf.Clamp(overheadDistance, minimumDistance, maximumDistance);
+            }
         }
 
         private void Update()

@@ -15,6 +15,11 @@
   history, remaining residual characterisation, and evidence.
 - [Stage 4 resume notes](experiment_history/04_stage4_resume_notes.md): the current Unity/ROS
   localisation status, validated operating procedure, known limitations, and next experiments.
+- [pathplannning bridge and field geometry handoff (2026-08-03)](experiment_history/28_pathplannning_bridge_and_field_geometry_handoff_20260803.md):
+  the `pathplannning` B-spline+FF+PD package's Unity physics bridge, current per-leg
+  verification status, the rulebook-driven field geometry fixes, and the operational
+  gotchas (WSL2 zombie socket, `ros_tcp_endpoint` executor starvation, safe start/stop
+  ordering) found while validating it.
 
 ## Requirements (`requirements/`)
 
@@ -57,6 +62,9 @@
 - [Ground-truth-seeded diagnostics](experiment_history/05_truth_diagnostics_summary.md):
   offline ICP-from-truth and seed-mode comparisons used to isolate bias sources; not
   accuracy measurements in their own right.
+- [28: pathplannning bridge and field geometry handoff (2026-08-03)](experiment_history/28_pathplannning_bridge_and_field_geometry_handoff_20260803.md):
+  handoff snapshot for the separate `pathplannning` package's Unity bridge and the
+  rulebook-driven field fixes (start zone, slalom walls, bingo shelf position).
 
 ## Running the simulator
 

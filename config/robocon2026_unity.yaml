@@ -59,15 +59,33 @@
     field_height: 3.310
     wall_thickness: 0.033
 
-    # Known non-perimeter surfaces: centre wall, four slalom baffles and the
-    # four physical vertical bingo posts (not a fictitious rectangular envelope).
-    wall_segment_x1: [-2.8025, -0.779, -0.779, 0.021, 0.021, 1.866, 2.166, 2.466, 2.766]
-    wall_segment_y1: [ 0.0000,  0.869, -1.669, 0.019, -0.819, -0.300, -0.300, -0.300, -0.300]
-    wall_segment_x2: [ 1.8460, -0.779, -0.779, 0.021, 0.021, 1.866, 2.166, 2.466, 2.766]
-    wall_segment_y2: [ 0.0000,  1.669, -0.869, 0.819, -0.019,  0.300,  0.300,  0.300,  0.300]
+    # Known non-perimeter surfaces: centre wall, slalom baffles, the
+    # notes/start and goal/slalom boundary walls, the bingo back-pocket
+    # divider, and the four physical vertical bingo posts (not a fictitious
+    # rectangular envelope).
+    # 2026-08-02: this list had never been updated to match this session's
+    # rulebook-driven wall fixes (see [[project_field_start_zone_fix_20260802]])
+    # -- it was still the original 9-segment map (old baffle_left_1/right_1
+    # position, no notes/start or goal/slalom boundary walls, bingo posts at
+    # the old centre.x=2.316). Scan-matching has been working against a stale
+    # wall map this whole session. Rebuilt from robocon2026_field.json's
+    # current walls.segments (excluding the 4 perimeter segments, which are
+    # handled separately via field_width/field_height/wall_thickness above)
+    # plus the 4 bingo posts recomputed at the corrected centre.x=2.0325
+    # (localX -0.45/-0.15/0.15/0.45 -> 1.5825/1.8825/2.1825/2.4825).
+    wall_segment_x1: [-2.8025, -0.821, -0.821, -1.579, -1.579, -1.579, -1.579, 0.021, 0.021, 0.821, 0.821, 2.5025, 1.5825, 1.8825, 2.1825, 2.4825]
+    wall_segment_y1: [ 0.0000,  0.800, -1.6715, 1.069, -1.669, 0.0165, -0.2665, 0.019, -0.819, 0.800, -1.6715, 0.0000, -0.300, -0.300, -0.300, -0.300]
+    wall_segment_x2: [ 1.5625, -0.821, -0.821, -1.579, -1.579, -1.579, -1.579, 0.021, 0.021, 0.821, 0.821, 2.8025, 1.5825, 1.8825, 2.1825, 2.4825]
+    wall_segment_y2: [ 0.0000,  1.6715, -0.800, 1.669, -1.069, 0.2665, -0.0165, 0.819, -0.019, 1.6715, -0.800, 0.0000,  0.300,  0.300,  0.300,  0.300]
 
-    initial_x: -2.419
-    initial_y: 1.354
+    # 2026-08-02: updated from -2.419/1.354 (old start-zone spawn) to match the
+    # rulebook-corrected start zone / robot spawn point (x900mm from the start
+    # wall, y300mm from the top outer wall -> field(-1.919, 1.3715); see
+    # [[project_field_start_zone_fix_20260802]]). Left stale, this mismatches
+    # the robot's actual Unity spawn and makes backend_optimizer_node
+    # continuously reset ("resuming from relocalization/reset handoff").
+    initial_x: -1.919
+    initial_y: 1.3715
     initial_theta: 0.0
 
     # Competition notes are 150 mm diameter.

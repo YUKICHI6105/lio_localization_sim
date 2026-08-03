@@ -52,10 +52,11 @@ def main():
         if colour == 'confidence':
             continue
         fill = '#1260ff' if colour == 'blue' else '#ff6412'
+        note_side = data['rules']['note_size'] * scale
         for x, y in points:
             parts.append(
-                f'<circle cx="{sx(x):.2f}" cy="{sy(y):.2f}" '
-                f'r="{data["rules"]["note_diameter"] * scale / 2:.2f}" '
+                f'<rect x="{sx(x) - note_side / 2:.2f}" y="{sy(y) - note_side / 2:.2f}" '
+                f'width="{note_side:.2f}" height="{note_side:.2f}" '
                 f'fill="{fill}" stroke="white" stroke-width="1"/>')
     bingo = data['bingo']
     bx, by = sx(bingo['centre']['x']), sy(bingo['centre']['y'])

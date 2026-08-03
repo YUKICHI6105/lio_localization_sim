@@ -1,0 +1,36 @@
+[15:46:40] [Warning] No settings for ROSConnection.instance! Open "ROS Settings" from the Robotics menu to configure it.
+[15:46:58] [Warning] [StartToBingo] Collision with Shelf_0
+[15:46:58] [Warning] [StartToBingo] Collision with Post_2
+[15:46:59] [Warning] [StartToBingo RESULT lap=0] final=(2.316,0.492)m completion_time=7.338s target_error=2.1mm terminal_yaw_error=31.91deg tracking_rmse=69.50mm tracking_max=208.10mm max_accel=154.33mps2 wheel_odom_rmse=0.00mm wheel_odom_max=0.00mm pickup_error=2.16mm pickup_speed=9.93mm/s notes_captured=True collisions=Shelf_0,Post_2
+[15:47:02] [Warning] [StartToBingo] Collision with baffle_left_2
+[15:47:06] [Warning] [StartToBingo RESULT lap=1] final=(-2.418,1.353)m completion_time=6.753s target_error=1.5mm terminal_yaw_error=44.44deg tracking_rmse=72.54mm tracking_max=208.10mm max_accel=370.80mps2 wheel_odom_rmse=0.00mm wheel_odom_max=0.00mm pickup_error=2.16mm pickup_speed=9.93mm/s notes_captured=True collisions=Shelf_0,Post_2,baffle_left_2
+[15:47:07] [Warning] Account API did not become accessible within 30 seconds.
+[15:47:13] [Warning] [StartToBingo] Collision with Post_2
+[15:47:13] [Warning] [StartToBingo] Collision with Shelf_0
+[15:47:14] [Warning] [StartToBingo RESULT lap=2] final=(2.316,0.492)m completion_time=7.412s target_error=2.8mm terminal_yaw_error=32.21deg tracking_rmse=71.68mm tracking_max=208.10mm max_accel=370.80mps2 wheel_odom_rmse=0.25mm wheel_odom_max=0.43mm pickup_error=3.28mm pickup_speed=9.95mm/s notes_captured=True collisions=Shelf_0,Post_2,baffle_left_2
+[15:47:17] [Warning] [StartToBingo] Collision with baffle_left_2
+[15:47:21] [Warning] [StartToBingo RESULT lap=3] final=(-2.421,1.355)m completion_time=6.817s target_error=2.6mm terminal_yaw_error=45.01deg tracking_rmse=66.66mm tracking_max=208.10mm max_accel=370.80mps2 wheel_odom_rmse=0.30mm wheel_odom_max=0.43mm pickup_error=3.28mm pickup_speed=9.95mm/s notes_captured=True collisions=Shelf_0,Post_2,baffle_left_2
+[15:47:29] [Warning] [StartToBingo] Collision with Shelf_0
+[15:47:29] [Warning] [StartToBingo] Collision with Post_2
+[15:47:29] [Warning] [StartToBingo] Collision with Shelf_0
+[15:47:29] [Warning] [StartToBingo] Collision with Post_2
+[15:47:30] [Warning] [StartToBingo RESULT lap=4] final=(2.315,0.492)m completion_time=7.614s target_error=2.8mm terminal_yaw_error=32.78deg tracking_rmse=68.14mm tracking_max=208.10mm max_accel=370.80mps2 wheel_odom_rmse=0.43mm wheel_odom_max=0.73mm pickup_error=1.46mm pickup_speed=9.89mm/s notes_captured=True collisions=Shelf_0,Post_2,baffle_left_2
+[15:47:32] [Warning] [StartToBingo] Collision with baffle_left_2
+[15:47:37] [Warning] [StartToBingo RESULT lap=5] final=(-2.419,1.354)m completion_time=6.794s target_error=0.1mm terminal_yaw_error=45.58deg tracking_rmse=65.40mm tracking_max=208.10mm max_accel=370.80mps2 wheel_odom_rmse=0.49mm wheel_odom_max=0.73mm pickup_error=1.46mm pickup_speed=9.89mm/s notes_captured=True collisions=Shelf_0,Post_2,baffle_left_2
+[15:47:44] [Warning] [StartToBingo] Collision with Shelf_0
+[15:47:44] [Warning] [StartToBingo] Collision with Post_2
+[15:47:45] [Warning] [StartToBingo RESULT lap=6] final=(2.315,0.492)m completion_time=7.222s target_error=2.6mm terminal_yaw_error=33.45deg tracking_rmse=62.17mm tracking_max=208.10mm max_accel=370.80mps2 wheel_odom_rmse=0.55mm wheel_odom_max=0.83mm pickup_error=1.41mm pickup_speed=9.69mm/s notes_captured=True collisions=Shelf_0,Post_2,baffle_left_2
+[15:47:48] [Warning] [StartToBingo] Collision with baffle_left_2
+[15:47:52] [Warning] [StartToBingo RESULT lap=7] final=(-2.416,1.353)m completion_time=6.811s target_error=2.9mm terminal_yaw_error=46.26deg tracking_rmse=62.99mm tracking_max=208.10mm max_accel=370.80mps2 wheel_odom_rmse=0.59mm wheel_odom_max=0.83mm pickup_error=1.41mm pickup_speed=9.69mm/s notes_captured=True collisions=Shelf_0,Post_2,baffle_left_2
+[15:48:00] [Warning] [StartToBingo] Collision with Shelf_0
+[15:48:00] [Warning] [StartToBingo] Collision with Post_2
+[15:48:00] [Warning] [StartToBingo RESULT lap=8] final=(2.316,0.492)m completion_time=7.343s target_error=2.2mm terminal_yaw_error=34.12deg tracking_rmse=60.97mm tracking_max=208.10mm max_accel=370.80mps2 wheel_odom_rmse=0.76mm wheel_odom_max=1.55mm pickup_error=1.63mm pickup_speed=9.97mm/s notes_captured=True collisions=Shelf_0,Post_2,baffle_left_2
+[15:48:03] [Warning] [StartToBingo] Collision with baffle_left_2
+[15:48:08] [Warning] [StartToBingo RESULT lap=9] final=(-2.420,1.355)m completion_time=7.267s target_error=1.4mm terminal_yaw_error=46.92deg tracking_rmse=60.39mm tracking_max=208.10mm max_accel=370.80mps2 wheel_odom_rmse=0.87mm wheel_odom_max=1.55mm pickup_error=1.63mm pickup_speed=9.97mm/s notes_captured=True collisions=Shelf_0,Post_2,baffle_left_2
+[15:48:15] [Warning] [StartToBingo] Collision with Shelf_0
+[15:48:15] [Warning] [StartToBingo] Collision with Post_2
+[15:48:15] [Warning] [StartToBingo] Collision with Shelf_0
+[15:48:15] [Warning] [StartToBingo] Collision with Post_2
+[15:48:16] [Warning] [StartToBingo RESULT lap=10] final=(2.315,0.492)m completion_time=7.059s target_error=2.3mm terminal_yaw_error=34.77deg tracking_rmse=59.11mm tracking_max=208.10mm max_accel=370.80mps2 wheel_odom_rmse=0.95mm wheel_odom_max=1.55mm pickup_error=2.68mm pickup_speed=9.73mm/s notes_captured=True collisions=Shelf_0,Post_2,baffle_left_2
+[15:48:21] [Warning] [StartToBingo] Collision with left_side
+[15:48:22] [Warning] [StartToBingo] Collision with start_end

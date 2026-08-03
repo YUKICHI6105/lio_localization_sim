@@ -1,0 +1,23 @@
+[INFO] [1785480370.864524234] [UnityEndpoint]: Starting server on 0.0.0.0:10000
+[INFO] [1785480401.756850127] [UnityEndpoint]: Connection from 127.0.0.1
+[INFO] [1785480402.038710045] [UnityEndpoint]: RegisterSubscriber(/odom_fast, <class 'nav_msgs.msg._odometry.Odometry'>) OK
+[INFO] [1785480402.078468018] [UnityEndpoint]: RegisterSubscriber(/tf, <class 'tf2_msgs.msg._tf_message.TFMessage'>) OK
+[INFO] [1785480402.103949964] [UnityEndpoint]: RegisterPublisher(/clock, <class 'rosgraph_msgs.msg._clock.Clock'>) OK
+[INFO] [1785480402.396340063] [UnityEndpoint]: RegisterPublisher(/scan, <class 'sensor_msgs.msg._laser_scan.LaserScan'>) OK
+[INFO] [1785480402.420209852] [UnityEndpoint]: RegisterPublisher(/ground_truth_pose, <class 'nav_msgs.msg._odometry.Odometry'>) OK
+[INFO] [1785480402.503203885] [UnityEndpoint]: RegisterPublisher(/unity_sensor_publish_counts, <class 'std_msgs.msg._string.String'>) OK
+[INFO] [1785480402.532595793] [UnityEndpoint]: RegisterPublisher(/robot_collision, <class 'std_msgs.msg._string.String'>) OK
+[INFO] [1785480402.569839050] [UnityEndpoint]: RegisterPublisher(/imu/data, <class 'sensor_msgs.msg._imu.Imu'>) OK
+[WARN] [1785480402.578138107] [rcl.logging_rosout]: Publisher already registered for node name: 'clock_RosPublisher'. If this is due to multiple nodes with the same name then all logs for the logger named 'clock_RosPublisher' will go out over the existing publisher. As soon as any node with that name is destructed it will unregister the publisher, preventing any further logs for that name from being published on the rosout topic.
+[INFO] [1785480402.611027805] [UnityEndpoint]: RegisterPublisher(/clock, <class 'rosgraph_msgs.msg._clock.Clock'>) OK
+[WARN] [1785480402.614652498] [rcl.logging_rosout]: Publisher already registered for node name: 'scan_RosPublisher'. If this is due to multiple nodes with the same name then all logs for the logger named 'scan_RosPublisher' will go out over the existing publisher. As soon as any node with that name is destructed it will unregister the publisher, preventing any further logs for that name from being published on the rosout topic.
+[INFO] [1785480402.659453797] [UnityEndpoint]: RegisterPublisher(/scan, <class 'sensor_msgs.msg._laser_scan.LaserScan'>) OK
+[WARN] [1785480402.660910868] [rcl.logging_rosout]: Publisher already registered for node name: 'ground_truth_pose_RosPublisher'. If this is due to multiple nodes with the same name then all logs for the logger named 'ground_truth_pose_RosPublisher' will go out over the existing publisher. As soon as any node with that name is destructed it will unregister the publisher, preventing any further logs for that name from being published on the rosout topic.
+[INFO] [1785480402.705103920] [UnityEndpoint]: RegisterPublisher(/ground_truth_pose, <class 'nav_msgs.msg._odometry.Odometry'>) OK
+[WARN] [1785480402.706987614] [rcl.logging_rosout]: Publisher already registered for node name: 'unity_sensor_publish_counts_RosPublisher'. If this is due to multiple nodes with the same name then all logs for the logger named 'unity_sensor_publish_counts_RosPublisher' will go out over the existing publisher. As soon as any node with that name is destructed it will unregister the publisher, preventing any further logs for that name from being published on the rosout topic.
+[INFO] [1785480402.739565302] [UnityEndpoint]: RegisterPublisher(/unity_sensor_publish_counts, <class 'std_msgs.msg._string.String'>) OK
+[WARN] [1785480402.741472758] [rcl.logging_rosout]: Publisher already registered for node name: 'robot_collision_RosPublisher'. If this is due to multiple nodes with the same name then all logs for the logger named 'robot_collision_RosPublisher' will go out over the existing publisher. As soon as any node with that name is destructed it will unregister the publisher, preventing any further logs for that name from being published on the rosout topic.
+[INFO] [1785480402.773934024] [UnityEndpoint]: RegisterPublisher(/robot_collision, <class 'std_msgs.msg._string.String'>) OK
+[WARN] [1785480402.776297288] [rcl.logging_rosout]: Publisher already registered for node name: 'imudata_RosPublisher'. If this is due to multiple nodes with the same name then all logs for the logger named 'imudata_RosPublisher' will go out over the existing publisher. As soon as any node with that name is destructed it will unregister the publisher, preventing any further logs for that name from being published on the rosout topic.
+[INFO] [1785480402.807997773] [UnityEndpoint]: RegisterPublisher(/imu/data, <class 'sensor_msgs.msg._imu.Imu'>) OK
+[INFO] [1785480501.004235552] [UnityEndpoint]: Disconnected from 127.0.0.1

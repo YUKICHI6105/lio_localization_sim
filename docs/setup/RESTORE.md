@@ -33,6 +33,7 @@ ros2_ws/
 └── src/
     ├── lio_localization/                  # localisation package + reference docs (main.md lives here)
     ├── lio_localization_sim/              # this repo: simulator, tooling, measurements
+    ├── pathplannning/                     # B-spline+FF+PD trajectory tracking (separate repo, branch: main)
     ├── sotoba/                            # ICP library — NEEDS the fork, see below
     ├── ROS-TCP-Endpoint/                  # Unity <-> ROS bridge
     └── (can_plugins2, odometry_plugins, robomas_*, solenoid_valve_ros2)
@@ -94,3 +95,16 @@ keyboard/mouse automation or window-focus tricks are needed or used.
 `docs/experiment_history/04_stage4_resume_notes.md` covers the operational pitfalls found the hard way: stale
 endpoints holding port 10000, publisher queue sizing against the 1 kHz IMU, and why a run must
 never be judged from an open-loop session.
+
+## 6. `pathplannning` (separate package, B-spline + FF + PD trajectory tracking)
+
+`src/pathplannning` is its own git repository (branch `main`), not part of this repo. It
+implements a full trajectory-tracking stack (`経路生成v4.md`) and, instead of a wheel-level
+dynamics model that doesn't exist anywhere in this environment, drives Unity directly via a
+`/cmd_vel_body` Twist bridge (`PathplanningCmdVelBridge.cs` in this repo's Unity project,
+gated by a `PathplanningBridgeMode.flag` marker file next to the Unity project's
+`Assets` folder). See
+[`28_pathplannning_bridge_and_field_geometry_handoff_20260803.md`](../experiment_history/28_pathplannning_bridge_and_field_geometry_handoff_20260803.md)
+for build/run instructions, per-leg verification status, and the operational pitfalls
+(WSL2 zombie socket, `ros_tcp_endpoint` executor starvation, safe start/stop ordering)
+found while validating it.

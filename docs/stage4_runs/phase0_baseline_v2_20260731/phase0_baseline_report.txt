@@ -1,0 +1,86 @@
+==============================================================================
+Phase 0 ベースライン計測レポート
+  対象run_dir     : /home/yukichi6105/ros2_ws/src/lio_localization_sim/docs/stage4_runs/phase0_baseline_v2_20260731
+  コンソールログ  : /home/yukichi6105/ros2_ws/src/lio_localization_sim/docs/stage4_runs/phase0_baseline_v2_20260731/unity_console.log
+==============================================================================
+
+-- ラップ別 Unity計測値 (StartToBingoValidation.Complete() の Debug.Log) --
+  lap  completion_time  target_error  terminal_yaw_error  tracking_rmse  tracking_max  max_accel   wheel_odom_rmse  wheel_odom_max  pickup_error  pickup_speed  notes  collisions
+    0           7.338s         2.10mm              31.91deg         69.50mm       208.10mm    154.33mps2            0.00mm           0.00mm         2.16mm         9.93mm/s   True  Shelf_0,Post_2
+    1           6.753s         1.50mm              44.44deg         72.54mm       208.10mm    370.80mps2            0.00mm           0.00mm         2.16mm         9.93mm/s   True  Shelf_0,Post_2,baffle_left_2
+    2           7.412s         2.80mm              32.21deg         71.68mm       208.10mm    370.80mps2            0.25mm           0.43mm         3.28mm         9.95mm/s   True  Shelf_0,Post_2,baffle_left_2
+    3           6.817s         2.60mm              45.01deg         66.66mm       208.10mm    370.80mps2            0.30mm           0.43mm         3.28mm         9.95mm/s   True  Shelf_0,Post_2,baffle_left_2
+    4           7.614s         2.80mm              32.78deg         68.14mm       208.10mm    370.80mps2            0.43mm           0.73mm         1.46mm         9.89mm/s   True  Shelf_0,Post_2,baffle_left_2
+    5           6.794s         0.10mm              45.58deg         65.40mm       208.10mm    370.80mps2            0.49mm           0.73mm         1.46mm         9.89mm/s   True  Shelf_0,Post_2,baffle_left_2
+    6           7.222s         2.60mm              33.45deg         62.17mm       208.10mm    370.80mps2            0.55mm           0.83mm         1.41mm         9.69mm/s   True  Shelf_0,Post_2,baffle_left_2
+    7           6.811s         2.90mm              46.26deg         62.99mm       208.10mm    370.80mps2            0.59mm           0.83mm         1.41mm         9.69mm/s   True  Shelf_0,Post_2,baffle_left_2
+    8           7.343s         2.20mm              34.12deg         60.97mm       208.10mm    370.80mps2            0.76mm           1.55mm         1.63mm         9.97mm/s   True  Shelf_0,Post_2,baffle_left_2
+    9           7.267s         1.40mm              46.92deg         60.39mm       208.10mm    370.80mps2            0.87mm           1.55mm         1.63mm         9.97mm/s   True  Shelf_0,Post_2,baffle_left_2
+   10           7.059s         2.30mm              34.77deg         59.11mm       208.10mm    370.80mps2            0.95mm           1.55mm         2.68mm         9.73mm/s   True  Shelf_0,Post_2,baffle_left_2
+
+  -- 集計 (全ラップ) --
+  completion_time       : n=11  平均=7.130s  最小=6.753s  最大=7.614s
+  target_error          : n=11  平均=2.118mm  最小=0.100mm  最大=2.900mm
+  terminal_yaw_error    : n=11  平均=38.859deg  最小=31.910deg  最大=46.920deg
+  tracking_rmse         : n=11  平均=65.414mm  最小=59.110mm  最大=72.540mm
+  tracking_max          : n=11  平均=208.100mm  最小=208.100mm  最大=208.100mm
+  max_accel             : n=11  平均=351.121mps2  最小=154.330mps2  最大=370.800mps2
+  衝突ありラップ数: 11 / 11
+
+-- 自己位置推定 誤差 (対 ground_truth.csv, 最近傍時刻マッチング) --
+  ※ これは上記の tracking_rmse/tracking_max（目標軌道への追従誤差=制御性能の指標）
+     とも、wheel_odom_rmse/wheel_odom_max（Unity内部の車輪デッドレコニング自己診断）
+     とも別の指標です。ここではROS側 /state_estimate, /odom_fast を
+     /ground_truth_pose と比較した「自己位置推定そのものの実誤差」を計測します。
+
+  [state_estimate vs ground_truth]
+    サンプル数(最近傍マッチ): 3822
+    位置誤差 平均: 2.30 mm
+    位置誤差 RMSE: 3.32 mm
+    位置誤差 最大: 11.22 mm
+    (参考) yaw誤差 平均/RMSE/最大: 0.168 / 0.218 / 0.689 deg
+
+  [odom_fast vs ground_truth]
+    サンプル数(最近傍マッチ): 97308
+    位置誤差 平均: 2.34 mm
+    位置誤差 RMSE: 3.32 mm
+    位置誤差 最大: 16.07 mm
+    (参考) yaw誤差 平均/RMSE/最大: 0.193 / 0.277 / 1.361 deg
+
+-- 最小壁クリアランス (参考値) --
+  最小クリアランス（ロボット中心点基準）: 233.5 mm  (t=88.480s, wall=baffle_left_2)
+  ※ ロボット中心点と壁セグメント間の最短距離であり、シャーシ（一辺0.5mの
+     正三角形）の半径分は差し引いていない。実際の車体端-壁クリアランスは
+     これより小さい可能性がある点に注意。
+
+-- 衝突ログ (consolidated/collisions.csv) --
+  件数: 21
+    t=16.401s  name=Post_2  relative_speed=1.4855mps
+    t=16.401s  name=Shelf_0  relative_speed=1.4855mps
+    t=19.822s  name=baffle_left_2  relative_speed=1.3656mps
+    t=31.061s  name=Post_2  relative_speed=1.3334mps
+    t=31.061s  name=Shelf_0  relative_speed=1.3334mps
+    t=34.388s  name=baffle_left_2  relative_speed=1.4454mps
+    t=46.023s  name=Post_2  relative_speed=1.3205mps
+    t=46.023s  name=Shelf_0  relative_speed=1.3205mps
+    t=46.546s  name=Post_2  relative_speed=0.3275mps
+    t=46.546s  name=Shelf_0  relative_speed=0.3275mps
+    t=49.322s  name=baffle_left_2  relative_speed=1.4351mps
+    t=60.881s  name=Post_2  relative_speed=0.5483mps
+    t=60.881s  name=Shelf_0  relative_speed=0.5483mps
+    t=63.865s  name=baffle_left_2  relative_speed=1.3513mps
+    t=75.490s  name=Post_2  relative_speed=0.6018mps
+    t=75.490s  name=Shelf_0  relative_speed=0.6018mps
+    t=78.503s  name=baffle_left_2  relative_speed=1.4890mps
+    t=90.321s  name=Shelf_0  relative_speed=0.6071mps
+    t=90.322s  name=Post_2  relative_speed=0.6021mps
+    t=90.533s  name=Post_2  relative_speed=0.1306mps
+    ... 他 1 件
+
+-- 過去基準との比較 (参考情報のみ。Phase 0 は「今日の実測値」を確立する工程であり、
+   旧基準への一致は合否判定条件ではない) --
+  今回の completion_time: 平均=7.130s (最小=6.753s, 最大=7.614s, n=11)
+  参照値 (経路追従.md §19記載): 6.53s
+  注記: 経路追従.md §19 に「現行6.53 s基準」と記載されているが、この数値は docs/start_to_bingo_baseline_and_algorithm_survey.md の "Final baseline test" 表には 出現しない（同表は completion time を明示的に "no measured completion timestamp" と している）。6.53s の出典は経路追従.md本文のみであり、実測値として検証できていない。
+
+==============================================================================
