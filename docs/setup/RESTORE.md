@@ -40,8 +40,11 @@ ros2_ws/
 ```
 
 `sotoba` must come from the fork, not upstream: `lio_localization` includes
-`sotoba/icp_resource/normal_known_icp.hpp`, and the adaptive convergence test and
-point-to-point best-of-N it relies on exist only in the fork's `main`.
+`sotoba/icp_resource/normal_known_icp.hpp`, and the adaptive convergence test it relies
+on exists only in the fork's `main`. (The fork also briefly carried a best-of-N rollback
+in the separate, unused `svd_icp.hpp` point-to-point resource — added for this project,
+never actually depended on since `lio_localization` only uses `normal_known_icp.hpp`, and
+removed again on 2026-08-04 since `sotoba` has no other relation to this project.)
 
 ```bash
 git clone https://github.com/YUKICHI6105/sotoba.git src/sotoba
