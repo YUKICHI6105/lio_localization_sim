@@ -1,0 +1,61 @@
+diff --git a/ros_tcp_endpoint/server.py b/ros_tcp_endpoint/server.py
+index 5954994..884120c 100644
+--- a/ros_tcp_endpoint/server.py
++++ b/ros_tcp_endpoint/server.py
+@@ -142,14 +142,26 @@ class TcpServer(Node):
+ 
+             MultiThreadedExecutor allows us to set the number of threads
+             needed as well as the nodes that need to be spun.
++
++            NOTE (2026-08-02): this is called once at process startup, before
++            Unity has connected and registered any publishers/subscribers/
++            services, so the *_table dicts below are always empty here and
++            num_threads always came out to 1. Later topics/services ARE added
++            to this same executor dynamically as Unity registers them (see
++            server.py's on_publisher_registration/on_subscriber_registration/
++            etc. calling executor.add_node()), but a MultiThreadedExecutor's
++            thread pool size is fixed at construction -- it does not grow
++            with the node count. With ~8 topics from a single Unity sensor
++            publisher (scan/imu/clock/odom_fast/ground_truth_pose/etc.) all
++            crammed onto one worker thread, high-rate topics starved each
++            other out, backing up each publisher's outgoing queue until
++            OutgoingMessageSender.SendInternal started returning
++            QueueFullWarning ("Queue full! Messages are getting dropped!")
++            even though the actual network path and CPU load were fine.
++            Use a fixed, generously-sized pool instead of the (at this call
++            site, always-empty) live registration count.
+         """
+-        num_threads = (
+-            len(self.publishers_table.keys())
+-            + len(self.subscribers_table.keys())
+-            + len(self.ros_services_table.keys())
+-            + len(self.unity_services_table.keys())
+-            + 1
+-        )
++        num_threads = 16
+         executor = MultiThreadedExecutor(num_threads)
+ 
+         executor.add_node(self)
+diff --git a/setup.cfg b/setup.cfg
+index 1525691..3e4e25a 100644
+--- a/setup.cfg
++++ b/setup.cfg
+@@ -1,4 +1,4 @@
+ [develop]
+-script-dir=$base/lib/ros_tcp_endpoint
++script_dir=$base/lib/ros_tcp_endpoint
+ [install]
+-install-scripts=$base/lib/ros_tcp_endpoint
++install_scripts=$base/lib/ros_tcp_endpoint
+diff --git a/setup.py b/setup.py
+index 0ec66d4..be62987 100644
+--- a/setup.py
++++ b/setup.py
+@@ -20,7 +20,6 @@ setup(
+     maintainer_email="unity-robotics@unity3d.com",
+     description="ROS TCP Endpoint Unity Integration (ROS2 version)",
+     license="Apache 2.0",
+-    tests_require=["pytest"],
+     entry_points={
+         "console_scripts": [
+             "default_server_endpoint = ros_tcp_endpoint.default_server_endpoint:main"

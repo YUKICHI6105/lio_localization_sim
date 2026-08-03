@@ -146,8 +146,16 @@ Unity⇄ROS接続が「Unity側は繋がっているつもりなのにROS側に�
 これは`wsl --shutdown`(PowerShellから)でしか消えない。詳細は
 Claude Codeのメモリ`feedback_wsl_orphan_socket_unity_ros`を参照(このリポジトリの外)。
 
-### `ros_tcp_endpoint`の変更(2026-08-02、`ROS-TCP-Endpoint`リポジトリの
-`main-ros2`ブランチにコミット済み、コミット`65aaf54`)
+### `ros_tcp_endpoint`の変更(2026-08-02、パッチとして`docs/setup/patches/
+ros_tcp_endpoint_local_fixes.patch`にこのリポジトリ側で保持)
+
+`ROS-TCP-Endpoint`はUnity社の公開パッケージであり、ローカルの修正をそのリポジトリに
+`git commit`することは避ける方針とした(公開リポジトリを汚さない)。そのため以下の
+修正はパッチファイルとして本リポジトリ(`lio_localization_sim`)側に保持し、
+`ROS-TCP-Endpoint`の作業ツリーには**コミットしないまま**適用する
+(`docs/setup/RESTORE.md` §2参照、`git apply docs/setup/patches/
+ros_tcp_endpoint_local_fixes.patch`)。`ROS-TCP-Endpoint`の`git log`・`origin`との
+関係は完全にクリーンなまま(手元の作業ツリーにのみ未コミットの変更として存在)。
 
 **1. スレッドプール枯渇バグ(実挙動に影響する本質的な修正)**
 

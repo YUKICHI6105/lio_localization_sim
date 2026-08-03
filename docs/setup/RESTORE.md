@@ -51,6 +51,33 @@ cd src/sotoba && git remote add upstream https://github.com/Stew-000-1-0-011/sot
 Check out the working branches, not `master`:
 `lio_localization` → `feature/icp-covariance`, `lio_localization_sim` → `feature/eval-fidelity`.
 
+`ROS-TCP-Endpoint` is Unity's publicly published package (`main-ros2`, tracking
+`origin/main-ros2`). We do **not** commit local fixes into that repo — it stays clean and
+pushable-as-is. Instead, after cloning it, apply the local-only patch tracked in *this* repo:
+
+```bash
+cd src/ROS-TCP-Endpoint
+git apply /path/to/lio_localization_sim/docs/setup/patches/ros_tcp_endpoint_local_fixes.patch
+```
+
+This patch (kept unstaged/uncommitted in `ROS-TCP-Endpoint`'s own working tree — never
+`git commit`ed there) fixes two things needed for this environment:
+
+- `setup_executor()` sizes its `MultiThreadedExecutor` thread pool from the
+  publisher/subscriber/service tables at process-startup time, before Unity has connected and
+  registered anything, so it always came out to 1 thread. Topics registered later share that
+  same fixed-size pool (it doesn't grow), so Unity's ~8 sensor topics (scan/imu/clock/
+  odom_fast/ground_truth_pose/etc.) starved each other on one thread, producing
+  `Queue full! Messages are getting dropped!` even with idle CPU and a healthy network path.
+  Hardcoded to `num_threads = 16`.
+- `setup.cfg`'s `script-dir`/`install-scripts` keys and `setup.py`'s `tests_require` are
+  rejected by the setuptools version in this environment; the patch renames to the
+  underscore form and drops the deprecated option so the package builds at all.
+
+This is a dev-mode (`--symlink-install`) checkout, so the patched `server.py` takes effect
+immediately without rebuilding. If `ROS-TCP-Endpoint` is ever re-cloned or reset, re-apply
+the patch before running anything.
+
 ## 3. Build
 
 ```bash
