@@ -1,3 +1,9 @@
 __pycache__/
 *.pyc
 .claude/
+
+# 生rosbag2(rosbag2記録の生データ)。サイズが大きく肥大化の主因だったため
+# 2026-08-04にgit追跡から除外(履歴からも除去済み)。ローカルには残すが、
+# 完全な記録はhttps://github.com/YUKICHI6105/lio_localization_sim-archiveを参照。
+docs/stage4_runs/**/*.mcap
+docs/stage4_runs/**/*.db3
